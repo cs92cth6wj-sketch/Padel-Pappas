@@ -568,6 +568,24 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
  }
  [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input {font-size:17px!important;}
 }
+/* 5.3: Navne igen over/under hinanden, midt i hver banehalvdel. */
+.padel-team{top:5%!important;bottom:5%!important;width:42%!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:space-around!important;gap:8px!important;white-space:normal!important}
+.padel-team.blue{left:4%!important}.padel-team.red{right:4%!important}
+.padel-player{max-width:94%!important;padding:5px 7px!important;
+ font-size:clamp(12px,2.8vw,18px)!important;overflow-wrap:anywhere!important}
+/* Score: simple text input without native plus, minus or clear buttons. */
+[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input{
+ background:#14568b!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+ caret-color:#fff!important;border:1px solid #51a7fa!important;
+ text-align:center!important;font-size:22px!important;font-weight:850!important;
+ border-radius:10px!important;min-height:50px!important;width:100%!important}
+[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input::placeholder{
+ color:#d8ebff!important;-webkit-text-fill-color:#d8ebff!important;opacity:1!important}
+[class*="st-key-on_court_score_"] [data-testid="stColumn"]:nth-child(2) [data-testid="stTextInput"] input{
+ background:#842e3d!important;border-color:#f28b98!important}
+@media(max-width:550px){.padel-team{gap:6px!important}.padel-player{font-size:clamp(12px,3.3vw,15px)!important}}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -755,18 +773,26 @@ with tab_games:
             with st.container(key=f"on_court_score_{d['round']}_{i}"):
                 col1, col2 = st.columns(2, gap='small')
                 with col1:
-                    v1 = st.number_input('Blå score',min_value=0,
-                                         max_value=int(d['target']) if d['target'] else 200,
-                                         value=m['blue_score'],key=f"blue_{d['round']}_{i}",
-                                         placeholder='Score',label_visibility='collapsed')
+                    raw_blue = st.text_input('Blå score',
+                        value='' if m['blue_score'] is None else str(m['blue_score']),
+                        key=f"blue_{d['round']}_{i}", placeholder='Score',
+                        label_visibility='collapsed', max_chars=3)
+                    max_blue = int(d['target']) if d['target'] else 200
+                    v1 = int(raw_blue) if raw_blue.isascii() and raw_blue.isdecimal() and int(raw_blue) <= max_blue else None
+                    if raw_blue and v1 is None:
+                        st.caption(f'Indtast et helt tal fra 0 til {max_blue}.')
                 with col2:
                     if d['target']:
                         v2 = None if v1 is None else int(d['target']) - int(v1)
                         st.markdown(f'<div class="padel-auto-score">{"– <small>automatisk</small>" if v2 is None else str(v2)}</div>',unsafe_allow_html=True)
                     else:
-                        v2 = st.number_input('Rød score',min_value=0,max_value=200,
-                                             value=m['red_score'],key=f"red_{d['round']}_{i}",
-                                             placeholder='Score',label_visibility='collapsed')
+                        raw_red = st.text_input('Rød score',
+                            value='' if m['red_score'] is None else str(m['red_score']),
+                            key=f"red_{d['round']}_{i}", placeholder='Score',
+                            label_visibility='collapsed', max_chars=3)
+                        v2 = int(raw_red) if raw_red.isascii() and raw_red.isdecimal() and int(raw_red) <= 200 else None
+                        if raw_red and v2 is None:
+                            st.caption('Indtast et helt tal fra 0 til 200.')
             st.markdown('<div class="padel-score-foot">Blå score indtastes · Rød beregnes automatisk ved fast pointantal</div>',unsafe_allow_html=True)
             resultater.append((v1, v2))
             if d.get('partner_mode') == 'Fast makker':
