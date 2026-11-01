@@ -101,6 +101,43 @@ h1,h2,h3{color:#f0f8f7!important;letter-spacing:-.04em}
 .podium-rank{font-size:25px}.podium-name{font-weight:800;font-size:14px;overflow-wrap:anywhere}.podium-score{font-size:23px;font-weight:900;color:#fff}.podium-label{font-size:11px;color:#b6cfca}
 .small-note{font-size:12px;color:#9fbab8}
 @media(max-width:500px){.block-container{padding-left:13px;padding-right:13px}.court{min-height:170px}.court-card{padding:10px}.stTabs [data-baseweb="tab"]{padding:9px 6px;font-size:13px}}
+
+/* Padel Pappas 3.1 — forbedret kontrast for mobil og desktop */
+.stTabs [data-baseweb="tab-list"] {background:#142b30!important;gap:6px!important;}
+.stTabs button[data-baseweb="tab"] {
+  color:#EAF4F5!important;opacity:1!important;
+  font-weight:750!important;font-size:16px!important;
+  text-shadow:none!important;
+}
+.stTabs button[data-baseweb="tab"] p,
+.stTabs button[data-baseweb="tab"] span {
+  color:inherit!important;opacity:1!important;font-weight:inherit!important;
+}
+.stTabs button[data-baseweb="tab"][aria-selected="true"] {
+  background:#146C60!important;color:#FFFFFF!important;
+  border-radius:10px 10px 0 0!important;
+}
+.stTabs button[data-baseweb="tab"][aria-selected="false"] {
+  color:#E5F0F1!important;background:#1A343A!important;
+}
+.stTabs [data-baseweb="tab-highlight"] {background:#49E5C4!important;}
+section[data-testid="stSidebar"] {color:#F4FAFA!important;}
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] label p,
+section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p,
+section[data-testid="stSidebar"] .stMarkdown p {
+  color:#F0F7F7!important;opacity:1!important;
+}
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p {color:#C8DEDF!important;opacity:1!important;}
+[data-testid="stAlert"] p {color:#F3F9FA!important;opacity:1!important;}
+[data-testid="stAlert"] {border-color:#4C8E9A!important;}
+@media(max-width:500px){
+  .stTabs button[data-baseweb="tab"]{font-size:14px!important;padding:10px 8px!important;}
+  .stTabs [data-baseweb="tab-list"]{gap:3px!important;}
+}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
