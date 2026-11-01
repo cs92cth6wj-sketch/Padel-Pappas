@@ -854,6 +854,33 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
  }
 }
 
+
+/* 7.4: React-Aria / Streamlit tabs: remove the native accent indicator.
+   The active card's turquoise border remains the only selection indicator. */
+.stApp [data-testid="stTabs"] [role="tablist"],
+.stApp [data-testid="stTabs"] [data-baseweb="tab-list"] {
+  position:relative!important; border-bottom:0!important;
+  box-shadow:none!important; background-image:none!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] > [data-baseweb="tab-highlight"],
+.stApp [data-testid="stTabs"] [data-baseweb="tab-highlight"],
+.stApp [data-testid="stTabs"] [data-baseweb="tab-border"],
+.stApp [data-testid="stTabs"] [role="tablist"] [class*="highlight"],
+.stApp [data-testid="stTabs"] [role="tablist"] [class*="indicator"],
+.stApp [data-testid="stTabs"] [role="tablist"] [class*="Indicator"] {
+  display:none!important; opacity:0!important; visibility:hidden!important;
+  height:0!important; border:0!important; box-shadow:none!important;
+}
+/* Opaque masking strip below the cards also covers Streamlit's animated
+   underline when a future release changes the indicator element again. */
+.stApp [data-testid="stTabs"] [role="tablist"]::after,
+.stApp [data-testid="stTabs"] [data-baseweb="tab-list"]::after {
+  content:""!important; display:block!important; position:absolute!important;
+  bottom:-8px!important; left:0!important; right:0!important; height:9px!important;
+  background:#090d12!important; border:0!important; border-radius:0!important;
+  pointer-events:none!important; z-index:50!important;
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
