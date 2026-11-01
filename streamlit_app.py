@@ -655,6 +655,18 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 @media(max-width:550px){
  .padel-auto-score{height:50px!important;min-height:50px!important}
 }
+
+/* Version 6.0 — neutral sort baggrund. Baner og knapper bevarer holdfarverne. */
+html, body, .stApp, [data-testid="stAppViewContainer"],
+[data-testid="stMain"], [data-testid="stMainBlockContainer"] {
+  background: #08090c !important;
+  background-image: none !important;
+}
+[data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+  background: #111318 !important;
+  background-image: none !important;
+}
+.stApp { color: #f4f7f8 !important; }
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
