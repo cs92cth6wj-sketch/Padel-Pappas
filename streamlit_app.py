@@ -2,6 +2,7 @@
 import html
 import json
 import secrets
+import random
 import re
 import requests
 import streamlit as st
@@ -815,6 +816,45 @@ with tab_games:
         if st.button('Start turnering',type='primary',use_container_width=True):
             new_round(d);save();st.rerun()
     else:
+        # Første runde kan fordeles på ny, inden noget resultat er gemt.
+        # Gemte scorer og efterfølgende runder er altid beskyttet.
+        can_reshuffle = (d['round'] == 1 and not d['history'] and
+                         all(m.get('blue_score') is None and m.get('red_score') is None
+                             for m in d['matches']))
+        if can_reshuffle:
+            st.caption('Ikke tilfreds med fordelingen? Bland første runde igen, inden du gemmer resultater.')
+            if st.button('🔀 Bland hold igen', use_container_width=True,
+                         key=f"reshuffle_first_{st.session_state.tid}"):
+                previous_lineups = [
+                    (tuple(sorted(m['blue'])), tuple(sorted(m['red'])))
+                    for m in d['matches']
+                ]
+                # Prøv forskellige fordelinger, så knappen normalt giver en reel ændring.
+                for _ in range(10):
+                    if d.get('partner_mode') == 'Fast makker':
+                        pairs = [d['players'][k:k+2] for k in range(0,len(d['players']),2)]
+                        rng = random.Random(secrets.randbits(64))
+                        rng.shuffle(pairs)
+                        generated, byes = make_fixed_pairs_round(
+                            pairs, d['format'], [], round_number=0)
+                    else:
+                        order = list(d['players'])
+                        rng = random.Random(secrets.randbits(64))
+                        rng.shuffle(order)
+                        generated, byes = make_round(
+                            order, d['format'], [], seed=secrets.randbits(64))
+                    new_lineups = [
+                        (tuple(sorted(m['blue'])), tuple(sorted(m['red'])))
+                        for m in generated
+                    ]
+                    if new_lineups != previous_lineups:
+                        break
+                d['matches'] = generated
+                d['byes'] = byes
+                # Rundenummer, turnerings-ID og tidligere data ændres ikke.
+                save()
+                st.rerun()
+            st.caption('Bemærk: Eventuelle indtastede, men ikke gemte scores går tabt ved ny blanding.')
         if d['byes']:
             st.info('Sidder over denne runde: '+', '.join(d['byes']))
         # Indtast alle kampresultater først. Hele runden gemmes i ét databasekald.
