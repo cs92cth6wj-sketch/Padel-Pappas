@@ -662,7 +662,7 @@ st.markdown(STYLE, unsafe_allow_html=True)
 
 def fresh():
     return {'title':'Søndagspadel','players':[],'format':'Mexicano','round_limit':7,'target':32,
-            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker','finale':None}
+            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker','ranking_priority':'Point først','finale':None}
 
 
 def save():
@@ -682,9 +682,16 @@ def all_matches(data):
     return [m for rd in data['history'] for m in rd['matches']] + data['matches']
 
 
+def standings(data):
+    """Calculate all results normally, but apply the tournament's tie-break order."""
+    rows = table(data['players'], all_matches(data))
+    if data.get('ranking_priority', 'Point først') == 'Sejre først':
+        return sorted(rows, key=lambda r: (-r['wins'], -r['points'], -r['diff'], r['name'].casefold()))
+    return sorted(rows, key=lambda r: (-r['points'], -r['wins'], -r['diff'], r['name'].casefold()))
+
+
 def sorted_players(data):
-    t=table(data['players'],all_matches(data))
-    return [r['name'] for r in t]
+    return [r['name'] for r in standings(data)]
 
 
 def new_round(data):
@@ -781,6 +788,9 @@ if st.session_state.get('tid'):
                                   help='Fast makker: Skriv partnerne to og to i spillerlisten (linje 1+2, 3+4 osv.).')
             if partner_mode == 'Fast makker':
                 st.caption('Faste par: 1. og 2. navn er et par; 3. og 4. navn er næste par osv. Parrene bliver sammen i alle runder.')
+            ranking_priority=st.radio('Hvad afgør placeringen?', ['Point først', 'Sejre først'],
+                                      index=1 if d.get('ranking_priority')=='Sejre først' else 0,
+                                      help='Point først: flest scorede point, derefter flest sejre og pointforskel. Sejre først: flest vundne kampe, derefter scorede point og pointforskel.')
             rounds=st.number_input('Maksimalt antal runder',min_value=1,max_value=40,value=int(d['round_limit']))
             target=st.number_input('Point pr. kamp (0 = frit)',min_value=0,max_value=100,value=int(d['target']))
             submitted=st.form_submit_button('Gem opsætning',type='primary',use_container_width=True)
@@ -793,7 +803,7 @@ if st.session_state.get('tid'):
             elif d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode','Skiftende makker')):
                 st.error('En startet turnering kan ikke ændre spillere eller turneringsform. Nulstil først.')
             else:
-                d.update(title=title,players=players,format=fmt,partner_mode=partner_mode,round_limit=int(rounds),target=int(target))
+                d.update(title=title,players=players,format=fmt,partner_mode=partner_mode,ranking_priority=ranking_priority,round_limit=int(rounds),target=int(target))
                 save();st.success('Opsætning gemt')
         st.divider()
         if st.button('Nulstil turnering',use_container_width=True):
@@ -961,7 +971,7 @@ with tab_games:
             st.subheader('🏆 Finale')
             finale = d.get('finale')
             if finale is None:
-                ranking = table(d['players'], all_matches(d))
+                ranking = standings(d)
                 if len(ranking) >= 4:
                     top4 = [r['name'] for r in ranking[:4]]
                     st.caption('De fire bedst placerede i grundspillet kvalificerer sig. Nr. 1 + 3 møder nr. 2 + 4. Finalens resultat ændrer ikke grundspillets stilling.')
@@ -1003,7 +1013,8 @@ with tab_games:
 
 with tab_table:
     st.subheader('🏆 Aktuel stilling')
-    rows=table(d['players'],all_matches(d))
+    st.caption(f"Sortering: {d.get('ranking_priority', 'Point først')} · derefter {'scorede point' if d.get('ranking_priority') == 'Sejre først' else 'sejre'}, pointforskel og navn")
+    rows=standings(d)
     if not rows:
         st.info('Tilføj spillere for at se stillingen.')
     else:
