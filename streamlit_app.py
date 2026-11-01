@@ -212,6 +212,64 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
   outline-color:#18B69E!important;
 }
 
+
+/* Version 3.4: faner og rediger-hold. Hold alle tilstande læsbare på mobil. */
+.stApp div[data-baseweb="tab-list"] [data-baseweb="tab"],
+.stApp div[data-baseweb="tab-list"] [role="tab"],
+.stApp .stTabs [data-baseweb="tab"] {
+  color:#F4FAFA!important;
+  -webkit-text-fill-color:#F4FAFA!important;
+  background:#214248!important;
+  opacity:1!important;
+  filter:none!important;
+  font-weight:750!important;
+  text-shadow:none!important;
+}
+.stApp div[data-baseweb="tab-list"] [data-baseweb="tab"] *,
+.stApp div[data-baseweb="tab-list"] [role="tab"] *,
+.stApp .stTabs [data-baseweb="tab"] * {
+  color:#F4FAFA!important;
+  -webkit-text-fill-color:#F4FAFA!important;
+  opacity:1!important;
+  filter:none!important;
+  font-weight:750!important;
+}
+.stApp div[data-baseweb="tab-list"] [aria-selected="true"],
+.stApp .stTabs [aria-selected="true"] {
+  background:#0C7869!important;
+  color:white!important;
+  -webkit-text-fill-color:white!important;
+}
+.stApp div[data-baseweb="tab-list"] [aria-selected="true"] *,
+.stApp .stTabs [aria-selected="true"] * {
+  color:white!important;
+  -webkit-text-fill-color:white!important;
+}
+/* Popover-knappen "Rediger hold" må aldrig blive hvid med hvid skrift. */
+.stApp [data-testid="stPopover"] > button,
+.stApp [data-testid="stPopover"] button,
+.stApp [data-testid="stPopoverButton"] button,
+.stApp button[kind="secondary"] {
+  background:#24434A!important;
+  border:1px solid #62878E!important;
+  color:#F8FCFD!important;
+  -webkit-text-fill-color:#F8FCFD!important;
+  opacity:1!important;
+}
+.stApp [data-testid="stPopover"] button *,
+.stApp [data-testid="stPopoverButton"] button *,
+.stApp button[kind="secondary"] * {
+  color:#F8FCFD!important;
+  -webkit-text-fill-color:#F8FCFD!important;
+  opacity:1!important;
+}
+.stApp [data-testid="stPopover"] button:hover,
+.stApp button[kind="secondary"]:hover {background:#31585F!important;border-color:#7DDACA!important;}
+.stApp [data-testid="stPopover"] button:disabled,
+.stApp button[kind="secondary"]:disabled {opacity:.58!important;}
+@media (max-width:600px) {
+  .stApp div[data-baseweb="tab-list"] [data-baseweb="tab"] {padding:10px 8px!important;font-size:14px!important;}
+}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
