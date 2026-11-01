@@ -438,16 +438,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button * {
  color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;opacity:1!important;
 }
-/* Redundant selectors intentionally cover Streamlit tab markup versions. */
-.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"]:not([aria-selected="true"]),
-.stApp [data-baseweb="tab-list"] [role="tab"]:not([aria-selected="true"]) {
- background:#E7F1F0!important;color:#142C30!important;-webkit-text-fill-color:#142C30!important;
- opacity:1!important;border-radius:9px!important;
-}
-.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"]:not([aria-selected="true"]) *,
-.stApp [data-baseweb="tab-list"] [role="tab"]:not([aria-selected="true"]) * {
- color:#142C30!important;-webkit-text-fill-color:#142C30!important;opacity:1!important;
-}
+/* Legacy light inactive tabs removed in 6.2. */
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
 .stApp [data-baseweb="tab-list"] [role="tab"][aria-selected="true"] {
  background:#097D6D!important;color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
@@ -696,6 +687,28 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
 }
 .stApp [data-testid="stTabs"] [data-baseweb="tab-list"] {
   background:transparent!important;
+}
+
+
+/* 6.2: Use the same green styling for every tab state, regardless of BaseWeb markup. */
+.stApp div[data-testid="stTabs"] div[role="tablist"] button[role="tab"]:not([aria-selected="true"]),
+.stApp div[data-testid="stTabs"] div[data-baseweb="tab-list"] button[data-baseweb="tab"]:not([aria-selected="true"]),
+.stApp div[data-baseweb="tab-list"] button[role="tab"][aria-selected="false"],
+.stApp div[data-baseweb="tab-list"] button[data-baseweb="tab"][aria-selected="false"] {
+  background-color:#176458!important;background-image:none!important;
+  border:1px solid #38a899!important;color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;opacity:1!important;
+}
+.stApp div[data-testid="stTabs"] div[role="tablist"] button[role="tab"]:not([aria-selected="true"]) *,
+.stApp div[data-testid="stTabs"] div[data-baseweb="tab-list"] button[data-baseweb="tab"]:not([aria-selected="true"]) *,
+.stApp div[data-baseweb="tab-list"] button[role="tab"][aria-selected="false"] *,
+.stApp div[data-baseweb="tab-list"] button[data-baseweb="tab"][aria-selected="false"] * {
+  color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;opacity:1!important;
+}
+.stApp div[data-testid="stTabs"] button[role="tab"][aria-selected="true"],
+.stApp div[data-baseweb="tab-list"] button[data-baseweb="tab"][aria-selected="true"] {
+  background-color:#0b9b83!important;color:#ffffff!important;
+  border-color:#65e6ce!important;
 }
 
 </style>
