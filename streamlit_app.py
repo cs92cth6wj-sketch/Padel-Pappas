@@ -5,11 +5,7 @@ import secrets
 import re
 import requests
 import streamlit as st
-import streamlit.components.v1 as components
-from pathlib import Path
 from engine import make_round, make_fixed_pairs_round, table
-
-court_input = components.declare_component('padel_court_input', path=str(Path(__file__).parent / 'padel_court_component'))
 
 st.set_page_config(page_title='Padel Samlet', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
 # Server-side Supabase credentials are read only from Streamlit Secrets.
@@ -437,14 +433,14 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .padel-real-top{display:flex;align-items:center;justify-content:space-between;color:#e8ffff;margin:0 2px 10px;gap:10px}
 .padel-real-top .court-pill{white-space:nowrap}
 .padel-real{width:100%;aspect-ratio:2/1;min-height:160px;max-height:245px;margin:0 auto;position:relative;border:5px solid #688e92;border-radius:9px;background:linear-gradient(to right,#14568b 0%,#174572 49.7%,#762b34 50.3%,#92303e 100%);box-shadow:inset 0 0 25px #09131c99,0 8px 22px #0005;overflow:hidden;isolation:isolate}
-/* Net x=50%. Servelinjerne er 6,95 m fra nettet: x=15,25% og 84,75% på en 20 m bane. */
+/* Net i midten, servelinjer 6,95 m fra nettet (34,75/65,25% af længden). */
 .padel-real:before{content:'';position:absolute;inset:6px;border:2px solid rgba(238,253,255,.7);z-index:1;pointer-events:none}
 .padel-real:after{content:'';position:absolute;top:0;bottom:0;left:50%;width:5px;transform:translateX(-50%);background:repeating-linear-gradient(to bottom,#e5f5f5 0 4px,#56727b 4px 7px);border-inline:1px solid #f9ffff;z-index:3;pointer-events:none;box-shadow:0 0 6px #0009}
 .padel-service{position:absolute;top:6px;bottom:6px;border-left:2px solid #eef8ffcf;z-index:2;pointer-events:none}
-.padel-service.top{left:15.25%}.padel-service.bottom{left:84.75%}
+.padel-service.top{left:34.75%}.padel-service.bottom{left:65.25%}
 .padel-center-upper,.padel-center-lower{position:absolute;top:50%;height:2px;transform:translateY(-50%);background:#f2fbffcf;z-index:2;pointer-events:none}
-.padel-center-upper{left:15.25%;width:34.75%}.padel-center-lower{left:50%;width:34.75%}
-/* Navne tæt ved bagvægge; scorefelter i separat bånd under banen. */
+.padel-center-upper{left:34.75%;width:15.25%}.padel-center-lower{left:50%;width:15.25%}
+/* Navne tæt ved bagvægge; scorefelter i midten på hver sin halvdel. */
 .padel-team{position:absolute;top:8%;bottom:8%;width:30%;display:flex;align-items:center;justify-content:space-between;flex-direction:column;gap:6px;z-index:4;color:#fff;font-weight:750;text-align:center;font-size:clamp(10px,2.7vw,16px)}
 .padel-team.blue{left:2%}.padel-team.red{right:2%}
 .padel-player{background:#071a2add;border-radius:7px;max-width:100%;padding:4px 5px;overflow-wrap:anywhere;text-shadow:0 1px 3px #000;line-height:1.15}
@@ -468,140 +464,6 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
  [class*="st-key-on_court_score_"]{padding:5px!important}
  [class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"]{gap:5px!important}
  [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{font-size:17px!important}
-}
-
-/* VERSION 5.0: tydelige centrerede spillere og holdfarvede scorefelter.
-   CSS er lagt sidst for at overstyre de ældre farver. */
-.padel-team{
-  top:3%!important;bottom:3%!important;width:45%!important;
-  display:flex!important;flex-direction:row!important;gap:6px!important;white-space:nowrap!important;
-  justify-content:space-evenly!important;align-items:center!important;
-  gap:7px!important;text-align:center!important;
-  font-size:clamp(14px,2.8vw,19px)!important;
-  font-weight:850!important;
-}
-.padel-team.blue{left:2.5%!important}
-.padel-team.red{right:2.5%!important}
-.padel-player{
-  display:block!important;max-width:96%!important;
-  border-radius:9px!important;padding:6px 8px!important;
-  line-height:1.18!important;color:#fff!important;
-  text-shadow:0 1px 3px #000!important;
-  overflow-wrap:anywhere!important;
-}
-/* Blå score: både selve tallet, inputrammen og plus/minus skal passe til den blå halvdel. */
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input,
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] [data-baseweb="input"],
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] [data-baseweb="base-input"]{
-  background:#14568b!important;color:#fff!important;
-  -webkit-text-fill-color:#fff!important;
-  border-color:#4aaefa!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input{
-  font-size:22px!important;font-weight:900!important;
-  text-align:center!important;caret-color:#fff!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input::placeholder{
-  color:#e7f5ff!important;-webkit-text-fill-color:#e7f5ff!important;opacity:1!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] button{
-  background:#14568b!important;color:#fff!important;border-color:#4aaefa!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] button *{
-  color:#fff!important;stroke:#fff!important;fill:none!important;
-}
-/* Rød score beregnes automatisk ved fast pointantal. */
-.padel-auto-score{
-  background:#842e3d!important;color:#fff!important;
-  border:2px solid #f28b98!important;border-radius:10px!important;
-  font-size:22px!important;font-weight:900!important;min-height:52px!important;
-  display:flex!important;flex-direction:row!important;gap:6px!important;white-space:nowrap!important;
-  justify-content:center!important;align-items:center!important;
-  padding:6px 4px!important;
-}
-.padel-auto-score small{display:inline!important;color:#fff!important;font-size:12px!important;font-weight:650!important;opacity:.92!important}
-/* Ved frit pointformat er det andet input rødt. */
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] input,
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] [data-baseweb="input"],
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] [data-baseweb="base-input"]{
-  background:#842e3d!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
-  border-color:#f28b98!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] button{
-  background:#842e3d!important;color:#fff!important;border-color:#f28b98!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] button *{stroke:#fff!important;color:#fff!important;fill:none!important}
-@media(max-width:550px){
- .padel-team{font-size:clamp(13px,3.5vw,16px)!important;gap:4px!important}
- .padel-player{padding:5px 6px!important}
- [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{font-size:19px!important}
- .padel-auto-score{font-size:19px!important;min-height:48px!important}
-}
-
-/* 5.2: stabilt layout af score-felt, X og plus/minus i to kolonner.
-   Slå native clear-kryds fra, og giv spin-knapperne deres naturlige plads. */
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] {
-  width:100%!important;min-width:0!important;overflow:visible!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="input"],
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="base-input"] {
-  width:100%!important;min-width:0!important;display:flex!important;
-  align-items:stretch!important;overflow:hidden!important;border-radius:10px!important;
-  box-sizing:border-box!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input {
-  width:100%!important;min-width:0!important;flex:1 1 0!important;
-  padding:6px 2px!important;text-overflow:clip!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] button {
-  flex:0 0 32px!important;width:32px!important;min-width:32px!important;
-  height:auto!important;min-height:48px!important;padding:0!important;
-  border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="clear-icon"],
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [aria-label="Clear"],
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [aria-label="Clear input"] {
-  display:none!important;
-}
-[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] svg {
-  width:16px!important;height:16px!important;stroke-width:2.5!important;
-}
-@media(max-width:550px){
- [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] button {
-   flex-basis:26px!important;width:26px!important;min-width:26px!important;min-height:46px!important;
- }
- [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input {font-size:17px!important;}
-}
-/* 5.3: Navne igen over/under hinanden, midt i hver banehalvdel. */
-.padel-team{top:5%!important;bottom:5%!important;width:42%!important;
- display:flex!important;flex-direction:column!important;align-items:center!important;
- justify-content:space-around!important;gap:8px!important;white-space:normal!important}
-.padel-team.blue{left:4%!important}.padel-team.red{right:4%!important}
-.padel-player{max-width:94%!important;padding:5px 7px!important;
- font-size:clamp(12px,2.8vw,18px)!important;overflow-wrap:anywhere!important}
-/* Score: simple text input without native plus, minus or clear buttons. */
-[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input{
- background:#14568b!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
- caret-color:#fff!important;border:1px solid #51a7fa!important;
- text-align:center!important;font-size:22px!important;font-weight:850!important;
- border-radius:10px!important;min-height:50px!important;width:100%!important}
-[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input::placeholder{
- color:#d8ebff!important;-webkit-text-fill-color:#d8ebff!important;opacity:1!important}
-[class*="st-key-on_court_score_"] [data-testid="stColumn"]:nth-child(2) [data-testid="stTextInput"] input{
- background:#842e3d!important;border-color:#f28b98!important}
-@media(max-width:550px){.padel-team{gap:6px!important}.padel-player{font-size:clamp(12px,3.3vw,15px)!important}}
-/* 5.4: blue and red score controls have exactly the same external height. */
-[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input{
-  box-sizing:border-box!important;height:50px!important;min-height:50px!important;
-  padding:0 8px!important;line-height:50px!important;
-}
-.padel-auto-score{
-  box-sizing:border-box!important;height:50px!important;min-height:50px!important;
-  padding:0 8px!important;margin:0!important;
-  line-height:1!important;width:100%!important;
-}
-@media(max-width:550px){
- .padel-auto-score{height:50px!important;min-height:50px!important}
 }
 </style>
 '''
@@ -769,32 +631,40 @@ with tab_games:
         # Indtast alle kampresultater først. Hele runden gemmes i ét databasekald.
         resultater = []
         for i, m in enumerate(d['matches']):
-            # Stable frontend component keeps both inputs ON the court.
-            # The browser sends changes back to Python; "Gem runde" still saves
-            # all results together through the existing Supabase logic.
-            current_key = f"court_{st.session_state.tid}_{d['round']}_{i}_{'_'.join(m['blue'] + m['red'])}"
-            component_scores = court_input(
-                court=m['court'], round=d['round'],
-                blue_players=m['blue'], red_players=m['red'],
-                target=int(d['target']),
-                blue_score=m['blue_score'], red_score=m['red_score'],
-                default={'blue': m['blue_score'], 'red': m['red_score']},
-                key=current_key,
-            )
-            component_scores = component_scores if isinstance(component_scores, dict) else {}
-            def safe_score(value, upper):
-                if type(value) is int and 0 <= value <= upper:
-                    return value
-                return None
-            v1 = safe_score(component_scores.get('blue'), int(d['target']) if d['target'] else 200)
-            if d['target']:
-                v2 = int(d['target']) - v1 if v1 is not None else None
-            else:
-                v2 = safe_score(component_scores.get('red'), 200)
-            if component_scores.get('blue') is not None and v1 is None:
-                st.warning(f"Bane {m['court']}: Blå score er ugyldig.")
-            if not d['target'] and component_scores.get('red') is not None and v2 is None:
-                st.warning(f"Bane {m['court']}: Rød score er ugyldig.")
+            a = [html.escape(name) for name in m['blue']]
+            b = [html.escape(name) for name in m['red']]
+            # Vandret bane: hver servelinje ligger 6,95 m fra nettet.
+            # Skiftede makkere og resultatlogik påvirkes ikke af layoutet.
+            court = f'''<div class="padel-real-card">
+              <div class="padel-real-top"><span class="court-pill">Bane {m['court']}</span><span>Runde {d['round']}</span></div>
+              <div class="padel-real">
+                <div class="padel-service top"></div><div class="padel-service bottom"></div>
+                <div class="padel-center-upper"></div><div class="padel-center-lower"></div>
+                <div class="padel-team blue"><span class="padel-player">{a[0]}</span><span class="padel-player">{a[1]}</span></div>
+                <div class="padel-team red"><span class="padel-player">{b[0]}</span><span class="padel-player">{b[1]}</span></div>
+                <div class="padel-net-badge">VS</div>
+              </div></div>'''
+            st.markdown(court, unsafe_allow_html=True)
+            # Score controls are kept in a fixed two-column score strip right beneath the
+            # corresponding coloured half. Avoid positioning native widgets over the graphic:
+            # Streamlit's responsive layout otherwise obscures names on phones.
+            st.markdown('<div class="padel-score-strip-header"><span class="blue">Blåt hold · score</span><span class="red">Rødt hold · score</span></div>',unsafe_allow_html=True)
+            with st.container(key=f"on_court_score_{d['round']}_{i}"):
+                col1, col2 = st.columns(2, gap='small')
+                with col1:
+                    v1 = st.number_input('Blå score',min_value=0,
+                                         max_value=int(d['target']) if d['target'] else 200,
+                                         value=m['blue_score'],key=f"blue_{d['round']}_{i}",
+                                         placeholder='Score',label_visibility='collapsed')
+                with col2:
+                    if d['target']:
+                        v2 = None if v1 is None else int(d['target']) - int(v1)
+                        st.markdown(f'<div class="padel-auto-score">{"–" if v2 is None else v2}<small>automatisk</small></div>',unsafe_allow_html=True)
+                    else:
+                        v2 = st.number_input('Rød score',min_value=0,max_value=200,
+                                             value=m['red_score'],key=f"red_{d['round']}_{i}",
+                                             placeholder='Score',label_visibility='collapsed')
+            st.markdown('<div class="padel-score-foot">Blå score indtastes · Rød beregnes automatisk ved fast pointantal</div>',unsafe_allow_html=True)
             resultater.append((v1, v2))
             if d.get('partner_mode') == 'Fast makker':
                 st.caption('Faste makkerpar: Holdene kan ikke byttes enkeltvis under turneringen.')
