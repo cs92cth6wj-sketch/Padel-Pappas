@@ -5,9 +5,64 @@ import secrets
 import re
 import requests
 import streamlit as st
+import streamlit.components.v1 as components
+from pathlib import Path
+import base64
+import zlib
+import tempfile
 from engine import make_round, make_fixed_pairs_round, table
 
+# Den interaktive banes HTML er indbygget i denne fil.
+# Streamlit kan derfor indlaese den uden ekstra mapper i GitHub.
+_COURT_HTML_ZLIB_BASE64 = (
+    'eNqtWf1u48YR/19PwZPro5SQNEl9WCJNX3tBil6RuwBxG7QI0mLJXUp7xw+VXNpWZAF9hz5D36H/5036JJ3ZJSlSls5pURiQyN3Z'
+    '+Z7fzMo3r2geie2GaWuRJreDG/zSEpKtgiElw9ubNSP09iZlgmjRmhQlE8GwErG5GNarGUlZMLzn7GGTF2KoRXkmWAZUD5yKdUDZ'
+    'PY+YKV8MnnHBSWKWEUlY4Fj28ApElmKbsNvBF7swfzRL/hPPVl6YF5QVJqzsUSMjzOl2l5JixTPP9kMSfVoVeZVRTxQkKzekAJF+'
+    'DKLNmKQ82XrlthQsNStumGSzSZipFow7tsqZ9sd3RgnnzJIVPPajPMkL72HNBdtLQfk9K+Ikf/DWnFKW7QdWuWZJsuvITXjGSGGu'
+    'CkI5yB450xllK+PCuZ5cTxh82+7MpWNfGeI5m0etzBNOtYvp9TVd2PWGieer0nMWm0d/QyhF4x0XqNXHbPMI0kW+2VFebhKy9eKE'
+    'Pfofq1LweGvWzvbAA+DkkIkHxjKfJHyVmWBNWnoRbLOiZW1rDW/lLXA385wpvConXLBlHMYRyNxwNPiZ9jN3ES5Yy++64dY3Z2JL'
+    'vaO8KsRuk5cQ9jzzCpYQwe+ZT8oNiwQQw7LnXjl+yjNzzfhqLTxnCWf9lDw2CxMHF2QCeY5tXzYunR2UmrOls5wfuxTVOoqk/5kI'
+    'Lm0VwPksXDqafQmPyym5Jtp0aV3D2/XSjSYLbWZbE3hbzibuJNZQoXFjqReyOC/YromKrvut7SQEXSvBfJ5BDXmL1mWee7AjjuMl'
+    'HOEYMpPdA4/Sy/KMgYCMdRzZMktYLLwZ+AQyBOsiFyJP4UFWBeiSqvoAt7M/jUwgHNeOnKH8gy8KtmEQjGxlHntF5JrialzES9Av'
+    '1mwN0sW4mC8W9mKJzxokwdj/yeQZZY+ei9XCCqz6Ewqjnsp2qemijazbV+iCzeN5HNKo5esc+Fpo9k7a7swsd3a5b3cKTBm1tZha'
+    '17A1sFJO0aoz2qD36kz7RTrU3J7pUNsxUVJbso5CKKlHNLDuy5eCKr+fR1MG01ARbbSb95QHAIom7okkmzmURdPjYrEPRTaZw2NT'
+    'fPjcQM+q4NSHJ4CaHrh0kKQFlgd1fmHbiF+MpOeS4bLNhcY70+ml30M7/DApLwAz8DwgVZWeRLnPw2Ljp+mZEkMtrTCpmArXBKIo'
+    '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'
+    'A0DirzMOHOiqi/dRNW/fXKmb6JX6N99/AF+49fQ='
+)
+_court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
+_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v56'
+_component_dir.mkdir(parents=True, exist_ok=True)
+_component_file = _component_dir / 'index.html'
+if not _component_file.exists() or _component_file.read_bytes() != _court_html:
+    _component_file.write_bytes(_court_html)
 st.set_page_config(page_title='Padel Samlet', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
+
+court_input = components.declare_component('padel_court_input_v56', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
 DB_URL = str(st.secrets.get('SUPABASE_URL', '')).rstrip('/')
 DB_KEY = str(st.secrets.get('SUPABASE_SECRET_KEY', ''))
@@ -465,6 +520,140 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
  [class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"]{gap:5px!important}
  [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{font-size:17px!important}
 }
+
+/* VERSION 5.0: tydelige centrerede spillere og holdfarvede scorefelter.
+   CSS er lagt sidst for at overstyre de ældre farver. */
+.padel-team{
+  top:3%!important;bottom:3%!important;width:45%!important;
+  display:flex!important;flex-direction:row!important;gap:6px!important;white-space:nowrap!important;
+  justify-content:space-evenly!important;align-items:center!important;
+  gap:7px!important;text-align:center!important;
+  font-size:clamp(14px,2.8vw,19px)!important;
+  font-weight:850!important;
+}
+.padel-team.blue{left:2.5%!important}
+.padel-team.red{right:2.5%!important}
+.padel-player{
+  display:block!important;max-width:96%!important;
+  border-radius:9px!important;padding:6px 8px!important;
+  line-height:1.18!important;color:#fff!important;
+  text-shadow:0 1px 3px #000!important;
+  overflow-wrap:anywhere!important;
+}
+/* Blå score: både selve tallet, inputrammen og plus/minus skal passe til den blå halvdel. */
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input,
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] [data-baseweb="input"],
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] [data-baseweb="base-input"]{
+  background:#14568b!important;color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border-color:#4aaefa!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input{
+  font-size:22px!important;font-weight:900!important;
+  text-align:center!important;caret-color:#fff!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input::placeholder{
+  color:#e7f5ff!important;-webkit-text-fill-color:#e7f5ff!important;opacity:1!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] button{
+  background:#14568b!important;color:#fff!important;border-color:#4aaefa!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] button *{
+  color:#fff!important;stroke:#fff!important;fill:none!important;
+}
+/* Rød score beregnes automatisk ved fast pointantal. */
+.padel-auto-score{
+  background:#842e3d!important;color:#fff!important;
+  border:2px solid #f28b98!important;border-radius:10px!important;
+  font-size:22px!important;font-weight:900!important;min-height:52px!important;
+  display:flex!important;flex-direction:row!important;gap:6px!important;white-space:nowrap!important;
+  justify-content:center!important;align-items:center!important;
+  padding:6px 4px!important;
+}
+.padel-auto-score small{display:inline!important;color:#fff!important;font-size:12px!important;font-weight:650!important;opacity:.92!important}
+/* Ved frit pointformat er det andet input rødt. */
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] input,
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] [data-baseweb="input"],
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] [data-baseweb="base-input"]{
+  background:#842e3d!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+  border-color:#f28b98!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] button{
+  background:#842e3d!important;color:#fff!important;border-color:#f28b98!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] button *{stroke:#fff!important;color:#fff!important;fill:none!important}
+@media(max-width:550px){
+ .padel-team{font-size:clamp(13px,3.5vw,16px)!important;gap:4px!important}
+ .padel-player{padding:5px 6px!important}
+ [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{font-size:19px!important}
+ .padel-auto-score{font-size:19px!important;min-height:48px!important}
+}
+
+/* 5.2: stabilt layout af score-felt, X og plus/minus i to kolonner.
+   Slå native clear-kryds fra, og giv spin-knapperne deres naturlige plads. */
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] {
+  width:100%!important;min-width:0!important;overflow:visible!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="input"],
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="base-input"] {
+  width:100%!important;min-width:0!important;display:flex!important;
+  align-items:stretch!important;overflow:hidden!important;border-radius:10px!important;
+  box-sizing:border-box!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input {
+  width:100%!important;min-width:0!important;flex:1 1 0!important;
+  padding:6px 2px!important;text-overflow:clip!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] button {
+  flex:0 0 32px!important;width:32px!important;min-width:32px!important;
+  height:auto!important;min-height:48px!important;padding:0!important;
+  border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="clear-icon"],
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [aria-label="Clear"],
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [aria-label="Clear input"] {
+  display:none!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] svg {
+  width:16px!important;height:16px!important;stroke-width:2.5!important;
+}
+@media(max-width:550px){
+ [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] button {
+   flex-basis:26px!important;width:26px!important;min-width:26px!important;min-height:46px!important;
+ }
+ [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input {font-size:17px!important;}
+}
+/* 5.3: Navne igen over/under hinanden, midt i hver banehalvdel. */
+.padel-team{top:5%!important;bottom:5%!important;width:42%!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:space-around!important;gap:8px!important;white-space:normal!important}
+.padel-team.blue{left:4%!important}.padel-team.red{right:4%!important}
+.padel-player{max-width:94%!important;padding:5px 7px!important;
+ font-size:clamp(12px,2.8vw,18px)!important;overflow-wrap:anywhere!important}
+/* Score: simple text input without native plus, minus or clear buttons. */
+[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input{
+ background:#14568b!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+ caret-color:#fff!important;border:1px solid #51a7fa!important;
+ text-align:center!important;font-size:22px!important;font-weight:850!important;
+ border-radius:10px!important;min-height:50px!important;width:100%!important}
+[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input::placeholder{
+ color:#d8ebff!important;-webkit-text-fill-color:#d8ebff!important;opacity:1!important}
+[class*="st-key-on_court_score_"] [data-testid="stColumn"]:nth-child(2) [data-testid="stTextInput"] input{
+ background:#842e3d!important;border-color:#f28b98!important}
+@media(max-width:550px){.padel-team{gap:6px!important}.padel-player{font-size:clamp(12px,3.3vw,15px)!important}}
+/* 5.4: blue and red score controls have exactly the same external height. */
+[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input{
+  box-sizing:border-box!important;height:50px!important;min-height:50px!important;
+  padding:0 8px!important;line-height:50px!important;
+}
+.padel-auto-score{
+  box-sizing:border-box!important;height:50px!important;min-height:50px!important;
+  padding:0 8px!important;margin:0!important;
+  line-height:1!important;width:100%!important;
+}
+@media(max-width:550px){
+ .padel-auto-score{height:50px!important;min-height:50px!important}
+}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -631,40 +820,32 @@ with tab_games:
         # Indtast alle kampresultater først. Hele runden gemmes i ét databasekald.
         resultater = []
         for i, m in enumerate(d['matches']):
-            a = [html.escape(name) for name in m['blue']]
-            b = [html.escape(name) for name in m['red']]
-            # Vandret bane: hver servelinje ligger 6,95 m fra nettet.
-            # Skiftede makkere og resultatlogik påvirkes ikke af layoutet.
-            court = f'''<div class="padel-real-card">
-              <div class="padel-real-top"><span class="court-pill">Bane {m['court']}</span><span>Runde {d['round']}</span></div>
-              <div class="padel-real">
-                <div class="padel-service top"></div><div class="padel-service bottom"></div>
-                <div class="padel-center-upper"></div><div class="padel-center-lower"></div>
-                <div class="padel-team blue"><span class="padel-player">{a[0]}</span><span class="padel-player">{a[1]}</span></div>
-                <div class="padel-team red"><span class="padel-player">{b[0]}</span><span class="padel-player">{b[1]}</span></div>
-                <div class="padel-net-badge">VS</div>
-              </div></div>'''
-            st.markdown(court, unsafe_allow_html=True)
-            # Score controls are kept in a fixed two-column score strip right beneath the
-            # corresponding coloured half. Avoid positioning native widgets over the graphic:
-            # Streamlit's responsive layout otherwise obscures names on phones.
-            st.markdown('<div class="padel-score-strip-header"><span class="blue">Blåt hold · score</span><span class="red">Rødt hold · score</span></div>',unsafe_allow_html=True)
-            with st.container(key=f"on_court_score_{d['round']}_{i}"):
-                col1, col2 = st.columns(2, gap='small')
-                with col1:
-                    v1 = st.number_input('Blå score',min_value=0,
-                                         max_value=int(d['target']) if d['target'] else 200,
-                                         value=m['blue_score'],key=f"blue_{d['round']}_{i}",
-                                         placeholder='Score',label_visibility='collapsed')
-                with col2:
-                    if d['target']:
-                        v2 = None if v1 is None else int(d['target']) - int(v1)
-                        st.markdown(f'<div class="padel-auto-score">{"–" if v2 is None else v2}<small>automatisk</small></div>',unsafe_allow_html=True)
-                    else:
-                        v2 = st.number_input('Rød score',min_value=0,max_value=200,
-                                             value=m['red_score'],key=f"red_{d['round']}_{i}",
-                                             placeholder='Score',label_visibility='collapsed')
-            st.markdown('<div class="padel-score-foot">Blå score indtastes · Rød beregnes automatisk ved fast pointantal</div>',unsafe_allow_html=True)
+            # Stable frontend component keeps both inputs ON the court.
+            # The browser sends changes back to Python; "Gem runde" still saves
+            # all results together through the existing Supabase logic.
+            current_key = f"court_{st.session_state.tid}_{d['round']}_{i}_{'_'.join(m['blue'] + m['red'])}"
+            component_scores = court_input(
+                court=m['court'], round=d['round'],
+                blue_players=m['blue'], red_players=m['red'],
+                target=int(d['target']),
+                blue_score=m['blue_score'], red_score=m['red_score'],
+                default={'blue': m['blue_score'], 'red': m['red_score']},
+                key=current_key,
+            )
+            component_scores = component_scores if isinstance(component_scores, dict) else {}
+            def safe_score(value, upper):
+                if type(value) is int and 0 <= value <= upper:
+                    return value
+                return None
+            v1 = safe_score(component_scores.get('blue'), int(d['target']) if d['target'] else 200)
+            if d['target']:
+                v2 = int(d['target']) - v1 if v1 is not None else None
+            else:
+                v2 = safe_score(component_scores.get('red'), 200)
+            if component_scores.get('blue') is not None and v1 is None:
+                st.warning(f"Bane {m['court']}: Blå score er ugyldig.")
+            if not d['target'] and component_scores.get('red') is not None and v2 is None:
+                st.warning(f"Bane {m['court']}: Rød score er ugyldig.")
             resultater.append((v1, v2))
             if d.get('partner_mode') == 'Fast makker':
                 st.caption('Faste makkerpar: Holdene kan ikke byttes enkeltvis under turneringen.')
