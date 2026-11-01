@@ -661,7 +661,7 @@ st.markdown(STYLE, unsafe_allow_html=True)
 
 def fresh():
     return {'title':'Søndagspadel','players':[],'format':'Mexicano','round_limit':7,'target':32,
-            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker'}
+            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker','finale':None}
 
 
 def save():
@@ -913,7 +913,53 @@ with tab_games:
             if not unchanged:
                 st.caption('Indtast alle scores og tryk Gem runde, før næste runde kan dannes.')
         elif unchanged:
-            st.success('Turneringen er færdig! Se slutstillingen under Stilling.')
+            st.success('Alle ordinære runder er færdige! Se stillingen eller spil finalen herunder.')
+
+        # Finale efter grundspillet. Holdes adskilt fra ordinære kampstatistikker.
+        if d['round'] >= d['round_limit'] and unchanged:
+            st.divider()
+            st.subheader('🏆 Finale')
+            finale = d.get('finale')
+            if finale is None:
+                ranking = table(d['players'], all_matches(d))
+                if len(ranking) >= 4:
+                    top4 = [r['name'] for r in ranking[:4]]
+                    st.caption('De fire bedst placerede i grundspillet kvalificerer sig. Nr. 1 + 3 møder nr. 2 + 4. Finalens resultat ændrer ikke grundspillets stilling.')
+                    st.write(f'**Blåt hold:** {top4[0]} + {top4[2]}')
+                    st.write(f'**Rødt hold:** {top4[1]} + {top4[3]}')
+                    if st.button('Start finale', type='primary', use_container_width=True):
+                        d['finale'] = {'blue':[top4[0],top4[2]], 'red':[top4[1],top4[3]], 'blue_score':None, 'red_score':None, 'court':1}
+                        save(); st.rerun()
+                else:
+                    st.warning('Der kræves mindst fire spillere for at afvikle en finale.')
+            else:
+                st.write('**Blåt hold:** ' + ' + '.join(finale['blue']))
+                st.write('**Rødt hold:** ' + ' + '.join(finale['red']))
+                if finale['blue_score'] is not None and finale['red_score'] is not None:
+                    st.metric('Finaleresultat', f"{finale['blue_score']} – {finale['red_score']}")
+                    if finale['blue_score'] == finale['red_score']:
+                        st.warning('Finalen står lige. Ret resultatet for at kåre en vinder.')
+                    else:
+                        winner = finale['blue'] if finale['blue_score'] > finale['red_score'] else finale['red']
+                        st.success('🏆 Turneringsvindere: ' + ' & '.join(winner))
+                    if st.button('Ret finaleresultat'):
+                        finale['blue_score'] = None
+                        finale['red_score'] = None
+                        save(); st.rerun()
+                else:
+                    st.caption('Indtast finalens score og gem den. Ved fast pointantal beregnes rødt holds score automatisk.')
+                    with st.form('finale_score_form'):
+                        blue_f = st.number_input('Blåt hold – finale', min_value=0, max_value=int(d['target']) if d['target'] else 200, value=0, step=1)
+                        if d['target']:
+                            red_f = int(d['target']) - int(blue_f)
+                            st.metric('Rødt hold – automatisk', red_f)
+                        else:
+                            red_f = st.number_input('Rødt hold – finale', min_value=0, max_value=200, value=0, step=1)
+                        if st.form_submit_button('Gem finaleresultat', type='primary', use_container_width=True):
+                            finale['blue_score'] = int(blue_f)
+                            finale['red_score'] = int(red_f)
+                            save(); st.rerun()
+
 
 with tab_table:
     st.subheader('🏆 Aktuel stilling')
