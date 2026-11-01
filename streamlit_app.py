@@ -5,7 +5,11 @@ import secrets
 import re
 import requests
 import streamlit as st
+import streamlit.components.v1 as components
+from pathlib import Path
 from engine import make_round, make_fixed_pairs_round, table
+
+court_input = components.declare_component('padel_court_input', path=str(Path(__file__).parent / 'padel_court_component'))
 
 st.set_page_config(page_title='Padel Samlet', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
 # Server-side Supabase credentials are read only from Streamlit Secrets.
@@ -765,48 +769,32 @@ with tab_games:
         # Indtast alle kampresultater først. Hele runden gemmes i ét databasekald.
         resultater = []
         for i, m in enumerate(d['matches']):
-            a = [html.escape(name) for name in m['blue']]
-            b = [html.escape(name) for name in m['red']]
-            # Vandret bane: hver servelinje ligger 6,95 m fra nettet.
-            # Skiftede makkere og resultatlogik påvirkes ikke af layoutet.
-            court = f'''<div class="padel-real-card">
-              <div class="padel-real-top"><span class="court-pill">Bane {m['court']}</span><span>Runde {d['round']}</span></div>
-              <div class="padel-real">
-                <div class="padel-service top"></div><div class="padel-service bottom"></div>
-                <div class="padel-center-upper"></div><div class="padel-center-lower"></div>
-                <div class="padel-team blue"><span class="padel-player">{a[0]}</span><span class="padel-player">{a[1]}</span></div>
-                <div class="padel-team red"><span class="padel-player">{b[0]}</span><span class="padel-player">{b[1]}</span></div>
-                <div class="padel-net-badge">VS</div>
-              </div></div>'''
-            st.markdown(court, unsafe_allow_html=True)
-            # Score controls are kept in a fixed two-column score strip right beneath the
-            # corresponding coloured half. Avoid positioning native widgets over the graphic:
-            # Streamlit's responsive layout otherwise obscures names on phones.
-            st.markdown('<div class="padel-score-strip-header"><span class="blue">Blåt hold · score</span><span class="red">Rødt hold · score</span></div>',unsafe_allow_html=True)
-            with st.container(key=f"on_court_score_{d['round']}_{i}"):
-                col1, col2 = st.columns(2, gap='small')
-                with col1:
-                    raw_blue = st.text_input('Blå score',
-                        value='' if m['blue_score'] is None else str(m['blue_score']),
-                        key=f"blue_{d['round']}_{i}", placeholder='Score',
-                        label_visibility='collapsed', max_chars=3)
-                    max_blue = int(d['target']) if d['target'] else 200
-                    v1 = int(raw_blue) if raw_blue.isascii() and raw_blue.isdecimal() and int(raw_blue) <= max_blue else None
-                    if raw_blue and v1 is None:
-                        st.caption(f'Indtast et helt tal fra 0 til {max_blue}.')
-                with col2:
-                    if d['target']:
-                        v2 = None if v1 is None else int(d['target']) - int(v1)
-                        st.markdown(f'<div class="padel-auto-score">{"– <small>automatisk</small>" if v2 is None else str(v2)}</div>',unsafe_allow_html=True)
-                    else:
-                        raw_red = st.text_input('Rød score',
-                            value='' if m['red_score'] is None else str(m['red_score']),
-                            key=f"red_{d['round']}_{i}", placeholder='Score',
-                            label_visibility='collapsed', max_chars=3)
-                        v2 = int(raw_red) if raw_red.isascii() and raw_red.isdecimal() and int(raw_red) <= 200 else None
-                        if raw_red and v2 is None:
-                            st.caption('Indtast et helt tal fra 0 til 200.')
-            st.markdown('<div class="padel-score-foot">Blå score indtastes · Rød beregnes automatisk ved fast pointantal</div>',unsafe_allow_html=True)
+            # Stable frontend component keeps both inputs ON the court.
+            # The browser sends changes back to Python; "Gem runde" still saves
+            # all results together through the existing Supabase logic.
+            current_key = f"court_{st.session_state.tid}_{d['round']}_{i}_{'_'.join(m['blue'] + m['red'])}"
+            component_scores = court_input(
+                court=m['court'], round=d['round'],
+                blue_players=m['blue'], red_players=m['red'],
+                target=int(d['target']),
+                blue_score=m['blue_score'], red_score=m['red_score'],
+                default={'blue': m['blue_score'], 'red': m['red_score']},
+                key=current_key,
+            )
+            component_scores = component_scores if isinstance(component_scores, dict) else {}
+            def safe_score(value, upper):
+                if type(value) is int and 0 <= value <= upper:
+                    return value
+                return None
+            v1 = safe_score(component_scores.get('blue'), int(d['target']) if d['target'] else 200)
+            if d['target']:
+                v2 = int(d['target']) - v1 if v1 is not None else None
+            else:
+                v2 = safe_score(component_scores.get('red'), 200)
+            if component_scores.get('blue') is not None and v1 is None:
+                st.warning(f"Bane {m['court']}: Blå score er ugyldig.")
+            if not d['target'] and component_scores.get('red') is not None and v2 is None:
+                st.warning(f"Bane {m['court']}: Rød score er ugyldig.")
             resultater.append((v1, v2))
             if d.get('partner_mode') == 'Fast makker':
                 st.caption('Faste makkerpar: Holdene kan ikke byttes enkeltvis under turneringen.')
