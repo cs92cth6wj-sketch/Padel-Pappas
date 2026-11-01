@@ -811,6 +811,52 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
  .stApp [data-testid="stVerticalBlock"]{gap:.45rem!important}
 }
 
+
+/* PADEL PAPPAS 7.2 - tab navigation matching the three stat tiles */
+.stApp [data-testid="stTabs"] [role="tablist"],
+.stApp [data-baseweb="tab-list"] {
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:9px!important;overflow:visible!important;width:100%!important;
+ background:transparent!important;border:0!important;padding:0!important;
+ margin:0 0 7px!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"],
+.stApp [data-baseweb="tab-list"] [data-baseweb="tab"]{
+ box-sizing:border-box!important;display:flex!important;justify-content:center!important;align-items:center!important;
+ min-width:0!important;width:100%!important;max-width:100%!important;
+ min-height:68px!important;margin:0!important;padding:12px 3px!important;
+ background:#141f27!important;border:1px solid #293c44!important;
+ border-radius:14px!important;box-shadow:none!important;
+ color:#e9f3f5!important;-webkit-text-fill-color:#e9f3f5!important;
+ font-size:clamp(12px,3vw,16px)!important;font-weight:730!important;line-height:1.2!important;
+ white-space:nowrap!important;text-align:center!important;opacity:1!important;
+ transition:border-color .15s ease,background .15s ease!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"] *,
+.stApp [data-baseweb="tab-list"] [data-baseweb="tab"] * {
+ color:inherit!important;-webkit-text-fill-color:inherit!important;
+ font-weight:inherit!important;white-space:nowrap!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
+.stApp [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"]{
+ background:#16292c!important;border:2px solid #31d7b6!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ box-shadow:inset 0 0 0 1px #31d7b61a!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"]:hover{
+ border-color:#54a99a!important;
+}
+.stApp [data-testid="stTabs"] [data-baseweb="tab-highlight"],
+.stApp [data-testid="stTabs"] [data-baseweb="tab-border"]{display:none!important;}
+@media(max-width:520px){
+ .stApp [data-testid="stTabs"] [role="tablist"],.stApp [data-baseweb="tab-list"]{gap:6px!important;}
+ .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"],
+ .stApp [data-baseweb="tab-list"] [data-baseweb="tab"]{
+  min-height:60px!important;padding:9px 1px!important;font-size:clamp(11px,3.05vw,14px)!important;
+  border-radius:12px!important;
+ }
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
