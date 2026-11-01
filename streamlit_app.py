@@ -465,6 +465,74 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
  [class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"]{gap:5px!important}
  [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{font-size:17px!important}
 }
+
+/* VERSION 5.0: tydelige centrerede spillere og holdfarvede scorefelter.
+   CSS er lagt sidst for at overstyre de ældre farver. */
+.padel-team{
+  top:3%!important;bottom:3%!important;width:45%!important;
+  display:flex!important;flex-direction:column!important;
+  justify-content:space-evenly!important;align-items:center!important;
+  gap:7px!important;text-align:center!important;
+  font-size:clamp(14px,2.8vw,19px)!important;
+  font-weight:850!important;
+}
+.padel-team.blue{left:2.5%!important}
+.padel-team.red{right:2.5%!important}
+.padel-player{
+  display:block!important;max-width:96%!important;
+  border-radius:9px!important;padding:6px 8px!important;
+  line-height:1.18!important;color:#fff!important;
+  text-shadow:0 1px 3px #000!important;
+  overflow-wrap:anywhere!important;
+}
+/* Blå score: både selve tallet, inputrammen og plus/minus skal passe til den blå halvdel. */
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input,
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] [data-baseweb="input"],
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] [data-baseweb="base-input"]{
+  background:#14568b!important;color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border-color:#4aaefa!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input{
+  font-size:22px!important;font-weight:900!important;
+  text-align:center!important;caret-color:#fff!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] input::placeholder{
+  color:#e7f5ff!important;-webkit-text-fill-color:#e7f5ff!important;opacity:1!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] button{
+  background:#14568b!important;color:#fff!important;border-color:#4aaefa!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stNumberInput"] button *{
+  color:#fff!important;stroke:#fff!important;fill:none!important;
+}
+/* Rød score beregnes automatisk ved fast pointantal. */
+.padel-auto-score{
+  background:#842e3d!important;color:#fff!important;
+  border:2px solid #f28b98!important;border-radius:10px!important;
+  font-size:22px!important;font-weight:900!important;min-height:52px!important;
+  display:flex!important;flex-direction:column!important;
+  justify-content:center!important;align-items:center!important;
+  padding:6px 4px!important;
+}
+.padel-auto-score small{color:#fff!important;font-size:11px!important;font-weight:650!important;opacity:.92!important}
+/* Ved frit pointformat er det andet input rødt. */
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] input,
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] [data-baseweb="input"],
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] [data-baseweb="base-input"]{
+  background:#842e3d!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+  border-color:#f28b98!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] button{
+  background:#842e3d!important;color:#fff!important;border-color:#f28b98!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] button *{stroke:#fff!important;color:#fff!important;fill:none!important}
+@media(max-width:550px){
+ .padel-team{font-size:clamp(13px,3.5vw,16px)!important;gap:4px!important}
+ .padel-player{padding:5px 6px!important}
+ [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{font-size:19px!important}
+ .padel-auto-score{font-size:19px!important;min-height:48px!important}
+}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
