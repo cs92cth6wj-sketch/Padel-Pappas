@@ -433,14 +433,14 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .padel-real-top{display:flex;align-items:center;justify-content:space-between;color:#e8ffff;margin:0 2px 10px;gap:10px}
 .padel-real-top .court-pill{white-space:nowrap}
 .padel-real{width:100%;aspect-ratio:2/1;min-height:160px;max-height:245px;margin:0 auto;position:relative;border:5px solid #688e92;border-radius:9px;background:linear-gradient(to right,#14568b 0%,#174572 49.7%,#762b34 50.3%,#92303e 100%);box-shadow:inset 0 0 25px #09131c99,0 8px 22px #0005;overflow:hidden;isolation:isolate}
-/* Net i midten, servelinjer 6,95 m fra nettet (34,75/65,25% af længden). */
+/* Net x=50%. Servelinjerne er 6,95 m fra nettet: x=15,25% og 84,75% på en 20 m bane. */
 .padel-real:before{content:'';position:absolute;inset:6px;border:2px solid rgba(238,253,255,.7);z-index:1;pointer-events:none}
 .padel-real:after{content:'';position:absolute;top:0;bottom:0;left:50%;width:5px;transform:translateX(-50%);background:repeating-linear-gradient(to bottom,#e5f5f5 0 4px,#56727b 4px 7px);border-inline:1px solid #f9ffff;z-index:3;pointer-events:none;box-shadow:0 0 6px #0009}
 .padel-service{position:absolute;top:6px;bottom:6px;border-left:2px solid #eef8ffcf;z-index:2;pointer-events:none}
-.padel-service.top{left:34.75%}.padel-service.bottom{left:65.25%}
+.padel-service.top{left:15.25%}.padel-service.bottom{left:84.75%}
 .padel-center-upper,.padel-center-lower{position:absolute;top:50%;height:2px;transform:translateY(-50%);background:#f2fbffcf;z-index:2;pointer-events:none}
-.padel-center-upper{left:34.75%;width:15.25%}.padel-center-lower{left:50%;width:15.25%}
-/* Navne tæt ved bagvægge; scorefelter i midten på hver sin halvdel. */
+.padel-center-upper{left:15.25%;width:34.75%}.padel-center-lower{left:50%;width:34.75%}
+/* Navne tæt ved bagvægge; scorefelter i separat bånd under banen. */
 .padel-team{position:absolute;top:8%;bottom:8%;width:30%;display:flex;align-items:center;justify-content:space-between;flex-direction:column;gap:6px;z-index:4;color:#fff;font-weight:750;text-align:center;font-size:clamp(10px,2.7vw,16px)}
 .padel-team.blue{left:2%}.padel-team.red{right:2%}
 .padel-player{background:#071a2add;border-radius:7px;max-width:100%;padding:4px 5px;overflow-wrap:anywhere;text-shadow:0 1px 3px #000;line-height:1.15}
