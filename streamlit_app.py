@@ -470,7 +470,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
    CSS er lagt sidst for at overstyre de ældre farver. */
 .padel-team{
   top:3%!important;bottom:3%!important;width:45%!important;
-  display:flex!important;flex-direction:column!important;
+  display:flex!important;flex-direction:row!important;gap:6px!important;white-space:nowrap!important;
   justify-content:space-evenly!important;align-items:center!important;
   gap:7px!important;text-align:center!important;
   font-size:clamp(14px,2.8vw,19px)!important;
@@ -511,11 +511,11 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
   background:#842e3d!important;color:#fff!important;
   border:2px solid #f28b98!important;border-radius:10px!important;
   font-size:22px!important;font-weight:900!important;min-height:52px!important;
-  display:flex!important;flex-direction:column!important;
+  display:flex!important;flex-direction:row!important;gap:6px!important;white-space:nowrap!important;
   justify-content:center!important;align-items:center!important;
   padding:6px 4px!important;
 }
-.padel-auto-score small{color:#fff!important;font-size:11px!important;font-weight:650!important;opacity:.92!important}
+.padel-auto-score small{display:inline!important;color:#fff!important;font-size:12px!important;font-weight:650!important;opacity:.92!important}
 /* Ved frit pointformat er det andet input rødt. */
 [class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] input,
 [class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stNumberInput"] [data-baseweb="input"],
@@ -532,6 +532,41 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
  .padel-player{padding:5px 6px!important}
  [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{font-size:19px!important}
  .padel-auto-score{font-size:19px!important;min-height:48px!important}
+}
+
+/* 5.2: stabilt layout af score-felt, X og plus/minus i to kolonner.
+   Slå native clear-kryds fra, og giv spin-knapperne deres naturlige plads. */
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] {
+  width:100%!important;min-width:0!important;overflow:visible!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="input"],
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="base-input"] {
+  width:100%!important;min-width:0!important;display:flex!important;
+  align-items:stretch!important;overflow:hidden!important;border-radius:10px!important;
+  box-sizing:border-box!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input {
+  width:100%!important;min-width:0!important;flex:1 1 0!important;
+  padding:6px 2px!important;text-overflow:clip!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] button {
+  flex:0 0 32px!important;width:32px!important;min-width:32px!important;
+  height:auto!important;min-height:48px!important;padding:0!important;
+  border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [data-baseweb="clear-icon"],
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [aria-label="Clear"],
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] [aria-label="Clear input"] {
+  display:none!important;
+}
+[class*="st-key-on_court_score_"] [data-testid="stNumberInput"] svg {
+  width:16px!important;height:16px!important;stroke-width:2.5!important;
+}
+@media(max-width:550px){
+ [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] button {
+   flex-basis:26px!important;width:26px!important;min-width:26px!important;min-height:46px!important;
+ }
+ [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input {font-size:17px!important;}
 }
 </style>
 '''
@@ -727,7 +762,7 @@ with tab_games:
                 with col2:
                     if d['target']:
                         v2 = None if v1 is None else int(d['target']) - int(v1)
-                        st.markdown(f'<div class="padel-auto-score">{"–" if v2 is None else v2}<small>automatisk</small></div>',unsafe_allow_html=True)
+                        st.markdown(f'<div class="padel-auto-score">{"– <small>automatisk</small>" if v2 is None else str(v2)}</div>',unsafe_allow_html=True)
                     else:
                         v2 = st.number_input('Rød score',min_value=0,max_value=200,
                                              value=m['red_score'],key=f"red_{d['round']}_{i}",
