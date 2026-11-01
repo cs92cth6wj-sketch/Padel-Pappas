@@ -586,6 +586,19 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 [class*="st-key-on_court_score_"] [data-testid="stColumn"]:nth-child(2) [data-testid="stTextInput"] input{
  background:#842e3d!important;border-color:#f28b98!important}
 @media(max-width:550px){.padel-team{gap:6px!important}.padel-player{font-size:clamp(12px,3.3vw,15px)!important}}
+/* 5.4: blue and red score controls have exactly the same external height. */
+[class*="st-key-on_court_score_"] [data-testid="stTextInput"] input{
+  box-sizing:border-box!important;height:50px!important;min-height:50px!important;
+  padding:0 8px!important;line-height:50px!important;
+}
+.padel-auto-score{
+  box-sizing:border-box!important;height:50px!important;min-height:50px!important;
+  padding:0 8px!important;margin:0!important;
+  line-height:1!important;width:100%!important;
+}
+@media(max-width:550px){
+ .padel-auto-score{height:50px!important;min-height:50px!important}
+}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
