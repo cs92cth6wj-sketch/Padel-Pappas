@@ -16,51 +16,41 @@ from engine import make_round, make_fixed_pairs_round, table
 # Den interaktive banes HTML er indbygget i denne fil.
 # Streamlit kan derfor indlaese den uden ekstra mapper i GitHub.
 _COURT_HTML_ZLIB_BASE64 = (
-    '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'
-)
+    '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')
 _court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
-_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v56'
+_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v57'
 _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
 if not _component_file.exists() or _component_file.read_bytes() != _court_html:
     _component_file.write_bytes(_court_html)
 st.set_page_config(page_title='Padel Samlet', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
 
-court_input = components.declare_component('padel_court_input_v56', path=str(_component_dir))
+court_input = components.declare_component('padel_court_input_v57', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
 DB_URL = str(st.secrets.get('SUPABASE_URL', '')).rstrip('/')
 DB_KEY = str(st.secrets.get('SUPABASE_SECRET_KEY', ''))
@@ -848,6 +838,13 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
 }
 .stApp [data-testid="stTabs"] [data-baseweb="tab-highlight"],
 .stApp [data-testid="stTabs"] [data-baseweb="tab-border"]{display:none!important;}
+.stApp [data-baseweb="tab-highlight"],
+.stApp [data-baseweb="tab-border"],
+.stApp [data-testid="stTabs"] [role="tablist"]::before,
+.stApp [data-testid="stTabs"] [role="tablist"]::after,
+.stApp [data-testid="stTabs"] [role="tab"]::before,
+.stApp [data-testid="stTabs"] [role="tab"]::after{display:none!important;content:none!important;height:0!important;border:0!important;background:none!important;}
+.stApp [data-testid="stTabs"] [role="tablist"]{border-bottom:0!important;box-shadow:none!important;background-image:none!important;}
 @media(max-width:520px){
  .stApp [data-testid="stTabs"] [role="tablist"],.stApp [data-baseweb="tab-list"]{gap:6px!important;}
  .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"],
