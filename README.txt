@@ -1,1 +1,0 @@
-Padel Pappas 3.8: Ved fast antal point indtastes kun blåt holds score; rødt holds score = point pr. kamp minus blåt holds score. Ved 0 (frit) indtastes begge scores. Gem runde gemmer alle kampe på én gang. Historikrettelser beregner også rødt automatisk ved fast pointtal. Udskift kun streamlit_app.py i GitHub. Behold engine.py og Supabase. Test med en prøveturnering.
