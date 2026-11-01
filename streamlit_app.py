@@ -711,6 +711,74 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
   border-color:#65e6ce!important;
 }
 
+
+/* PADEL PAPPAS 7.0 · unified visual system (last stylesheet wins) */
+:root{color-scheme:dark}
+html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
+ background:#090d12!important;color:#eff7f7!important;
+}
+.stApp{background:radial-gradient(circle at 70% -150px,#173c3a 0,#090d12 520px)!important}
+[data-testid="stHeader"]{background:transparent!important}
+.block-container{max-width:860px!important;padding-top:1.6rem!important;padding-bottom:6rem!important}
+[data-testid="stSidebar"], [data-testid="stSidebarContent"]{background:#101a20!important}
+.stApp h1,.stApp h2,.stApp h3{color:#f5fbfa!important;letter-spacing:-.025em!important}
+.brand{font-size:11px!important;letter-spacing:.18em!important;color:#3be5bd!important}
+.hero-title{font-weight:850!important;font-size:clamp(28px,6vw,43px)!important;margin-top:6px!important;letter-spacing:-.035em!important}
+.subtitle{color:#a3b6bd!important;font-size:14px!important}
+.p7-hero{padding:19px 20px 12px;background:linear-gradient(145deg,#13282c,#10171d 80%);border:1px solid #29454b;border-radius:20px;margin:2px 0 16px}
+.p7-id{display:inline-block;background:#142e2e;border:1px solid #326b60;border-radius:8px;padding:7px 10px;margin:6px 0 4px;font-size:12px;color:#bfefe6;overflow-wrap:anywhere}
+.p7-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0 20px}
+.p7-stat{background:#141f27;border:1px solid #293c44;border-radius:14px;padding:12px 7px;text-align:center}
+.p7-stat strong{font-size:24px;line-height:1.2;color:#fff;display:block;font-weight:850;font-variant-numeric:tabular-nums}
+.p7-stat small{display:block;color:#9fb4bd;font-size:11px;margin-top:5px}
+/* Tab buttons: neither white default widgets nor green text on green. */
+.stApp [data-testid="stTabs"] div[role="tablist"], .stApp [data-baseweb="tab-list"]{background:transparent!important;gap:8px!important;padding:0!important;overflow-x:auto!important}
+.stApp [data-testid="stTabs"] button[role="tab"],.stApp [data-baseweb="tab-list"] button[data-baseweb="tab"]{
+ flex:1 0 auto!important;background:#17282b!important;border:1px solid #2b655e!important;border-radius:12px!important;
+ color:#d6f2ed!important;-webkit-text-fill-color:#d6f2ed!important;padding:12px 10px!important;font-weight:750!important;opacity:1!important;
+}
+.stApp [data-testid="stTabs"] button[role="tab"] *, .stApp [data-baseweb="tab-list"] button[data-baseweb="tab"] *{
+ color:inherit!important;-webkit-text-fill-color:inherit!important;font-weight:inherit!important;opacity:1!important;
+}
+.stApp [data-testid="stTabs"] button[role="tab"][aria-selected="true"],.stApp [data-baseweb="tab-list"] button[data-baseweb="tab"][aria-selected="true"]{
+ background:#0da98f!important;border-color:#4df1cb!important;color:#fff!important;-webkit-text-fill-color:#fff!important;box-shadow:0 4px 17px #04b18c22!important;
+}
+.stApp [data-testid="stTabs"] [data-baseweb="tab-highlight"],.stApp [data-testid="stTabs"] [data-baseweb="tab-border"]{display:none!important}
+/* Court card preserved: enhanced framing only, no changes to interactive component */
+.padel-real-card,.court-card{background:#141f27!important;border:1px solid #314c58!important;box-shadow:0 12px 28px #0004!important;border-radius:17px!important}
+.padel-real-top,.court-top{font-weight:750!important;color:#f5fcfc!important}
+.padel-score-foot{color:#a5b9bc!important}
+.padel-player{font-weight:850!important;letter-spacing:-.012em!important;text-shadow:0 2px 4px #000!important}
+/* Modern leader board and podium */
+.podium{gap:10px!important;margin:18px 0 22px!important}
+.podium-card{background:#18232b!important;border:1px solid #364450!important;border-radius:18px!important;box-shadow:0 8px 24px #0003!important;padding:16px 5px!important}
+.podium-card.winner{background:linear-gradient(155deg,#164c44,#193029)!important;border-color:#42d4ac!important;padding:25px 5px!important}
+.podium-name{color:#f6fbfc!important;font-size:clamp(12px,3.3vw,15px)!important}
+.podium-score{font-size:clamp(22px,5.5vw,29px)!important}
+.standing-heading{color:#b6cbd0!important;padding:11px 9px!important}
+.standing-row{background:#141f26!important;border:1px solid #2d3e47!important;border-radius:13px!important;min-height:45px!important;box-shadow:0 2px 8px #0002}
+.standing-row.top{background:#16433b!important;border-color:#37bb9f!important}
+.standing-row .standing-person{color:#fff!important}
+/* Forms and actions */
+.stApp [data-testid="stButton"] button[kind="primary"],.stApp [data-testid="stFormSubmitButton"] button[kind="primary"]{
+ background:#0dab90!important;color:#fff!important;border:1px solid #37dbc0!important;border-radius:12px!important;min-height:48px!important;font-weight:780!important;
+}
+.stApp [data-testid="stButton"] button[kind="secondary"],.stApp [data-testid="stFormSubmitButton"] button[kind="secondary"]{
+ background:#1d2a33!important;color:#f1f8f8!important;border:1px solid #42606c!important;border-radius:12px!important;
+}
+.stApp [data-testid="stButton"] button *, .stApp [data-testid="stFormSubmitButton"] button *{
+ color:inherit!important;-webkit-text-fill-color:inherit!important
+}
+[data-testid="stExpander"]{border:1px solid #354b53!important;border-radius:13px!important;background:#132027!important}
+[data-testid="stExpander"] summary, [data-testid="stExpander"] summary *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+@media(max-width:520px){
+ .block-container{padding-left:12px!important;padding-right:12px!important;padding-top:.8rem!important}
+ .p7-hero{padding:15px 14px 12px;border-radius:16px}
+ .p7-stats{gap:6px}.p7-stat{padding:11px 4px}.p7-stat strong{font-size:21px}
+ .stApp [data-testid="stTabs"] button[role="tab"]{font-size:13px!important;padding:11px 8px!important}
+ .standing-row{padding-left:6px!important;padding-right:6px!important}
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -826,9 +894,23 @@ if url_id and url_id != st.session_state.get('tid'):
 if 'tourney' not in st.session_state:
     st.session_state.tourney=fresh()
 d=st.session_state.tourney
-st.markdown('<div class="brand">🎾 PADEL SAMLET</div><div class="hero-title">Turnering & resultater</div><div class="subtitle">Kampe, makkerskifte og stilling – samlet ét sted</div>',unsafe_allow_html=True)
+st.markdown(
+    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 7.0</div>'
+    f'<div class="hero-title">{html.escape(d["title"])}</div>'
+    f'<div class="subtitle">{html.escape(d["format"])} · {html.escape(d.get("partner_mode", "Skiftende makker"))} · Turnering & resultater</div>'
+    + (f'<div class="p7-id">Turnerings-ID: {html.escape(st.session_state.tid)}</div>' if st.session_state.get('tid') else '')
+    + '</div>', unsafe_allow_html=True)
 if st.session_state.get('tid'):
-    st.info(f'Turnerings-ID: **{st.session_state.tid}** · Link: https://padel-pappas.streamlit.app/?id={st.session_state.tid}')
+    st.caption(f'Del turneringen: https://padel-pappas.streamlit.app/?id={st.session_state.tid}')
+played_rounds = len(d.get('history', []))
+if d.get('matches') and all(m.get('blue_score') is not None and m.get('red_score') is not None for m in d['matches']):
+    played_rounds += 1
+st.markdown(
+    '<div class="p7-stats">'
+    f'<div class="p7-stat"><strong>{d.get("round", 0)}/{d.get("round_limit", 7)}</strong><small>Runde</small></div>'
+    f'<div class="p7-stat"><strong>{len(d.get("matches", []))}</strong><small>Baner i runden</small></div>'
+    f'<div class="p7-stat"><strong>{d.get("target", 0) or "Fri"}</strong><small>Point pr. kamp</small></div>'
+    '</div>', unsafe_allow_html=True)
 
 if st.session_state.get('tid'):
     with st.sidebar:
@@ -1068,7 +1150,7 @@ with tab_games:
 
 
 with tab_table:
-    st.subheader('🏆 Aktuel stilling')
+    st.subheader('🏆 Leaderboard')
     st.caption(f"Sortering: {d.get('ranking_priority', 'Point først')} · derefter {'scorede point' if d.get('ranking_priority') == 'Sejre først' else 'sejre'}, pointforskel og navn")
     rows=standings(d)
     if not rows:
@@ -1110,7 +1192,7 @@ with tab_table:
         st.caption('Makkere: '+(', '.join(partners) if partners else 'Ingen kampe endnu'))
 
 with tab_log:
-    st.subheader('📜 Kampoversigt og rettelser')
+    st.subheader('📜 Kamphistorik')
     rounds=d['history']+([{'number':d['round'],'matches':d['matches']}] if d['matches'] else [])
     if not rounds:st.info('Ingen runder spillet endnu.')
     for rd in reversed(rounds):
