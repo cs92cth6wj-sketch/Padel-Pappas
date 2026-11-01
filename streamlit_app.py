@@ -667,6 +667,37 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
   background-image: none !important;
 }
 .stApp { color: #f4f7f8 !important; }
+
+/* Version 6.1: Alle navigationfaner er grønne med tydelig hvid tekst. */
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"],
+.stApp [data-baseweb="tab-list"] [role="tab"],
+.stApp .stTabs [data-baseweb="tab"] {
+  background:#176458!important;
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  border:1px solid #2f9c8d!important;
+  border-radius:11px!important;
+  opacity:1!important;
+  box-shadow:none!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"] *,
+.stApp [data-baseweb="tab-list"] [role="tab"] *,
+.stApp .stTabs [data-baseweb="tab"] * {
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  opacity:1!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
+.stApp [data-baseweb="tab-list"] [role="tab"][aria-selected="true"],
+.stApp .stTabs [data-baseweb="tab"][aria-selected="true"] {
+  background:#079b80!important;
+  border-color:#67ead5!important;
+  box-shadow:inset 0 -3px #f5df82!important;
+}
+.stApp [data-testid="stTabs"] [data-baseweb="tab-list"] {
+  background:transparent!important;
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
