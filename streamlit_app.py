@@ -314,6 +314,54 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
   background-color:#FFFFFF!important;
 }
 
+
+/* Padel Pappas 3.9: history controls readable in both desktop and iOS Safari */
+.stApp [data-testid="stExpander"] details,
+.stApp [data-testid="stExpander"] details > summary,
+.stApp [data-testid="stExpander"] summary {
+ background:#203D43!important;color:#F7FCFC!important;border-radius:10px!important;
+ -webkit-text-fill-color:#F7FCFC!important;
+}
+.stApp [data-testid="stExpander"] summary *,
+.stApp [data-testid="stExpander"] [data-testid="stExpanderToggleIcon"] {
+ color:#F7FCFC!important;-webkit-text-fill-color:#F7FCFC!important;opacity:1!important;
+}
+.stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+ background:#112A2F!important;color:#F5FBFB!important;
+}
+.stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"] *,
+.stApp [data-testid="stExpander"] [data-testid="stMetricLabel"] *,
+.stApp [data-testid="stExpander"] [data-testid="stMetricValue"] *,
+.stApp [data-testid="stExpander"] [data-testid="stMetricValue"] {
+ color:#F3FAFA!important;-webkit-text-fill-color:#F3FAFA!important;opacity:1!important;
+}
+.stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button,
+.stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button[kind="secondary"] {
+ background:#204148!important;border:1px solid #6EB6B0!important;color:#FFFFFF!important;
+ -webkit-text-fill-color:#FFFFFF!important;
+}
+.stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button * {
+ color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;opacity:1!important;
+}
+/* Redundant selectors intentionally cover Streamlit tab markup versions. */
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"]:not([aria-selected="true"]),
+.stApp [data-baseweb="tab-list"] [role="tab"]:not([aria-selected="true"]) {
+ background:#E7F1F0!important;color:#142C30!important;-webkit-text-fill-color:#142C30!important;
+ opacity:1!important;border-radius:9px!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"]:not([aria-selected="true"]) *,
+.stApp [data-baseweb="tab-list"] [role="tab"]:not([aria-selected="true"]) * {
+ color:#142C30!important;-webkit-text-fill-color:#142C30!important;opacity:1!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
+.stApp [data-baseweb="tab-list"] [role="tab"][aria-selected="true"] {
+ background:#097D6D!important;color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"] *,
+.stApp [data-baseweb="tab-list"] [role="tab"][aria-selected="true"] * {
+ color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -610,7 +658,9 @@ with tab_log:
                                          value=int(m['blue_score'] or 0))
                     if d['target']:
                         newr=int(d['target'])-newb
-                        c2.metric('Rød (automatisk)',newr)
+                        c2.metric('Rød (beregnet)',newr)
+                        if m['blue_score'] is None:
+                            st.caption('Foreløbig beregning – kampen er ikke gemt som afgjort.')
                     else:
                         newr=c2.number_input('Rød',min_value=0,max_value=200,
                                              value=int(m['red_score'] or 0))
