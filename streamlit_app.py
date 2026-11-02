@@ -4928,53 +4928,88 @@ with tab_table:
                 f'<span class="standing-value standing-points">{r["points"]}</span>'
                 '</div>',unsafe_allow_html=True)
         st.caption('V = Vundne · U = Uafgjorte · T = Tabte · +/- = Pointforskel')
+        # Delingsbilledet tegnes i browseren efter den samme mobil-leaderboardstruktur.
+        # Billedfilen klargøres INDEN brugeren trykker: Web Share API kræver brugeraktivering.
         try:
-            # The image is generated in memory only; there are no download or preview controls.
-            share_image = pp125_standing_png(d, rows)
-            share_b64 = base64.b64encode(share_image).decode('ascii')
-            share_filename = f'Padel-Pappas-8362-Stilling-{re.sub(r"[^A-Za-z0-9_-]", "-", d.get("title", "Turnering"))}.png'
-            share_title = html.escape(str(d.get('title') or 'Padel Pappas'), quote=True)
-            share_filename_js = json.dumps(share_filename)
-            share_title_js = json.dumps(str(d.get('title') or 'Padel Pappas'))
-            share_html = f"""<!doctype html><html lang="da"><head><meta name="viewport" content="width=device-width, initial-scale=1" />
+            share_rows = [dict(rank=i+1, name=r['name'], wins=r['wins'],
+                               draws=r['draws'], losses=r['losses'],
+                               diff=r['diff'], points=r['points'])
+                          for i, r in enumerate(rows)]
+            share_payload = json.dumps(share_rows, ensure_ascii=False)
+            share_title = json.dumps(str(d.get('title') or 'Padel Pappas'), ensure_ascii=False)
+            share_subtitle = json.dumps(f"{d.get('format','Padel')} · {len(rows)} spillere", ensure_ascii=False)
+            share_logo = base64.b64encode(zlib.decompress(base64.b64decode(_PP125_LOGO))).decode('ascii')
+            share_html = r"""<!doctype html><html lang="da"><head><meta name="viewport" content="width=device-width,initial-scale=1" />
             <style>
-              html,body{{margin:0;padding:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}}
-              #share{{display:block;width:100%;min-height:54px;border:0;border-radius:15px;background:#148479;color:white;font-size:17px;font-weight:650;cursor:pointer;touch-action:manipulation;}}
-              #share:disabled{{opacity:.65}}
-              #info{{font-size:13px;color:#667b7d;line-height:1.35;margin:8px 2px 0;}}
+            html,body{margin:0;padding:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+            button{display:block;width:100%;min-height:52px;border:0;border-radius:15px;background:#148479;color:white;font-size:17px;font-weight:650;cursor:pointer}
+            button:disabled{opacity:.55}
+            #msg{font-size:13px;color:#526e70;min-height:18px;margin:5px 3px}
             </style></head><body>
-            <button type="button" id="share">↗ Del stilling</button>
-            <div id="info" role="status" aria-live="polite"></div>
+            <button id="share" type="button" disabled>↗ Klargør stilling …</button><div id="msg" role="status"></div>
             <script>
-            const button=document.getElementById('share');
-            const info=document.getElementById('info');
-            // Convert embedded image to a File without fetching from another domain.
-            const bytes64={json.dumps(share_b64)};
-            const filename={share_filename_js};
-            const title={share_title_js};
-            button.addEventListener('click', async ()=>{{
-              info.textContent='';
-              if (!navigator.share || !navigator.canShare) {{
-                info.textContent='Denne browser understøtter ikke deling af billedfiler her. Åbn eventuelt appen direkte i Safari.';
-                return;
-              }}
-              button.disabled=true;
-              try {{
-                const binary=atob(bytes64);
-                const bytes=new Uint8Array(binary.length);
-                for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-                const file=new File([bytes],filename,{{type:'image/png'}});
-                if(!navigator.canShare({{files:[file]}})){{
-                  info.textContent='Billeddeling er ikke tilladt i dette appvindue. Prøv at åbne Padel Pappas direkte i Safari.';
-                  return;
-                }}
-                await navigator.share({{files:[file],title:title}});
-              }} catch(e) {{
-                if(e?.name!=='AbortError') info.textContent='iPhone kunne ikke åbne delingsmenuen her. Prøv eventuelt direkte i Safari.';
-              }} finally {{button.disabled=false;}}
-            }});
+            const rows=__ROWS__,title=__TITLE__,subtitle=__SUBTITLE__;
+            const logo='data:image/png;base64,__LOGO__';
+            const btn=document.getElementById('share'),msg=document.getElementById('msg');
+            let readyFile=null;
+            const W=1080, H=190+rows.length*119+64;
+            const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+            const ctx=canvas.getContext('2d');
+            function roundRect(x,y,w,h,r,fill,stroke,lineWidth=2){
+              ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+              if(stroke){ctx.lineWidth=lineWidth;ctx.strokeStyle=stroke;ctx.stroke();}
+            }
+            function text(t,x,y,size=30,bold=false,color='#26363d',align='left'){
+              ctx.font=`${bold?'700':'400'} ${size}px -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif`;
+              ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(String(t),x,y);
+            }
+            function ellipse(x,y,r,color){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
+            function draw(logoImg){
+              ctx.fillStyle='#F7FAF9';ctx.fillRect(0,0,W,H);
+              text(title,40,53,43,true,'#233B3E');text(subtitle,40,105,26,false,'#688084');
+              if(logoImg)ctx.drawImage(logoImg,878,12,160,135);
+              const xs=[58,145,670,743,816,914,1010];
+              ['#','Spiller','V','U','T','+/-','Point'].forEach((v,i)=>text(v,xs[i],171,26,true,'#26383D',i>1?'center':'left'));
+              rows.forEach((r,i)=>{
+                const y=192+i*119;
+                const bg=i===0?'#FFF7E3':i===1?'#F1F4F8':i===2?'#FFF1E8':'#FFFFFF';
+                const border=i===0?'#D6AA3A':i===1?'#ABB8C7':i===2?'#C68A64':'#DDE9EB';
+                roundRect(40,y,1000,102,30,bg,border,i<3?4:2);
+                if(i<3){ellipse(88,y+51,29,['#D8AA25','#ADB8C2','#B9794D'][i]);text(i+1,88,y+51,30,true,'#FFF','center');}
+                else text(`${i+1}.`,61,y+51,32,true);
+                let nameSize=33;let name=String(r.name);
+                while(nameSize>21){ctx.font=`700 ${nameSize}px Arial`;if(ctx.measureText(name).width<455)break;nameSize--;}
+                text(name,145,y+51,nameSize,true);
+                [r.wins,r.draws,r.losses,r.diff>0?`+${r.diff}`:r.diff,r.points].forEach((v,j)=>text(v,xs[j+2],y+51,31,j===4,'#293C40','center'));
+              });
+              text('V = Vundne · U = Uafgjorte · T = Tabte · +/- = Pointforskel',43,H-29,22,false,'#697D81');
+            }
+            function prepare(){
+              canvas.toBlob(blob=>{
+                if(!blob){msg.textContent='Kunne ikke klargøre billedet.';return;}
+                readyFile=new File([blob],'Padel-Pappas-8362-Stilling.png',{type:'image/png'});
+                btn.disabled=false;btn.textContent='↗ Del stilling';
+              },'image/png');
+            }
+            const im=new Image();
+            im.onload=()=>{draw(im);prepare();};
+            im.onerror=()=>{draw(null);prepare();};
+            im.src=logo;
+            btn.addEventListener('click',async()=>{
+              if(!readyFile)return;
+              // No await before navigator.share: preserve iOS user gesture.
+              if(!navigator.share || !navigator.canShare || !navigator.canShare({files:[readyFile]})){
+                msg.textContent='Fildeling er blokeret i dette Streamlit-appvindue. Åbn appen direkte i Safari for at prøve igen.';return;
+              }
+              try{await navigator.share({files:[readyFile],title:'Padel Pappas 8362 – '+title});}
+              catch(e){if(e?.name!=='AbortError')msg.textContent='iPhone kunne ikke dele billedet fra appvinduet.';}
+            });
             </script></body></html>"""
-            components.html(share_html,height=90,scrolling=False)
+            share_html = (share_html.replace('__ROWS__', share_payload)
+                             .replace('__TITLE__', share_title)
+                             .replace('__SUBTITLE__', share_subtitle)
+                             .replace('__LOGO__', share_logo))
+            components.html(share_html, height=93, scrolling=False)
         except Exception as share_exc:
             st.warning(f'Kunne ikke klargøre deling af stillingen: {share_exc}')
 
@@ -5063,4 +5098,4 @@ with tab_log:
                                 m['red_score']=int(newr)
                                 save()
                                 st.success('Resultatet er gemt.')
-                                st.rerun()
+        
