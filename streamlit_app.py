@@ -1629,7 +1629,7 @@ tab_games,tab_table,tab_log=st.tabs(['🎾 Kampe','🏆 Stilling','📜 Historik
 with tab_games:
     completed_history = d.get('history', [])
     if completed_history:
-        choices = ['Aktuel runde'] + [f'✓ Runde {r["number"]}' for r in reversed(completed_history)]
+        choices = [f'✓ Runde {r["number"]}' for r in sorted(completed_history, key=lambda r: r['number'])] + ['Aktuel runde']
         st.caption('Se tidligere runder (resultater kan rettes under Historik)')
         game_view_key = f'pp101_game_round_{st.session_state.get("tid", "")}'
         if st.session_state.get(game_view_key) not in choices:
@@ -1928,11 +1928,11 @@ with tab_log:
     if not rounds:
         st.info('Ingen runder spillet endnu.')
     else:
-        round_numbers = [r['number'] for r in reversed(rounds)]
+        round_numbers = sorted({r['number'] for r in rounds})
         st.caption('Vælg runde')
         history_view_key = f'pp101_history_round_{st.session_state.get("tid", "")}'
         if st.session_state.get(history_view_key) not in round_numbers:
-            st.session_state[history_view_key] = round_numbers[0]
+            st.session_state[history_view_key] = round_numbers[-1]
         for start in range(0, len(round_numbers), 4):
             columns = st.columns(min(4, len(round_numbers) - start), gap='small')
             for column, number in zip(columns, round_numbers[start:start + 4]):
