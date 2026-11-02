@@ -4819,80 +4819,88 @@ _PP125_LOGO = (
 )
 
 def pp125_standing_png(data, standings_rows):
-    """Export the COMPLETE ranking as a crisp, mobile-readable, shareable PNG."""
+    """Export a clean mobile-style leaderboard PNG that looks close to the on-screen standings."""
     W = 1080
-    margin = 42
-    row_h = 81
-    top = 345
+    margin = 32
+    row_h = 126
+    top = 170
     footer = 112
     H = top + len(standings_rows) * row_h + footer
-    canvas = Image.new('RGB', (W, H), '#F6FAF9')
+    canvas = Image.new('RGBA', (W, H), '#F6FAF9')
     dr = ImageDraw.Draw(canvas)
     fontdir = '/usr/share/fonts/truetype/dejavu/'
+
     def font(size, bold=False):
         try:
             return ImageFont.truetype(fontdir + ('DejaVuSans-Bold.ttf' if bold else 'DejaVuSans.ttf'), size)
         except OSError:
             return ImageFont.load_default()
-    def fit(text, max_width, start_size=32, min_size=18, bold=True):
+
+    def fit(text, max_width, start_size=40, min_size=22, bold=True):
         txt = str(text)
         size = start_size
-        while size > min_size and dr.textbbox((0, 0), txt, font=font(size,bold))[2] > max_width:
+        while size > min_size and dr.textbbox((0, 0), txt, font=font(size, bold))[2] > max_width:
             size -= 1
-        if dr.textbbox((0,0),txt,font=font(size,bold))[2] > max_width:
-            while len(txt)>1 and dr.textbbox((0,0),txt+'…',font=font(size,bold))[2] > max_width:
+        if dr.textbbox((0, 0), txt, font=font(size, bold))[2] > max_width:
+            while len(txt) > 1 and dr.textbbox((0, 0), txt + '…', font=font(size, bold))[2] > max_width:
                 txt = txt[:-1]
             txt += '…'
-        return txt, font(size,bold)
+        return txt, font(size, bold)
+
     def center(x, y, text, f, fill):
-        bbox = dr.textbbox((0,0),str(text),font=f)
-        dr.text((x-(bbox[2]-bbox[0])/2, y),str(text),font=f,fill=fill)
-    # One cohesive, compact masthead. The original 8362 logo is unaltered except resizing.
-    dr.rounded_rectangle((margin, 27, W-margin, 251), radius=27, fill='#FFFFFF',outline='#D8E8E5',width=3)
-    dr.text((margin+26,62),'PADEL PAPPAS 8362',font=font(25,True),fill='#118171')
-    title, title_font = fit(data.get('title') or 'Turnering', 630, 52, 28)
-    dr.text((margin+25,100),title,font=title_font,fill='#182F33')
-    meta=f"{data.get('format','Padel')}  ·  {len(standings_rows)} spillere"
-    dr.text((margin+26,173),meta,font=font(24),fill='#657B7D')
+        bbox = dr.textbbox((0, 0), str(text), font=f)
+        dr.text((x - (bbox[2] - bbox[0]) / 2, y), str(text), font=f, fill=fill)
+
+    # Clean compact header, not a big poster block
+    title = data.get('title') or 'Turnering'
+    subtitle = 'SLUTSTILLING' if finals_complete(data) else 'STILLING'
+    dr.text((margin, 24), subtitle, font=font(30, True), fill='#138777')
+    title_txt, title_font = fit(title, 700, 58, 34, True)
+    dr.text((margin, 58), title_txt, font=title_font, fill='#1B3136')
+    meta = f"{data.get('format', 'Padel')} · {len(standings_rows)} spillere"
+    dr.text((margin, 118), meta, font=font(24), fill='#657B7D')
+
+    # Small transparent logo top-right
     try:
-        img=Image.open(BytesIO(zlib.decompress(base64.b64decode(_PP125_LOGO)))).convert('RGB')
-        img.thumbnail((222,205),Image.Resampling.LANCZOS)
-        canvas.paste(img,(W-margin-12-img.width,36+(205-img.height)//2))
+        img = Image.open(BytesIO(zlib.decompress(base64.b64decode(_PP125_LOGO)))).convert('RGBA')
+        img.thumbnail((175, 120), Image.Resampling.LANCZOS)
+        canvas.alpha_composite(img, (W - margin - img.width, 28 + (110 - img.height)//2))
     except Exception:
         pass
-    dr.text((margin+7,276),'SLUTSTILLING' if finals_complete(data) else 'STILLING',font=font(32,True),fill='#203A3D')
-    # Align numeric columns; leave generous space for full names.
-    cols = [margin+18, margin+86, 690, 758, 826, 902, 985]
-    for x, txt in zip(cols,['#','Spiller','V','U','T','+/-','Point']):
-        if x >= 694:
-            center(x,318,txt,font(20,True),'#536B6F')
+
+    cols = [margin + 16, margin + 82, 665, 740, 815, 900, 1000]
+    for x, txt in zip(cols, ['#', 'Spiller', 'V', 'U', 'T', '+/-', 'Point']):
+        if x >= 660:
+            center(x, top - 36, txt, font(22, True), '#536B6F')
         else:
-            dr.text((x,318),txt,font=font(20,True),fill='#536B6F')
-    medals=('🥇','🥈','🥉')
+            dr.text((x, top - 36), txt, font=font(22, True), fill='#536B6F')
+
     for idx, row in enumerate(standings_rows):
-        y=top+idx*row_h
-        bg=('#FFF7DF','#F0F3F7','#FFF0E7')[idx] if idx<3 else '#FFFFFF'
-        outline=('#D6AA3A','#AAB9C8','#C68A64')[idx] if idx<3 else '#DEEBE9'
-        dr.rounded_rectangle((margin,y+4,W-margin,y+row_h-5),radius=19,fill=bg,outline=outline,width=4 if idx<3 else 2)
-        # Draw medal circles using the same 3 award colors as the on-screen table.
-        if idx<3:
-            medal_color=('#D5A224','#A8B4C2','#B7774A')[idx]
-            dr.ellipse((margin+12,y+20,margin+55,y+63),fill=medal_color)
-            center(margin+33,y+25,str(idx+1),font(22,True),'#FFFFFF')
+        y = top + idx * row_h
+        bg = ('#FFF7DF', '#F0F3F7', '#FFF0E7')[idx] if idx < 3 else '#FFFFFF'
+        outline = ('#D6AA3A', '#AAB9C8', '#C68A64')[idx] if idx < 3 else '#DDEAE8'
+        dr.rounded_rectangle((margin, y + 4, W - margin, y + row_h - 8), radius=28, fill=bg, outline=outline, width=4 if idx < 3 else 2)
+
+        if idx < 3:
+            medal_color = ('#D5A224', '#A8B4C2', '#B7774A')[idx]
+            dr.ellipse((margin + 14, y + 34, margin + 72, y + 92), fill=medal_color)
+            center(margin + 43, y + 45, str(idx + 1), font(28, True), '#FFFFFF')
         else:
-            dr.text((cols[0],y+23),str(idx+1)+'.',font=font(25,True),fill='#23393C')
-        name, name_f=fit(row['name'], 489, 30, 19)
-        dr.text((cols[1],y+23),name,font=name_f,fill='#20383B')
-        diff=int(row['diff'])
-        values=[row['wins'],row['draws'],row['losses'],f'{diff:+d}',row['points']]
-        for x,v in zip(cols[2:], values):
-            center(x,y+24,str(v),font(27,x==cols[-1]),'#18363A')
-    end=top+len(standings_rows)*row_h
-    dr.text((margin+8,end+22),'V = Vundne    U = Uafgjorte    T = Tabte    +/- = Pointforskel',font=font(20),fill='#64787B')
-    dr.text((margin+8,end+64),'Padel Pappas 8362  ·  '+datetime.now().strftime('%d.%m.%Y'),font=font(19,True),fill='#138777')
-    out=BytesIO()
-    canvas.save(out,format='PNG',optimize=True)
+            dr.text((cols[0], y + 42), str(idx + 1) + '.', font=font(32, True), fill='#23393C')
+
+        name, name_f = fit(row['name'], 430, 33, 22, True)
+        dr.text((cols[1], y + 40), name, font=name_f, fill='#20383B')
+        diff = int(row['diff'])
+        values = [row['wins'], row['draws'], row['losses'], f'{diff:+d}', row['points']]
+        for x, v in zip(cols[2:], values):
+            center(x, y + 42, str(v), font(31, x == cols[-1]), '#18363A')
+
+    end = top + len(standings_rows) * row_h
+    dr.text((margin + 2, end + 18), 'V = Vundne · U = Uafgjorte · T = Tabte · +/- = Pointforskel', font=font(22), fill='#64787B')
+    out = BytesIO()
+    canvas.convert('RGB').save(out, format='PNG', optimize=True)
     return out.getvalue()
+
 
 with tab_table:
     st.subheader('🏆 Leaderboard')
@@ -4921,34 +4929,54 @@ with tab_table:
                 '</div>',unsafe_allow_html=True)
         st.caption('V = Vundne · U = Uafgjorte · T = Tabte · +/- = Pointforskel')
         try:
-            pp125_image = pp125_standing_png(d, rows)
-            png_filename = f'Padel-Pappas-8362-Stilling-{re.sub(r"[^A-Za-z0-9_-]", "-", d.get("title", "Turnering"))}.png'
-            st.download_button(
-                '📷 Download hele stillingen som PNG',
-                data=pp125_image,
-                file_name=png_filename,
-                mime='image/png',
-                use_container_width=True,
-                key='pp125_download_standing_png',
-            )
-            st.caption('iPhone-tip: Hvis download ikke gemmer i Fotos, så brug visningen nedenfor og hold fingeren nede på billedet for at gemme det.')
-
-            with st.expander('🖼️ Vis stillingsbillede til gemning på telefon'):
-                st.image(pp125_image, use_container_width=True)
-                st.markdown(
-                    '<div style="padding:10px 12px;border:1px solid #d7e5e2;border-radius:14px;background:#f8fbfb;color:#4d676b;font-size:0.95rem;line-height:1.5;">'
-                    '<strong>Gem på iPhone:</strong> Tryk og hold på billedet ovenfor og vælg <strong>Gem i Fotos</strong> eller <strong>Føj til Fotos</strong>.'
-                    '</div>',
-                    unsafe_allow_html=True,
-                )
-                b64 = base64.b64encode(pp125_image).decode('ascii')
-                st.markdown(
-                    f'<a href="data:image/png;base64,{b64}" target="_blank" style="display:block;text-align:center;margin-top:12px;padding:14px 16px;border-radius:18px;background:#254B54;color:white;text-decoration:none;font-weight:700;">🔎 Åbn PNG-billede alene</a>',
-                    unsafe_allow_html=True,
-                )
-                st.caption('Hvis knappen virker på din telefon, kan du åbne billedet alene og derefter gemme det derfra.')
-        except Exception as pp125_exc:
-            st.warning(f'Kunne ikke generere stillingsbilledet: {pp125_exc}')
+            # The image is generated in memory only; there are no download or preview controls.
+            share_image = pp125_standing_png(d, rows)
+            share_b64 = base64.b64encode(share_image).decode('ascii')
+            share_filename = f'Padel-Pappas-8362-Stilling-{re.sub(r"[^A-Za-z0-9_-]", "-", d.get("title", "Turnering"))}.png'
+            share_title = html.escape(str(d.get('title') or 'Padel Pappas'), quote=True)
+            share_filename_js = json.dumps(share_filename)
+            share_title_js = json.dumps(str(d.get('title') or 'Padel Pappas'))
+            share_html = f"""<!doctype html><html lang="da"><head><meta name="viewport" content="width=device-width, initial-scale=1" />
+            <style>
+              html,body{{margin:0;padding:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}}
+              #share{{display:block;width:100%;min-height:54px;border:0;border-radius:15px;background:#148479;color:white;font-size:17px;font-weight:650;cursor:pointer;touch-action:manipulation;}}
+              #share:disabled{{opacity:.65}}
+              #info{{font-size:13px;color:#667b7d;line-height:1.35;margin:8px 2px 0;}}
+            </style></head><body>
+            <button type="button" id="share">↗ Del stilling</button>
+            <div id="info" role="status" aria-live="polite"></div>
+            <script>
+            const button=document.getElementById('share');
+            const info=document.getElementById('info');
+            // Convert embedded image to a File without fetching from another domain.
+            const bytes64={json.dumps(share_b64)};
+            const filename={share_filename_js};
+            const title={share_title_js};
+            button.addEventListener('click', async ()=>{{
+              info.textContent='';
+              if (!navigator.share || !navigator.canShare) {{
+                info.textContent='Denne browser understøtter ikke deling af billedfiler her. Åbn eventuelt appen direkte i Safari.';
+                return;
+              }}
+              button.disabled=true;
+              try {{
+                const binary=atob(bytes64);
+                const bytes=new Uint8Array(binary.length);
+                for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+                const file=new File([bytes],filename,{{type:'image/png'}});
+                if(!navigator.canShare({{files:[file]}})){{
+                  info.textContent='Billeddeling er ikke tilladt i dette appvindue. Prøv at åbne Padel Pappas direkte i Safari.';
+                  return;
+                }}
+                await navigator.share({{files:[file],title:title}});
+              }} catch(e) {{
+                if(e?.name!=='AbortError') info.textContent='iPhone kunne ikke åbne delingsmenuen her. Prøv eventuelt direkte i Safari.';
+              }} finally {{button.disabled=false;}}
+            }});
+            </script></body></html>"""
+            components.html(share_html,height=90,scrolling=False)
+        except Exception as share_exc:
+            st.warning(f'Kunne ikke klargøre deling af stillingen: {share_exc}')
 
         with st.expander('Se komplette statistikker'):
             st.dataframe([{'Spiller':r['name'],'KS':r['played'],'V':r['wins'],'U':r['draws'],'T':r['losses'],'Point':r['points'],'PF':r['diff']} for r in rows],hide_index=True,use_container_width=True)
