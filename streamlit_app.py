@@ -1,4 +1,4 @@
-# Padel Pappas 11.5 – AUTO uden bindestreg
+# Padel Pappas 11.8 – Americano planlægges på forhånd; finale er ekstra
 import html
 import json
 import secrets
@@ -1538,7 +1538,7 @@ st.markdown(STYLE, unsafe_allow_html=True)
 
 def fresh():
     return {'title':'Søndagspadel','players':[],'format':'Mexicano','round_limit':7,'target':32,
-            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker','ranking_priority':'Point først','finale':None}
+            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker','ranking_priority':'Point først','finale':None,'americano_schedule':[]}
 
 
 def save():
@@ -1570,6 +1570,78 @@ def sorted_players(data):
     return [r['name'] for r in standings(data)]
 
 
+def planned_americano(data):
+    """Plan all ordinary Americano rounds before play, separately from the final."""
+    players = list(data['players'])
+    limit = int(data['round_limit'])
+    previous = []
+    plan = []
+    if data.get('partner_mode') == 'Fast makker':
+        pairs = [players[i:i + 2] for i in range(0, len(players), 2)]
+        for r in range(limit):
+            games, byes = make_fixed_pairs_round(pairs, 'Americano', previous, round_number=r)
+            plan.append({'matches': games, 'byes': byes})
+            previous.extend(games)
+        return plan
+
+    # Circle method: for a multiple of four, every player gets each other
+    # player once as a partner in the first N-1 rounds.
+    if len(players) % 4 == 0:
+        rng = random.Random(secrets.randbits(64))
+        rng.shuffle(players)
+        ring = list(players)
+        for round_idx in range(limit):
+            pairings = [(ring[i], ring[-1-i]) for i in range(len(ring)//2)]
+            # Distribute partner pairs into matches; keep opponent repeats low.
+            rng.shuffle(pairings)
+            games = []
+            while pairings:
+                a = pairings.pop()
+                def opponent_cost(b):
+                    return sum(sum(1 for m in previous if
+                                   (x in m['blue'] and y in m['red']) or
+                                   (x in m['red'] and y in m['blue']))
+                               for x in a for y in b)
+                b = min(pairings, key=lambda candidate: (opponent_cost(candidate), rng.random()))
+                pairings.remove(b)
+                games.append({'court':len(games)+1, 'blue':list(a), 'red':list(b),
+                              'blue_score':None, 'red_score':None})
+            plan.append({'matches':games, 'byes':[]})
+            previous.extend(games)
+            # Standard round-robin rotation with first player fixed.
+            ring = [ring[0],ring[-1],*ring[1:-1]]
+        return plan
+
+    # Other group sizes require byes; optimise over the entire schedule.
+    # Several full candidates are compared for partner repetition and byes.
+    best_score = None
+    best_plan = None
+    for attempt in range(12):
+        schedule = []
+        matches_so_far = []
+        byes_count = {name:0 for name in players}
+        for r in range(limit):
+            # Prioritise people with fewer previous games to balance byes.
+            ordered = sorted(players, key=lambda name:(byes_count[name],
+                                 random.Random(attempt * 307 + r * 71 + players.index(name)).random()))
+            generated, byes = make_round(ordered, 'Americano', matches_so_far,
+                                        seed=(attempt+1)*100003 + r*71)
+            for name in byes: byes_count[name] += 1
+            schedule.append({'matches':generated, 'byes':byes})
+            matches_so_far.extend(generated)
+        pair_counts = {}
+        for m in matches_so_far:
+            for team in (m['blue'],m['red']):
+                key=tuple(sorted(team))
+                pair_counts[key] = pair_counts.get(key,0)+1
+        repeat = sum(max(0, c-1) for c in pair_counts.values())
+        score = (repeat, max(byes_count.values())-min(byes_count.values()))
+        if best_score is None or score < best_score:
+            best_score, best_plan = score, schedule
+            if score == (0,0): break
+    return best_plan
+
+
 def new_round(data):
     if data['round'] >= data['round_limit']:
         return False
@@ -1577,12 +1649,28 @@ def new_round(data):
         return False
     if data['matches']:
         data['history'].append({'number':data['round'],'matches':data['matches']})
-    order=sorted_players(data) if data['round'] and data['format']=='Mexicano' else list(data['players'])
-    if data.get('partner_mode') == 'Fast makker':
-        pairs = [data['players'][i:i+2] for i in range(0,len(data['players']),2)]
-        generated,byes = make_fixed_pairs_round(pairs,data['format'],all_matches(data),round_number=data['round'])
+    if data['format'] == 'Americano':
+        if len(data.get('americano_schedule', [])) != int(data['round_limit']):
+            # Existing tournaments without a saved plan: preserve completed
+            # rounds and generate a complete remaining schedule only once.
+            remaining = int(data['round_limit']) - int(data['round'])
+            if data['round'] == 0:
+                data['americano_schedule'] = planned_americano(data)
+            else:
+                temp = dict(data)
+                temp['round_limit'] = remaining
+                temp_plan = planned_americano(temp)
+                data['americano_schedule'] = ([None] * int(data['round'])) + temp_plan
+        entry = data['americano_schedule'][data['round']]
+        generated = [dict(m) for m in entry['matches']]
+        byes = list(entry['byes'])
     else:
-        generated,byes=make_round(order,data['format'],all_matches(data),seed=data['round']*87+37)
+        order=sorted_players(data) if data['round'] and data['format']=='Mexicano' else list(data['players'])
+        if data.get('partner_mode') == 'Fast makker':
+            pairs = [data['players'][i:i+2] for i in range(0,len(data['players']),2)]
+            generated,byes = make_fixed_pairs_round(pairs,data['format'],all_matches(data),round_number=data['round'])
+        else:
+            generated,byes=make_round(order,data['format'],all_matches(data),seed=data['round']*87+37)
     data['round']+=1
     data['matches']=generated
     data['byes']=byes
@@ -1748,7 +1836,7 @@ with st.sidebar:
 
 
 st.markdown(
-    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 11.6</div>'
+    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 11.8</div>'
     f'<div class="hero-title">{html.escape(d["title"])}</div>'
     f'<div class="subtitle">{html.escape(d["format"])} · {html.escape(d.get("partner_mode", "Skiftende makker"))} · {len(d["players"])} spillere</div>'
     + (f'<div class="p7-id">Turnerings-ID: {html.escape(st.session_state.tid)}</div>' if st.session_state.get('tid') else '')
@@ -1798,6 +1886,11 @@ if st.session_state.get('tid'):
             elif d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode','Skiftende makker')):
                 st.error('En startet turnering kan ikke ændre spillere eller turneringsform. Nulstil først.')
             else:
+                if not d['round'] and (players != d['players'] or fmt != d['format'] or partner_mode != d.get('partner_mode') or int(rounds) != int(d['round_limit'])):
+                    d['americano_schedule'] = []
+                if d['round'] and int(rounds) != int(d['round_limit']) and d['format'] == 'Americano':
+                    st.error('Antal runder kan ikke ændres efter Americano er startet, fordi programmet er fastlagt.')
+                    st.stop()
                 d.update(title=title,players=players,format=fmt,partner_mode=partner_mode,ranking_priority=ranking_priority,round_limit=int(rounds),target=int(target))
                 save();st.success('Opsætning gemt')
         st.divider()
@@ -1863,7 +1956,7 @@ with tab_games:
         can_reshuffle = (d['round'] == 1 and not d['history'] and
                          all(m.get('blue_score') is None and m.get('red_score') is None
                              for m in d['matches']))
-        if can_reshuffle:
+        if can_reshuffle and d['format'] != 'Americano':
             st.caption('Ikke tilfreds med fordelingen? Bland første runde igen, inden du gemmer resultater.')
             if st.button('🔀 Bland hold igen', use_container_width=True,
                          key=f"reshuffle_first_{st.session_state.tid}"):
