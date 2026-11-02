@@ -4922,14 +4922,31 @@ with tab_table:
         st.caption('V = Vundne · U = Uafgjorte · T = Tabte · +/- = Pointforskel')
         try:
             pp125_image = pp125_standing_png(d, rows)
+            png_filename = f'Padel-Pappas-8362-Stilling-{re.sub(r"[^A-Za-z0-9_-]", "-", d.get("title", "Turnering"))}.png'
             st.download_button(
                 '📷 Download hele stillingen som PNG',
                 data=pp125_image,
-                file_name=f'Padel-Pappas-8362-Stilling-{re.sub(r"[^A-Za-z0-9_-]", "-", d.get("title", "Turnering"))}.png',
+                file_name=png_filename,
                 mime='image/png',
                 use_container_width=True,
                 key='pp125_download_standing_png',
             )
+            st.caption('iPhone-tip: Hvis download ikke gemmer i Fotos, så brug visningen nedenfor og hold fingeren nede på billedet for at gemme det.')
+
+            with st.expander('🖼️ Vis stillingsbillede til gemning på telefon'):
+                st.image(pp125_image, use_container_width=True)
+                st.markdown(
+                    '<div style="padding:10px 12px;border:1px solid #d7e5e2;border-radius:14px;background:#f8fbfb;color:#4d676b;font-size:0.95rem;line-height:1.5;">'
+                    '<strong>Gem på iPhone:</strong> Tryk og hold på billedet ovenfor og vælg <strong>Gem i Fotos</strong> eller <strong>Føj til Fotos</strong>.'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
+                b64 = base64.b64encode(pp125_image).decode('ascii')
+                st.markdown(
+                    f'<a href="data:image/png;base64,{b64}" target="_blank" style="display:block;text-align:center;margin-top:12px;padding:14px 16px;border-radius:18px;background:#254B54;color:white;text-decoration:none;font-weight:700;">🔎 Åbn PNG-billede alene</a>',
+                    unsafe_allow_html=True,
+                )
+                st.caption('Hvis knappen virker på din telefon, kan du åbne billedet alene og derefter gemme det derfra.')
         except Exception as pp125_exc:
             st.warning(f'Kunne ikke generere stillingsbilledet: {pp125_exc}')
 
