@@ -16,43 +16,42 @@ from engine import make_round, make_fixed_pairs_round, table
 # Den interaktive banes HTML er indbygget i denne fil.
 # Streamlit kan derfor indlaese den uden ekstra mapper i GitHub.
 _COURT_HTML_ZLIB_BASE64 = (
-    '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'
+    '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'
 )
 _court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
-_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v91'
+_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v92'
 _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
 if not _component_file.exists() or _component_file.read_bytes() != _court_html:
     _component_file.write_bytes(_court_html)
 st.set_page_config(page_title='Padel Pappas', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
 
-court_input = components.declare_component('padel_court_input_v91', path=str(_component_dir))
+court_input = components.declare_component('padel_court_input_v92', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
 DB_URL = str(st.secrets.get('SUPABASE_URL', '')).rstrip('/')
 DB_KEY = str(st.secrets.get('SUPABASE_SECRET_KEY', ''))
@@ -1068,6 +1067,21 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
  .standing-heading,.standing-row{grid-template-columns:30px minmax(58px,1fr) 22px 22px 22px 35px 37px!important;gap:3px!important}
  .standing-rank{font-size:18px!important}
 }
+
+/* 9.2 — diskret redigering under banekortet */
+.stApp [class*="st-key-court_edit_actions_"] {
+  display:flex!important;justify-content:flex-end!important;
+  margin-top:-12px!important;margin-bottom:8px!important;
+  padding-right:12px!important;position:relative!important;z-index:2!important;
+}
+.stApp [class*="st-key-court_edit_actions_"] [data-testid="stPopover"] button,
+.stApp [class*="st-key-court_edit_actions_"] button {
+  background:transparent!important;color:#537780!important;-webkit-text-fill-color:#537780!important;
+  border:0!important;box-shadow:none!important;min-height:29px!important;
+  padding:2px 7px!important;font-size:12px!important;font-weight:600!important;
+}
+.stApp [class*="st-key-court_edit_actions_"] button *{color:#537780!important;-webkit-text-fill-color:#537780!important}
+.stApp [class*="st-key-court_edit_actions_"] button:hover{background:#edf7f5!important;color:#156f65!important}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1360,21 +1374,22 @@ with tab_games:
             else:
                 pass
             if d.get('partner_mode') != 'Fast makker':
-              with st.popover('Rediger hold', use_container_width=True):
-                p = d['players']
-                chosen = st.multiselect('Vælg fire spillere', p, default=m['blue'] + m['red'],
-                                        key=f"edit_{d['round']}_{i}", max_selections=4)
-                if len(chosen) == 4:
-                    if st.button('Byt makkerpar', key=f"swap_{d['round']}_{i}"):
-                        m['blue'] = [chosen[0], chosen[2]]
-                        m['red'] = [chosen[1], chosen[3]]
-                        m['blue_score'] = None
-                        m['red_score'] = None
-                        # Glem tidligere scores for netop denne kamp ved makkerskift.
-                        for colour in ('blue', 'red'):
-                            st.session_state.pop(f"{colour}_{d['round']}_{i}", None)
-                        save()
-                        st.rerun()
+                # Diskret redigeringslink direkte under banevisningen.
+                with st.container(key=f"court_edit_actions_{d['round']}_{i}"):
+                    with st.popover('✎ Rediger hold', use_container_width=False):
+                        p = d['players']
+                        chosen = st.multiselect('Vælg fire spillere', p, default=m['blue'] + m['red'],
+                                                key=f"edit_{d['round']}_{i}", max_selections=4)
+                        if len(chosen) == 4:
+                            if st.button('Byt makkerpar', key=f"swap_{d['round']}_{i}"):
+                                m['blue'] = [chosen[0], chosen[2]]
+                                m['red'] = [chosen[1], chosen[3]]
+                                m['blue_score'] = None
+                                m['red_score'] = None
+                                for colour in ('blue', 'red'):
+                                    st.session_state.pop(f"{colour}_{d['round']}_{i}", None)
+                                save()
+                                st.rerun()
 
         st.divider()
         st.subheader('Gem hele runden')
