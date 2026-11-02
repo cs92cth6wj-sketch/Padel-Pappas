@@ -1237,6 +1237,51 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
   border-color:#62B8A8!important;box-shadow:0 0 0 3px rgba(32,155,134,.13)!important;
 }
 
+
+/* 9.6: Streamlit input har flere indlejrede rammer; fjern den sorte yderste
+   kant fra ALLE lag i både sidebar og formularer, også ved fokus. */
+.stApp [data-testid="stTextInput"] [data-testid="stTextInputRootElement"],
+.stApp [data-testid="stTextInput"] [data-baseweb="input"],
+.stApp [data-testid="stTextInput"] [data-baseweb="base-input"],
+.stApp [data-testid="stTextInput"] [data-baseweb="input"] > div,
+.stApp [data-testid="stTextInput"] input,
+.stApp [data-testid="stTextArea"] [data-baseweb="textarea"],
+.stApp [data-testid="stTextArea"] textarea,
+.stApp [data-testid="stNumberInput"] [data-baseweb="input"],
+.stApp [data-testid="stNumberInput"] [data-baseweb="base-input"] {
+ background:#FFFFFF!important;
+ color:#20343D!important;-webkit-text-fill-color:#20343D!important;
+ border-color:#CFDEE1!important;
+ outline:0!important;
+ box-shadow:none!important;
+ -webkit-box-shadow:none!important;
+}
+/* Kun EN synlig ramme: input-containeren, ikke flere indlejrede lag. */
+.stApp [data-testid="stTextInput"] [data-baseweb="input"],
+.stApp [data-testid="stTextArea"] [data-baseweb="textarea"],
+.stApp [data-testid="stNumberInput"] [data-baseweb="input"] {
+ border:1px solid #CFDEE1!important;border-radius:13px!important;
+ overflow:hidden!important;box-shadow:none!important;
+}
+.stApp [data-testid="stTextInput"] [data-baseweb="base-input"],
+.stApp [data-testid="stTextInput"] [data-baseweb="base-input"] > div,
+.stApp [data-testid="stTextInput"] input,
+.stApp [data-testid="stTextArea"] textarea,
+.stApp [data-testid="stNumberInput"] input {
+ border:0!important;outline:0!important;box-shadow:none!important;
+}
+.stApp [data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
+.stApp [data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
+.stApp [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within {
+ border-color:#55B6A3!important;
+ box-shadow:0 0 0 3px rgba(40,160,139,.14)!important;
+}
+/* Sidepanel i nyere Streamlit kan bruge section, aside eller div. */
+[data-testid="stSidebar"] [data-testid="stTextInputRootElement"],
+[data-testid="stSidebarContent"] [data-testid="stTextInputRootElement"]{
+ border:0!important;box-shadow:none!important;outline:0!important;
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
