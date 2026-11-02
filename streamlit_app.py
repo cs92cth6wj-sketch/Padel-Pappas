@@ -1,4 +1,4 @@
-# Padel Pappas 8.1 - Light Edition (rettet filstart)
+# Padel Pappas 10.1 – Rundevalg med knapper
 import html
 import json
 import secrets
@@ -1418,6 +1418,27 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
  background:#ffffff!important;background-color:#ffffff!important;
 }
 
+
+/* 10.1: Rundevælgere bruger rigtige knapper og ingen mørke BaseWeb-selectfelter. */
+.stApp [data-testid="stTabs"] [data-testid="stButton"] button {
+  border-radius:12px!important;
+  min-height:43px!important;
+}
+.stApp [data-testid="stTabs"] [data-testid="stButton"] button[kind="secondary"] {
+  background:#FFFFFF!important;
+  border:1px solid #D7E5E9!important;
+  color:#203840!important;
+  box-shadow:none!important;
+}
+.stApp [data-testid="stTabs"] [data-testid="stButton"] button[kind="secondary"] *{
+  color:#203840!important;-webkit-text-fill-color:#203840!important;
+}
+.stApp [data-testid="stTabs"] [data-testid="stButton"] button[kind="primary"]{
+  background:#137F75!important;border:1px solid #137F75!important;color:#FFFFFF!important;
+}
+.stApp [data-testid="stTabs"] [data-testid="stButton"] button[kind="primary"] *{
+  color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
+}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1609,8 +1630,19 @@ with tab_games:
     completed_history = d.get('history', [])
     if completed_history:
         choices = ['Aktuel runde'] + [f'✓ Runde {r["number"]}' for r in reversed(completed_history)]
-        viewing = st.selectbox('Se runde', choices, key=f'pp9_round_browser_{st.session_state.get("tid", "")}',
-                               help='Tidligere runder vises her uden redigering. Brug Historik til rettelser.')
+        st.caption('Se tidligere runder (resultater kan rettes under Historik)')
+        game_view_key = f'pp101_game_round_{st.session_state.get("tid", "")}'
+        if st.session_state.get(game_view_key) not in choices:
+            st.session_state[game_view_key] = 'Aktuel runde'
+        for start in range(0, len(choices), 4):
+            columns = st.columns(min(4, len(choices) - start), gap='small')
+            for column, choice in zip(columns, choices[start:start + 4]):
+                with column:
+                    if st.button(choice, key=f'pp101_g_{start}_{choice}',
+                                 type='primary' if st.session_state[game_view_key] == choice else 'secondary',
+                                 use_container_width=True):
+                        st.session_state[game_view_key] = choice
+        viewing = st.session_state[game_view_key]
         if viewing != 'Aktuel runde':
             previous_num = int(viewing.split()[-1])
             previous = next((x for x in completed_history if x['number'] == previous_num), None)
@@ -1897,10 +1929,19 @@ with tab_log:
         st.info('Ingen runder spillet endnu.')
     else:
         round_numbers = [r['number'] for r in reversed(rounds)]
-        with st.container(key='pp98_round_selector'):
-            selected_round = st.selectbox('Vælg runde', round_numbers,
-                                          format_func=lambda n:f'Runde {n}',
-                                          key=f'pp97_hist_round_{st.session_state.get("tid","")}')
+        st.caption('Vælg runde')
+        history_view_key = f'pp101_history_round_{st.session_state.get("tid", "")}'
+        if st.session_state.get(history_view_key) not in round_numbers:
+            st.session_state[history_view_key] = round_numbers[0]
+        for start in range(0, len(round_numbers), 4):
+            columns = st.columns(min(4, len(round_numbers) - start), gap='small')
+            for column, number in zip(columns, round_numbers[start:start + 4]):
+                with column:
+                    if st.button(f'Runde {number}', key=f'pp101_h_{start}_{number}',
+                                 type='primary' if st.session_state[history_view_key] == number else 'secondary',
+                                 use_container_width=True):
+                        st.session_state[history_view_key] = number
+        selected_round = st.session_state[history_view_key]
         selected = next(r for r in rounds if r['number'] == selected_round)
         st.caption('Vælg en runde for at se resultater. Tryk på Ret resultat for at ændre.')
         for j, m in enumerate(selected['matches']):
