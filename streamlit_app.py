@@ -1439,6 +1439,41 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 .stApp [data-testid="stTabs"] [data-testid="stButton"] button[kind="primary"] *{
   color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
 }
+
+/* 10.3: konsekvent lodret afstand mellem kort på telefoner */
+.p7-stats{margin:14px 0 0!important;gap:12px!important}
+.pp9-progress{margin:0!important}
+.stApp [data-testid="stTabs"] [role="tablist"],
+.stApp [data-baseweb="tab-list"]{margin:0 0 12px!important;gap:12px!important}
+/* Streamlit elementer er søskende: det er mellem elementerne luft skal sættes. */
+.stApp [data-testid="stElementContainer"]:has(> [data-testid="stMarkdownContainer"] .p7-stats){margin-bottom:14px!important}
+.stApp [data-testid="stElementContainer"]:has(> [data-testid="stMarkdownContainer"] .pp9-progress){margin-bottom:14px!important}
+.stApp [data-testid="stElementContainer"]:has(> [data-testid="stMarkdownContainer"] .p7-stats) + [data-testid="stElementContainer"]{margin-top:0!important}
+.stApp [data-testid="stTabs"]{margin-top:0!important}
+@media(max-width:700px){
+ .p7-stats{gap:10px!important;margin:10px 0 0!important}
+ .p7-stat{min-height:86px!important;border-radius:14px!important}
+ .stApp [data-testid="stElementContainer"]:has(.p7-stats){margin-bottom:12px!important}
+ .stApp [data-testid="stElementContainer"]:has(.pp9-progress){margin-bottom:12px!important}
+ .pp9-progress{padding:12px!important;border-radius:15px!important}
+ .stApp [data-testid="stTabs"] [role="tablist"],
+ .stApp [data-baseweb="tab-list"]{gap:10px!important;margin:0 0 16px!important}
+ .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"],
+ .stApp [data-baseweb="tab-list"] [data-baseweb="tab"]{min-height:82px!important}
+ /* Rundevalg: knapper på to kolonner i stedet for lodret én efter én. */
+ .stApp [data-testid="stHorizontalBlock"]:has([class*="st-key-pp101_g_"]),
+ .stApp [data-testid="stHorizontalBlock"]:has([class*="st-key-pp101_h_"]){
+   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   column-gap:10px!important;row-gap:10px!important;align-items:stretch!important;
+ }
+ .stApp [data-testid="stHorizontalBlock"]:has([class*="st-key-pp101_g_"]) > [data-testid="stColumn"],
+ .stApp [data-testid="stHorizontalBlock"]:has([class*="st-key-pp101_h_"]) > [data-testid="stColumn"]{
+   width:100%!important;min-width:0!important;max-width:none!important;flex:initial!important;
+ }
+ .stApp [class*="st-key-pp101_g_"] button,
+ .stApp [class*="st-key-pp101_h_"] button{min-height:46px!important;border-radius:12px!important}
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1555,7 +1590,7 @@ if 'tourney' not in st.session_state:
     st.session_state.tourney=fresh()
 d=st.session_state.tourney
 st.markdown(
-    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 9.1</div>'
+    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 10.3</div>'
     f'<div class="hero-title">{html.escape(d["title"])}</div>'
     f'<div class="subtitle">{html.escape(d["format"])} · {html.escape(d.get("partner_mode", "Skiftende makker"))} · {len(d["players"])} spillere</div>'
     + (f'<div class="p7-id">Turnerings-ID: {html.escape(st.session_state.tid)}</div>' if st.session_state.get('tid') else '')
