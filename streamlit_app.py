@@ -1,4 +1,4 @@
-""Padel Samlet 2.0 — independently implemented mobile-first tournament app."""
+# Padel Pappas 8.1 - Light Edition (rettet filstart)
 import html
 import json
 import secrets
