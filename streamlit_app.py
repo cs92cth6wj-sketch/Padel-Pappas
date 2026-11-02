@@ -1,4 +1,4 @@
-# Padel Pappas 10.1 – Rundevalg med knapper
+# Padel Pappas 11.5 – AUTO uden bindestreg
 import html
 import json
 import secrets
@@ -16,42 +16,39 @@ from engine import make_round, make_fixed_pairs_round, table
 # Den interaktive banes HTML er indbygget i denne fil.
 # Streamlit kan derfor indlaese den uden ekstra mapper i GitHub.
 _COURT_HTML_ZLIB_BASE64 = (
-    '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'
+    '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'
 )
 _court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
-_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v94'
+_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v95'
 _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
 if not _component_file.exists() or _component_file.read_bytes() != _court_html:
@@ -63,7 +60,7 @@ _APP_ICON_PATH = Path(__file__).parent / 'app_icon.png'
 _APP_ICON = Image.open(_APP_ICON_PATH) if _APP_ICON_PATH.exists() else '🎾'
 st.set_page_config(page_title='Padel Pappas', page_icon=_APP_ICON, layout='centered', initial_sidebar_state='collapsed')
 
-court_input = components.declare_component('padel_court_input_v94', path=str(_component_dir))
+court_input = components.declare_component('padel_court_input_v95', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
 DB_URL = str(st.secrets.get('SUPABASE_URL', '')).rstrip('/')
 DB_KEY = str(st.secrets.get('SUPABASE_SECRET_KEY', ''))
@@ -1504,6 +1501,36 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
  .stApp [data-baseweb="tab-list"]{margin:0 0 14px!important;gap:9px!important;}
 }
 
+
+/* 11.6 – samme diskrete handlingsdesign som Rediger hold */
+.stApp [class*="st-key-pp116_share_actions"],
+.stApp [class*="st-key-pp116_history_edit_"] {
+  display:flex!important; justify-content:flex-start!important;
+  width:100%!important; margin:4px 0 10px!important;
+  padding:0!important; background:transparent!important;
+  border:0!important; box-shadow:none!important;
+}
+.stApp [class*="st-key-pp116_share_actions"] [data-testid="stPopover"] button,
+.stApp [class*="st-key-pp116_history_edit_"] [data-testid="stPopover"] button {
+  min-height:33px!important; padding:5px 11px!important;
+  border:1px solid #dcebe9!important; border-radius:9px!important;
+  background:#f4faf9!important;
+  color:#42777d!important; -webkit-text-fill-color:#42777d!important;
+  font-size:13px!important; font-weight:650!important;
+  box-shadow:none!important;
+}
+.stApp [class*="st-key-pp116_share_actions"] [data-testid="stPopover"] button *,
+.stApp [class*="st-key-pp116_history_edit_"] [data-testid="stPopover"] button * {
+  color:#42777d!important; -webkit-text-fill-color:#42777d!important;
+}
+.stApp [class*="st-key-pp116_share_actions"] [data-testid="stPopover"] button:hover,
+.stApp [class*="st-key-pp116_history_edit_"] [data-testid="stPopover"] button:hover {
+  background:#e9f5f2!important; border-color:#b9d9d4!important;
+}
+@media(max-width:520px){
+ .stApp [class*="st-key-pp116_share_actions"] [data-testid="stPopover"] button,
+ .stApp [class*="st-key-pp116_history_edit_"] [data-testid="stPopover"] button {font-size:12px!important;min-height:30px!important;padding:4px 9px!important}
+}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1721,16 +1748,17 @@ with st.sidebar:
 
 
 st.markdown(
-    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 11.4</div>'
+    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 11.6</div>'
     f'<div class="hero-title">{html.escape(d["title"])}</div>'
     f'<div class="subtitle">{html.escape(d["format"])} · {html.escape(d.get("partner_mode", "Skiftende makker"))} · {len(d["players"])} spillere</div>'
     + (f'<div class="p7-id">Turnerings-ID: {html.escape(st.session_state.tid)}</div>' if st.session_state.get('tid') else '')
     + '</div>', unsafe_allow_html=True)
 if st.session_state.get('tid'):
-    with st.popover('↗ Del turnering', use_container_width=False):
-        st.caption('Kopiér dette link og send det til deltagerne:')
-        st.code(f'https://padel-pappas.streamlit.app/?id={st.session_state.tid}', language=None)
-        st.caption('Alle med turnerings-ID kan redigere resultaterne.')
+    with st.container(key='pp116_share_actions'):
+        with st.popover('↗ Del turnering', use_container_width=False):
+            st.caption('Kopiér dette link og send det til deltagerne:')
+            st.code(f'https://padel-pappas.streamlit.app/?id={st.session_state.tid}', language=None)
+            st.caption('Alle med turnerings-ID kan redigere resultaterne.')
 played_rounds = len(d.get('history', []))
 if d.get('matches') and all(m.get('blue_score') is not None and m.get('red_score') is not None for m in d['matches']):
     played_rounds += 1
@@ -1794,12 +1822,13 @@ if st.session_state.get('tid') and d.get('round', 0) > 0:
 tab_games,tab_table,tab_log=st.tabs(['🎾 Kampe','🏆 Stilling','📜 Historik'])
 with tab_games:
     completed_history = d.get('history', [])
+    current_round_label = f'Runde {d["round"]}' if d.get('round', 0) > 0 else 'Aktuel runde'
     if completed_history:
-        choices = [f'✓ Runde {r["number"]}' for r in sorted(completed_history, key=lambda r: r['number'])] + ['Aktuel runde']
+        choices = [f'✓ Runde {r["number"]}' for r in sorted(completed_history, key=lambda r: r['number'])] + [current_round_label]
         st.caption('Se tidligere runder (resultater kan rettes under Historik)')
         game_view_key = f'pp101_game_round_{st.session_state.get("tid", "")}'
         if st.session_state.get(game_view_key) not in choices:
-            st.session_state[game_view_key] = 'Aktuel runde'
+            st.session_state[game_view_key] = current_round_label
         for start in range(0, len(choices), 4):
             columns = st.columns(min(4, len(choices) - start), gap='small')
             for column, choice in zip(columns, choices[start:start + 4]):
@@ -1809,7 +1838,7 @@ with tab_games:
                                  use_container_width=True):
                         st.session_state[game_view_key] = choice
         viewing = st.session_state[game_view_key]
-        if viewing != 'Aktuel runde':
+        if viewing != current_round_label:
             previous_num = int(viewing.split()[-1])
             previous = next((x for x in completed_history if x['number'] == previous_num), None)
             if previous:
@@ -1820,7 +1849,6 @@ with tab_games:
                                 html.escape(' & '.join(pm['blue']))+' <strong>'+score+'</strong> '+
                                 html.escape(' & '.join(pm['red']))+'</span></div>', unsafe_allow_html=True)
                 st.caption('Resultater kan rettes under Historik.')
-    st.markdown(f'<div class="p71-section-title">Runde {d["round"] or "–"} <span>· Kampe</span></div>', unsafe_allow_html=True)
     if not st.session_state.get('tid'):
         st.info('Opret en turnering eller åbn en eksisterende via ID i venstremenuen.')
     elif not d['players']:
@@ -2112,26 +2140,27 @@ with tab_log:
         st.caption('Vælg en runde for at se resultater. Tryk på Ret resultat for at ændre.')
         for j, m in enumerate(selected['matches']):
             st.markdown(pp97_history_court(m, selected_round), unsafe_allow_html=True)
-            with st.popover('✎ Ret resultat', use_container_width=False):
-                st.write(f'**Runde {selected_round} · Bane {m["court"]}**')
-                st.caption('Ændringer gemmes først, når du trykker Gem rettelse.')
-                with st.form(f"pp97_fix_{selected_round}_{j}"):
-                    c1,c2=st.columns(2)
-                    newb=c1.number_input('Blåt hold',min_value=0,
-                                         max_value=int(d['target']) if d['target'] else 200,
-                                         value=int(m['blue_score'] or 0),key=f'pp97_b_{selected_round}_{j}')
-                    if d['target']:
-                        newr=int(d['target'])-newb
-                        c2.metric('Rødt hold',newr)
-                    else:
-                        newr=c2.number_input('Rødt hold',min_value=0,max_value=200,
-                                             value=int(m['red_score'] or 0),key=f'pp97_r_{selected_round}_{j}')
-                    if st.form_submit_button('Gem rettelse', type='primary'):
-                        if d['target'] and newb+newr != d['target']:
-                            st.error(f'Scorerne skal tilsammen være {d["target"]} point.')
+            with st.container(key=f'pp116_history_edit_{selected_round}_{j}'):
+                with st.popover('✎ Ret resultat', use_container_width=False):
+                    st.write(f'**Runde {selected_round} · Bane {m["court"]}**')
+                    st.caption('Ændringer gemmes først, når du trykker Gem rettelse.')
+                    with st.form(f"pp97_fix_{selected_round}_{j}"):
+                        c1,c2=st.columns(2)
+                        newb=c1.number_input('Blåt hold',min_value=0,
+                                             max_value=int(d['target']) if d['target'] else 200,
+                                             value=int(m['blue_score'] or 0),key=f'pp97_b_{selected_round}_{j}')
+                        if d['target']:
+                            newr=int(d['target'])-newb
+                            c2.metric('Rødt hold',newr)
                         else:
-                            m['blue_score']=int(newb)
-                            m['red_score']=int(newr)
-                            save()
-                            st.success('Resultatet er gemt.')
-                            st.rerun()
+                            newr=c2.number_input('Rødt hold',min_value=0,max_value=200,
+                                                 value=int(m['red_score'] or 0),key=f'pp97_r_{selected_round}_{j}')
+                        if st.form_submit_button('Gem rettelse', type='primary'):
+                            if d['target'] and newb+newr != d['target']:
+                                st.error(f'Scorerne skal tilsammen være {d["target"]} point.')
+                            else:
+                                m['blue_score']=int(newb)
+                                m['red_score']=int(newr)
+                                save()
+                                st.success('Resultatet er gemt.')
+                                st.rerun()
