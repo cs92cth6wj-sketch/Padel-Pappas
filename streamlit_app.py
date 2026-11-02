@@ -16,49 +16,42 @@ from engine import make_round, make_fixed_pairs_round, table
 # Den interaktive banes HTML er indbygget i denne fil.
 # Streamlit kan derfor indlaese den uden ekstra mapper i GitHub.
 _COURT_HTML_ZLIB_BASE64 = (
-    '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'
-    'Qv1583+mnUwv'
+    'eNqtWf1u48YR/19PsSfXRykhaZL6sESavvQOFzRFkgPOadAiSIsldyltjiJVcumPyAL6Dn2GPEP7d/MmfZLO7JISKUvnJKgPJ5O7s/M9v5mVr16wPJYPa06WcpVe967wF0lptgj7jPavr5acsuurFZ'
+    'eUxEtalFyG/Uom1qxfr2Z0xcP+reB367yQfRLnmeQZUN0JJpch47ci5pZ6MUUmpKCpVcY05aFrO/0LEFnKh5Rf9z7ZRPm9VYofRbbwo7xgvLBgZYsamVHOHjYrWixE5jtBROMPiyKvMubLgmblmhYg'
+    'MkhAtJXQlUgf/PKhlHxlVcK06HqdcksvmDd8kXPypy/MEs5ZJS9EEsR5mhf+meeN5mN3q0Tlt7xI0vzOXwrGeLbt2eWSp+mmJfksSZJA6+m763tS5qlg5IxxTjmrN6yCMlGVvjtb3wdryhjadgnEM/'
+    '0f+Mp8vWGiXKf0wU9Sfh/8UJVSJA9W7UgfrAMHRlzecZ4FNBWLzBJgSunHsM2LHV+HeMB1ApKUI8CT3HfH8NrYNx2PxzGIXAu05InmlLIZ6zj3jM+Ty2TcMHAvp5MJ38kDScR1gH/X1pGj7IrzqpCb'
+    'dV5CyPPML3hKpbjlAS3XPJZADMu+d+EGK5FZSy4WS+m7I/TTit43C56H5qjk8V3HOW/8Pd5rPeVzdz499Dd4IjiIYduwVGScFtYCycGJg7nD+MI8c6eTaO4S5xwe52N6Scl4bl/C2+Xci0czMnHsEb'
+    'zNJyNvlBBUaNhY6kc8yQu+aaJmGMHOdhqBrpXkgcigfvzZzmW+t7cDsmkORwSG1OK3wKP0szzjICDjLUfumKU8kf4EfAIZhDWRS5mv4EFVBOiy0rUBbud/HlhAOKwdiS5t+aLgaw7ByBbWoVdkTjRX'
+    '8yyZg34JcQh43jybzmbObI7PBJJ5GPxoiYzxe9/DOuEFVvwRhVFPbbvSdLaLrNdV6IxPk2kSsXjH193ztdHsjbLdndje5Hy72ykwZfTWbGxfwlbPXgmGVp3QBr3XZNov0aHm9kSH2o6RlrojaymEkj'
+    'pEPfu23NR19bn6Caw7Hn0Q0pL8HmAMatTq7j+TAur309ir0Js6/o0t046prgPJ7R1JyYnLeDw+LC3H2QVuNIXH2oHquQGyRSFYAE8AXB2oagGT1+DUnT4/cxxEQ05Xp1LnfJc5jS/H4/Ogg534YTFR'
+    'AMLgefBftTqKmR8H2cZP4xMFiVraUVpxHdwRxFwtFZxtCu0NjDC2xl8Z48aaKM3jD4GiUto3eiM2atvns/ODyMwOUtiZYUdjSQewL5+6PcBk3UGw7U5aYYpTuloPXOgSpmdPbu9MVxV8A63WXUHXPs'
+    '0e7pa84FrfckkZgK5DsLVgNp05KrTgHKJd0lZy7LgTz+FzrPAYAfR0pR5J7r90gM2DdNg7yB0j0GF30e9TTNAmspNGXjuM9gzRRK22IomrNTER2bqSpk0rmcNo8itje1hH3c5W+388rZVuvz/NA835'
+    'bglJ3YqWNzqM7sQJ8kpigFXudkPd6QKLiA5cx5w45nxs2vPxsAGE0R4QLqfxBIae9pwlMoi8kIGa3ZrIY2NwRzr0bmQ6BP+pVEjUjzvrenSzH2FwXoGBDfoQzeJa6caxh+syr+KlRXWtr2gm1hUOGX'
+    'nW5e77ComWeQrmNDFjM5htktMxq/dzwAUhH8BXhzUxh5Jw7UssCbB0eCAyyeOqrGeshqWeF1tuantluktIrJM6z/YLu5R7EjLPNUeeOZ5DzKZNzPYS54xS4Nyc7oDlL4DFenkBRT5uTbBK7XbeeWrk'
+    'q6WQckVhwDx02Ew5bIoOcxFD2nk6VQixBKxtHUOyZvScupcwcxwFRLwTWAojUInPVpwJOtjDwAT71XBTz+/tGbyew7dqBK83rLrFTLtTNNpXT7SdcXVyMK46E8UPmxhqNN21rCkgi8K+RgGsjnFHSA'
+    '21joLa6S6vjiNPgw7eAVp04+LOUR2NqzVEjs7bkIij+hO34+K2d3Wh72VXF+oK2LvCe9H1FRO3BDQty7CvPNrvLIHRsADNNGtW8K7RJ4KFfeW+lEYcz1wgTU2JmyqjDzYvgDHIbbFXLLoS6+GPIIL3'
+    '6zPH9hWYHyOoh7WTDJr9kwxgOu8fUxazgGB3OfAIpoH2SOQeeOIphfcxdygJgA4nBRTPCig+KuC27F9/e3NkQ+dkbZxKTa2uWu8T/EIB1buXfZ24q5zBQlatoFfEfbKmEmo3C/vfOdb8+0/6BGoo5d'
+    'lCLsP+qE9oIailkiHsv05//kkSxO6S1NxbaB72b968e/8WjkBdxPkKLvoSBOVJcjQkWm30mDaeszLN90F9ElqsDE2qnjp0vasyLsRaXvdAJqm/2YD6YWFC05KbaFPoOY5JJEAUlyE85ZBEIqPpa3Bc'
+    'aBj7hfdwDN9BrLzBb0/g+thLqky1NgIjEVzGwKcmo5IOoZQzaCC2/tbDxt2veFnSBR+8i36A0dcG5QEiBxtR3sgCkiQVDQWMThU3kZePH1vF8fFxsx2axicGdLGdULip/kGBymC4UQoYZcPLh73PC8'
+    'ghTWCYDRx9ReXSjrlIBwz63wq1ax7eply9g9PyNNUHh5+Oth2RGJ53yeCWgn/MCrp9MdyIZPDi4q8qUT793QVgK6iiCIbDgsuqyEhWpSn0iayUJAu/rlYRL2qKoKbQiza4gyb8C+gbCyDJhi9fZleh'
+    'EvMq85FLS5dqDZ7hEBcwX/OOwka/nXEQ1tqu1w9fsIGh898Y2toCHfjHR8iEYa0g5lt48nydkMYwAKv16UY61AJu2X+vePFww1MIc14MjKYh6CMveFo7JeCpjfX3pv42DvIJ9qMwDNHOhinbqxJDbC'
+    'WvtYFYAyIAT9Zl8t9//NNoDMEef/o47sJ59bvLAxVewZRWfjBQSZzpMjZgpiIdbjnUDjlQHpIYWmbtECsabjtpmv2fQ1SEevHVzl2v8MPfifefFVJ0hbSYq4Vwg8jpRybE2y+29RbPYkBJFv7x5t3X'
+    'dqlMhlGsyWSIXk3wIgwbmBhudoBRbwZHSvUN4CKMy5n8FllBtSqWvtYN6/8bhAPjhzLPjG3HuYAvALIDMLxUhdhCuSbP2sCH2BLUaFfXIR6160x+fHSC3kmf7ccD8FsnY15TaL/Gp4qVovoIl/0ccc'
+    'jlPWzs2CiyoPedEbmGaUQefBT4VHjG9zZcMd/SeDkYCGaKYXi9OSVNsK6MgbjyXin+GN+/4aTNi9LXEjlrFobfiXPv+8dHA7wd9JrMfTZjg0inU7iXoHbqHDUMv66Tg/2djN+MPfcn6xwaIRy4t1W/'
+    '/Br/EmA0gBQouNLl/WYpUjaAIjgpHfvrYcS+KR4+kPXPP8GcgTOAMibhqST/+Rcpfv43I5BgfJHxkrQxpQXc2x6iyaYp61NGqAkFzIAGAV24rl14U1OMgSrhm6L6CucYo55jcLWZZAw9yeASVPuXep'
+    'YZIUFrWDFuGtZQlb+XEK2oknxg7OcdSMH3YFln4FGatSKPmfSRwO+2h08jUCAruIC8xW+zvhQl+Blq1IiXNFsAMCCWHqeAbCqa/d8Ww130wFucQIkRilMTkwBgOJKVVSqpNLa96Ih4HSFzF1qshefM'
+    'iJ4xo3dxQQA5mYbkkuRZ+kBoAvoRueSkgosDgYlyJSTkV0bgVikDQm9zwUBbDYyEVeh3HHfhl93bgfEBhGu4b7pGdKT1qE7QtJ3jhMNjzegE6b5FPd+j1PCnjyMkqWaFuNSa/4Jtrx45n7p0pedKw+'
+    'QAlNikbOwo5OVLop90FYVhqyVp5xnDTd1eakLMXqXMFsUf9rG4aWLv4Tb6AE2MrsW3AKb41Y8LB9rq4t1Vz+ZXF/rWeqH/uvk/q2tL/A=='
 )
 _court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
-_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v80'
+_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v90'
 _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
 if not _component_file.exists() or _component_file.read_bytes() != _court_html:
     _component_file.write_bytes(_court_html)
 st.set_page_config(page_title='Padel Pappas', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
 
-court_input = components.declare_component('padel_court_input_v80', path=str(_component_dir))
+court_input = components.declare_component('padel_court_input_v90', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
 DB_URL = str(st.secrets.get('SUPABASE_URL', '')).rstrip('/')
 DB_KEY = str(st.secrets.get('SUPABASE_SECRET_KEY', ''))
@@ -1026,6 +1019,29 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
   color:#223A43!important;-webkit-text-fill-color:#223A43!important;
 }
 
+
+/* Padel Pappas 9.0 - mobile light polish; appended last for reliable specificity */
+.pp9-progress{background:#fff;border:1px solid #d7e5e9;border-radius:17px;padding:14px;margin:12px 0 10px;box-shadow:0 3px 14px #263b4c0b}
+.pp9-progress-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px;color:#213842;font-size:14px}
+.pp9-progress-heading span{color:#138b7d;font-size:12px;font-weight:700}
+.pp9-track{height:8px;background:#e1efed;border-radius:99px;overflow:hidden}
+.pp9-fill{height:100%;background:#10a58e;border-radius:99px;transition:width .25s}
+.pp9-history-mini{display:flex;align-items:start;gap:10px;margin:7px 0;padding:11px;background:white;border:1px solid #deeaec;border-radius:12px;color:#243940;font-size:13px}
+.pp9-history-mini b{min-width:58px}.pp9-history-mini span{overflow-wrap:anywhere}
+.pp9-history-mini strong{color:#0e8979}
+.pp9-saved{display:inline-block;font-size:12px;font-weight:800;color:#0b8874;background:#e2f7f0;border:1px solid #a9dfd1;border-radius:999px;padding:3px 10px;margin:0 0 1px 4px}
+.pp9-winners{text-align:center;background:linear-gradient(130deg,#edfaf5,#fff8df);border:2px solid #33b99d;border-radius:18px;padding:24px 14px;margin:12px 0;color:#144f48;box-shadow:0 10px 30px #236b5215}
+.pp9-winners>div{font-size:13px;letter-spacing:.08em;font-weight:850}.pp9-winners strong{display:block;color:#163d3d;font-size:clamp(22px,5vw,35px);margin:12px 0}.pp9-winners small{color:#5c7977}
+/* More compact court surroundings and side-by-side round/points widgets */
+.stApp [data-testid="stPopover"]{margin:0!important}
+.stApp [data-testid="stPopover"] button{min-height:37px!important;border-radius:11px!important}
+.stApp [data-testid="stTabs"] [role="tablist"]{border-bottom:0!important}
+.stApp [data-testid="stTabs"] [role="tablist"]:after{display:none!important}
+.stApp .stTabs [data-baseweb="tab-highlight"],.stApp [data-baseweb="tab-border"]{display:none!important}
+.stApp section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] *,
+.stApp section[data-testid="stSidebar"] div[role="radiogroup"] label *,
+.stApp section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] *{color:#243840!important;-webkit-text-fill-color:#243840!important}
+@media(max-width:520px){.pp9-progress{padding:11px 12px;margin:7px 0 5px}.pp9-history-mini{font-size:12px}}
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1142,13 +1158,16 @@ if 'tourney' not in st.session_state:
     st.session_state.tourney=fresh()
 d=st.session_state.tourney
 st.markdown(
-    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 7.1</div>'
+    '<div class="p7-hero"><div class="brand">● PADEL PAPPAS 9.0</div>'
     f'<div class="hero-title">{html.escape(d["title"])}</div>'
     f'<div class="subtitle">{html.escape(d["format"])} · {html.escape(d.get("partner_mode", "Skiftende makker"))} · {len(d["players"])} spillere</div>'
     + (f'<div class="p7-id">Turnerings-ID: {html.escape(st.session_state.tid)}</div>' if st.session_state.get('tid') else '')
     + '</div>', unsafe_allow_html=True)
 if st.session_state.get('tid'):
-    st.caption(f'Del turneringen: https://padel-pappas.streamlit.app/?id={st.session_state.tid}')
+    with st.popover('↗ Del turnering', use_container_width=False):
+        st.caption('Kopiér dette link og send det til deltagerne:')
+        st.code(f'https://padel-pappas.streamlit.app/?id={st.session_state.tid}', language=None)
+        st.caption('Alle med turnerings-ID kan redigere resultaterne.')
 played_rounds = len(d.get('history', []))
 if d.get('matches') and all(m.get('blue_score') is not None and m.get('red_score') is not None for m in d['matches']):
     played_rounds += 1
@@ -1198,8 +1217,35 @@ if st.session_state.get('tid'):
             if st.button('Bekræft nulstilling',type='primary'):
                 st.session_state.tourney=fresh();d=st.session_state.tourney;save();st.session_state.confirm_reset=False;st.rerun()
 
+# Tour progress is visual only, based on completed and persisted round scores.
+completed_rounds = min(int(d.get('round_limit', 7)), played_rounds)
+round_total = max(1, int(d.get('round_limit', 7)))
+percent = round(100 * completed_rounds / round_total)
+if st.session_state.get('tid') and d.get('round', 0) > 0:
+    st.markdown(
+        '<div class="pp9-progress"><div class="pp9-progress-heading">'
+        f'<strong>Runde {d["round"]} af {round_total}</strong><span>{percent}% gennemført</span>'
+        '</div><div class="pp9-track"><div class="pp9-fill" style="width:'
+        f'{percent}%"></div></div></div>', unsafe_allow_html=True)
+
 tab_games,tab_table,tab_log=st.tabs(['🎾 Kampe','🏆 Stilling','📜 Historik'])
 with tab_games:
+    completed_history = d.get('history', [])
+    if completed_history:
+        choices = ['Aktuel runde'] + [f'✓ Runde {r["number"]}' for r in reversed(completed_history)]
+        viewing = st.selectbox('Se runde', choices, key=f'pp9_round_browser_{st.session_state.get("tid", "")}',
+                               help='Tidligere runder vises her uden redigering. Brug Historik til rettelser.')
+        if viewing != 'Aktuel runde':
+            previous_num = int(viewing.split()[-1])
+            previous = next((x for x in completed_history if x['number'] == previous_num), None)
+            if previous:
+                st.markdown(f'### Runde {previous_num} · Resultater')
+                for pm in previous['matches']:
+                    score = 'Afventer' if pm['blue_score'] is None else f'{pm["blue_score"]} – {pm["red_score"]}'
+                    st.markdown('<div class="pp9-history-mini"><b>Bane '+str(pm['court'])+'</b><span>'+
+                                h.escape(' & '.join(pm['blue']))+' <strong>'+score+'</strong> '+
+                                h.escape(' & '.join(pm['red']))+'</span></div>', unsafe_allow_html=True)
+                st.caption('Resultater kan rettes under Historik.')
     st.markdown(f'<div class="p71-section-title">Runde {d["round"] or "–"} <span>· Kampe</span></div>', unsafe_allow_html=True)
     if not st.session_state.get('tid'):
         st.info('Opret en turnering eller åbn en eksisterende via ID i venstremenuen.')
@@ -1258,6 +1304,8 @@ with tab_games:
             # The browser sends changes back to Python; "Gem runde" still saves
             # all results together through the existing Supabase logic.
             current_key = f"court_{st.session_state.tid}_{d['round']}_{i}_{'_'.join(m['blue'] + m['red'])}"
+            if m.get('blue_score') is not None and m.get('red_score') is not None:
+                st.markdown('<div class="pp9-saved">✓ Bane '+str(m['court'])+' · Gemt</div>', unsafe_allow_html=True)
             component_scores = court_input(
                 court=m['court'], round=d['round'],
                 blue_players=m['blue'], red_players=m['red'],
@@ -1375,7 +1423,7 @@ with tab_games:
                         st.warning('Finalen står lige. Ret resultatet for at kåre en vinder.')
                     else:
                         winner = finale['blue'] if finale['blue_score'] > finale['red_score'] else finale['red']
-                        st.success('🏆 Turneringsvindere: ' + ' & '.join(winner))
+                        st.markdown('<div class="pp9-winners"><div>🏆 TURNERINGSVINDERE</div><strong>' + html.escape(' & '.join(winner)) + '</strong><small>Finalen er afsluttet</small></div>', unsafe_allow_html=True)
                     if st.button('Ret finaleresultat'):
                         finale['blue_score'] = None
                         finale['red_score'] = None
