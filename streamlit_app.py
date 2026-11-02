@@ -1122,6 +1122,121 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
  .stApp [class*="st-key-court_edit_actions_"] {margin-top:-30px!important;margin-bottom:12px!important;padding-right:3px!important}
  .stApp [class*="st-key-court_edit_actions_"] button{font-size:11px!important}
 }
+
+/* 9.4: lyse, ensartede inputrammer i Streamlit-formularer.
+   Bevar indbyggede scorefelter på banerne uændret. */
+.stApp section[data-testid="stSidebar"] [data-testid="stTextInput"] [data-baseweb="input"],
+.stApp section[data-testid="stSidebar"] [data-testid="stTextInput"] [data-baseweb="base-input"],
+.stApp section[data-testid="stSidebar"] [data-testid="stTextArea"] [data-baseweb="textarea"],
+.stApp section[data-testid="stSidebar"] [data-testid="stNumberInput"] [data-baseweb="input"],
+.stApp section[data-testid="stSidebar"] [data-testid="stNumberInput"] [data-baseweb="base-input"],
+.stApp section[data-testid="stSidebar"] [data-baseweb="select"] > div,
+.stApp section[data-testid="stSidebar"] input,
+.stApp section[data-testid="stSidebar"] textarea {
+ background:#fff!important;
+ color:#20343d!important;-webkit-text-fill-color:#20343d!important;
+ border-color:#CFDEE1!important;
+ outline:none!important;
+ box-shadow:none!important;
+}
+.stApp section[data-testid="stSidebar"] [data-testid="stTextInput"] [data-baseweb="input"],
+.stApp section[data-testid="stSidebar"] [data-testid="stNumberInput"] [data-baseweb="input"],
+.stApp section[data-testid="stSidebar"] [data-testid="stTextArea"] [data-baseweb="textarea"],
+.stApp section[data-testid="stSidebar"] [data-baseweb="select"] > div {
+ border:1px solid #CFDEE1!important;
+ border-radius:13px!important;
+ box-shadow:none!important;
+ overflow:hidden!important;
+}
+.stApp section[data-testid="stSidebar"] [data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
+.stApp section[data-testid="stSidebar"] [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within,
+.stApp section[data-testid="stSidebar"] [data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
+.stApp section[data-testid="stSidebar"] [data-baseweb="select"] > div:focus-within {
+ border-color:#63B8A9!important;
+ box-shadow:0 0 0 3px rgba(32,155,134,.16)!important;
+ outline:none!important;
+}
+.stApp section[data-testid="stSidebar"] input:focus,
+.stApp section[data-testid="stSidebar"] textarea:focus {
+ outline:none!important;box-shadow:none!important;
+}
+.stApp section[data-testid="stSidebar"] input::placeholder,
+.stApp section[data-testid="stSidebar"] textarea::placeholder {
+ color:#778C94!important;-webkit-text-fill-color:#778C94!important;opacity:1!important;
+}
+
+
+/* PADEL PAPPAS 9.5: Historik i samme lyse tema som baner og stilling. */
+.stApp [class*="st-key-pp95_history"] [data-testid="stExpander"],
+.stApp [class*="st-key-pp95_history"] details,
+.stApp [class*="st-key-pp95_history"] [data-testid="stVerticalBlockBorderWrapper"] {
+  background:#FFFFFF!important;
+  color:#20343D!important;
+  border:1px solid #DBE7EB!important;
+  border-radius:16px!important;
+  box-shadow:0 4px 18px rgba(29,63,72,.06)!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stExpander"] details,
+.stApp [class*="st-key-pp95_history"] [data-testid="stExpander"] [data-testid="stExpanderDetails"],
+.stApp [class*="st-key-pp95_history"] [data-testid="stExpander"] [data-testid="stExpanderHeader"],
+.stApp [class*="st-key-pp95_history"] [data-testid="stExpander"] summary,
+.stApp [class*="st-key-pp95_history"] [data-testid="stExpander"] summary * {
+  background:#FFFFFF!important;
+  color:#20343D!important;
+  -webkit-text-fill-color:#20343D!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stForm"],
+.stApp [class*="st-key-pp95_history"] [data-testid="stForm"] > div,
+.stApp [class*="st-key-pp95_history"] form {
+  background:#F6FAFB!important;
+  color:#20343D!important;
+  border:1px solid #DFEAED!important;
+  border-radius:13px!important;
+  box-shadow:none!important;
+}
+.stApp [class*="st-key-pp95_history"] p,
+.stApp [class*="st-key-pp95_history"] label,
+.stApp [class*="st-key-pp95_history"] label *,
+.stApp [class*="st-key-pp95_history"] [data-testid="stMarkdownContainer"] *,
+.stApp [class*="st-key-pp95_history"] [data-testid="stCaptionContainer"] *,
+.stApp [class*="st-key-pp95_history"] [data-testid="stMetric"] *,
+.stApp [class*="st-key-pp95_history"] [data-testid="stMetricValue"] {
+  color:#20343D!important;
+  -webkit-text-fill-color:#20343D!important;
+  opacity:1!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stNumberInput"] input,
+.stApp [class*="st-key-pp95_history"] [data-testid="stNumberInput"] [data-baseweb="input"],
+.stApp [class*="st-key-pp95_history"] [data-testid="stNumberInput"] [data-baseweb="base-input"] {
+  background:#FFFFFF!important;
+  color:#20343D!important;
+  -webkit-text-fill-color:#20343D!important;
+  border-color:#CFDEE1!important;
+  box-shadow:none!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stNumberInput"] button{
+  background:#EAF3F4!important;
+  border-color:#D4E3E7!important;
+  color:#21434C!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stNumberInput"] button svg{
+  color:#21434C!important;
+  stroke:#21434C!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stFormSubmitButton"] button{
+  background:#E7F5F2!important;
+  border:1px solid #96CCC3!important;
+  color:#166B61!important;
+  -webkit-text-fill-color:#166B61!important;
+  border-radius:11px!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stFormSubmitButton"] button *{
+  color:#166B61!important;-webkit-text-fill-color:#166B61!important;
+}
+.stApp [class*="st-key-pp95_history"] [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within{
+  border-color:#62B8A8!important;box-shadow:0 0 0 3px rgba(32,155,134,.13)!important;
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1560,30 +1675,31 @@ with tab_table:
         st.caption('Makkere: '+(', '.join(partners) if partners else 'Ingen kampe endnu'))
 
 with tab_log:
-    st.subheader('📜 Kamphistorik')
-    rounds=d['history']+([{'number':d['round'],'matches':d['matches']}] if d['matches'] else [])
-    if not rounds:st.info('Ingen runder spillet endnu.')
-    for rd in reversed(rounds):
-        with st.expander(f'Runde {rd["number"]}',expanded=rd['number']==d['round']):
-            for j,m in enumerate(rd['matches']):
-                st.write(f"**Bane {m['court']}** · {', '.join(m['blue'])} vs {', '.join(m['red'])}")
-                if m['blue_score'] is None:st.caption('Ikke afgjort')
-                else:st.caption(f"Resultat: {m['blue_score']} – {m['red_score']}")
-                with st.form(f"fix_{rd['number']}_{j}"):
-                    c1,c2=st.columns(2)
-                    newb=c1.number_input('Blå',min_value=0,
-                                         max_value=int(d['target']) if d['target'] else 200,
-                                         value=int(m['blue_score'] or 0))
-                    if d['target']:
-                        newr=int(d['target'])-newb
-                        c2.metric('Rød (beregnet)',newr)
-                        if m['blue_score'] is None:
-                            st.caption('Foreløbig beregning – kampen er ikke gemt som afgjort.')
-                    else:
-                        newr=c2.number_input('Rød',min_value=0,max_value=200,
-                                             value=int(m['red_score'] or 0))
-                    if st.form_submit_button('Ret resultat'):
-                        if d['target'] and newb+newr!=d['target']:
-                            st.error(f'Kampens samlede point skal være {d["target"]}.')
+    with st.container(key='pp95_history'):
+        st.subheader('📜 Kamphistorik')
+        rounds=d['history']+([{'number':d['round'],'matches':d['matches']}] if d['matches'] else [])
+        if not rounds:st.info('Ingen runder spillet endnu.')
+        for rd in reversed(rounds):
+            with st.expander(f'Runde {rd["number"]}',expanded=rd['number']==d['round']):
+                for j,m in enumerate(rd['matches']):
+                    st.write(f"**Bane {m['court']}** · {', '.join(m['blue'])} vs {', '.join(m['red'])}")
+                    if m['blue_score'] is None:st.caption('Ikke afgjort')
+                    else:st.caption(f"Resultat: {m['blue_score']} – {m['red_score']}")
+                    with st.form(f"fix_{rd['number']}_{j}"):
+                        c1,c2=st.columns(2)
+                        newb=c1.number_input('Blå',min_value=0,
+                                             max_value=int(d['target']) if d['target'] else 200,
+                                             value=int(m['blue_score'] or 0))
+                        if d['target']:
+                            newr=int(d['target'])-newb
+                            c2.metric('Rød (beregnet)',newr)
+                            if m['blue_score'] is None:
+                                st.caption('Foreløbig beregning – kampen er ikke gemt som afgjort.')
                         else:
-                            m['blue_score']=newb;m['red_score']=newr;save();st.success('Resultatet er rettet.');st.rerun()
+                            newr=c2.number_input('Rød',min_value=0,max_value=200,
+                                                 value=int(m['red_score'] or 0))
+                        if st.form_submit_button('Ret resultat'):
+                            if d['target'] and newb+newr!=d['target']:
+                                st.error(f'Kampens samlede point skal være {d["target"]}.')
+                            else:
+                                m['blue_score']=newb;m['red_score']=newr;save();st.success('Resultatet er rettet.');st.rerun()
