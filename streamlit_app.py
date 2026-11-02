@@ -1315,6 +1315,29 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
  .pp97-score{height:42px;font-size:19px;width:23%;min-width:60px}
 }
 
+
+/* PADEL PAPPAS 9.8 – historik: lys rundevælger med tilpasset fokus. */
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] > div,
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] [data-baseweb="select"] > div,
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] [data-baseweb="input"],
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] [data-baseweb="base-input"] {
+ background:#FFFFFF!important;color:#213841!important;-webkit-text-fill-color:#213841!important;
+ border:1px solid #D7E5E9!important;border-radius:13px!important;
+ box-shadow:none!important;outline:none!important;
+}
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] > div:focus-within {
+ border-color:#41B8A2!important;box-shadow:0 0 0 3px rgba(27,154,132,.15)!important;
+ outline:none!important;
+}
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] input,
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] span,
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] div,
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] svg {
+ color:#213841!important;-webkit-text-fill-color:#213841!important;fill:initial!important;
+}
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] svg {fill:#516B73!important;}
+.stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] > div {min-height:48px!important;}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1773,7 +1796,7 @@ def pp97_history_court(match, round_number):
     return (
         '<div class="pp97-card"><div class="pp97-top">'
         f'<span class="pp97-pill">Bane {esc(match["court"])}</span>'
-        f'<span>Runde {esc(round_number)} · <b class="pp97-badge{status_class}">{badge}</b></span>'
+        f'<span class="pp97-badge{status_class}">{badge}</span>'
         '</div><div class="pp97-court">'
         '<div class="pp97-service left"></div><div class="pp97-service right"></div>'
         '<div class="pp97-midline left"></div><div class="pp97-midline right"></div>'
@@ -1794,11 +1817,12 @@ with tab_log:
         st.info('Ingen runder spillet endnu.')
     else:
         round_numbers = [r['number'] for r in reversed(rounds)]
-        selected_round = st.selectbox('Vælg runde', round_numbers,
-                                      format_func=lambda n:f'Runde {n}',
-                                      key=f'pp97_hist_round_{st.session_state.get("tid","")}')
+        with st.container(key='pp98_round_selector'):
+            selected_round = st.selectbox('Vælg runde', round_numbers,
+                                          format_func=lambda n:f'Runde {n}',
+                                          key=f'pp97_hist_round_{st.session_state.get("tid","")}')
         selected = next(r for r in rounds if r['number'] == selected_round)
-        st.caption('Visning af gemte og endnu ikke afgjorte kampe. Tryk Ret resultat for at ændre en score.')
+        st.caption('Vælg en runde for at se resultater. Tryk på Ret resultat for at ændre.')
         for j, m in enumerate(selected['matches']):
             st.markdown(pp97_history_court(m, selected_round), unsafe_allow_html=True)
             with st.popover('✎ Ret resultat', use_container_width=False):
