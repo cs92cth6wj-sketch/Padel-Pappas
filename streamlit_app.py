@@ -2229,6 +2229,8 @@ with tab_games:
                         st.warning('Der kræves mindst fire spillere for at afvikle placeringsfinaler.')
                 else:
                     st.caption('Én ekstra kamp pr. fire spillere. Finaleresultaterne påvirker ikke grundspillets stilling.')
+                    # Saml alle scorefelter, så finalerunden kan gemmes med én knap.
+                    final_results = []
                     for index, match in enumerate(finales):
                         court = match.get('court', index + 1)
                         rank_start = match.get('rank_start', 4 * index + 1)
@@ -2238,8 +2240,6 @@ with tab_games:
                         scored = match.get('blue_score') is not None and match.get('red_score') is not None
                         edit_key = f'pp122_edit_final_{st.session_state.tid}_{index}'
                         editing = st.session_state.get(edit_key, False)
-                        # Scoren præsenteres på den samme interaktive padelbane som grundspillet.
-                        # Kun bane 1 får mesterskabsfinalens guld/sølv-farver.
                         final_key = f'pp122_court_final_{st.session_state.tid}_{index}_{int(editing)}_{int(scored)}'
                         final_value = court_input(
                             court=court, round='Finale', final_label=label,
@@ -2252,6 +2252,8 @@ with tab_games:
                         )
                         final_value = final_value if isinstance(final_value, dict) else {}
                         if scored and not editing:
+                            # Uændrede, allerede gemte resultater tages med ved samlet lagring.
+                            final_results.append((match['blue_score'], match['red_score']))
                             st.caption('✓ Resultat gemt · ' + str(match['blue_score']) + ' – ' + str(match['red_score']))
                             if match['blue_score'] == match['red_score']:
                                 st.warning('Kampen står lige. Ret resultatet for at kåre et vinderhold.')
@@ -2270,24 +2272,40 @@ with tab_games:
                             blue_valid = type(blue_value) is int and 0 <= blue_value <= upper
                             if d['target']:
                                 red_value = int(d['target']) - blue_value if blue_valid else None
-                                red_valid = red_value is not None
                             else:
                                 red_value = final_value.get('red')
-                                red_valid = type(red_value) is int and 0 <= red_value <= 200
-                            if st.button('💾 Gem finaleresultat', type='primary', use_container_width=True,
-                                         key=f'save_placement_final_{index}'):
-                                if not blue_valid or not red_valid:
-                                    st.error('Indtast en gyldig score på banen før du gemmer resultatet.')
-                                else:
-                                    match['blue_score'] = int(blue_value)
-                                    match['red_score'] = int(red_value)
-                                    st.session_state[edit_key] = False
-                                    save()
-                                    st.rerun()
+                            red_valid = type(red_value) is int and 0 <= red_value <= (upper if d['target'] else 200)
+                            final_results.append((int(blue_value), int(red_value)) if blue_valid and red_valid else (None, None))
                             if editing and st.button('Annuller rettelse', key=f'cancel_placement_final_{index}'):
                                 st.session_state[edit_key] = False
                                 st.rerun()
-                        st.divider()
+                        if index < len(finales) - 1:
+                            st.divider()
+
+                    st.divider()
+                    st.subheader('Gem hele finalerunden')
+                    antal_klare = sum(b is not None and r is not None for b, r in final_results)
+                    st.caption(f'{antal_klare} af {len(finales)} finalekampe har gyldige scores.')
+                    if st.button('💾 Gem finalerunde', type='primary', use_container_width=True,
+                                 key=f'pp123_save_all_finales_{st.session_state.tid}'):
+                        fejl = []
+                        for match, (blue, red) in zip(finales, final_results):
+                            bane = match.get('court', '?')
+                            if blue is None or red is None:
+                                fejl.append(f'Bane {bane}: Der mangler et gyldigt resultat.')
+                            elif d['target'] and blue + red != int(d['target']):
+                                fejl.append(f'Bane {bane}: Scores skal tilsammen give {d["target"]} point.')
+                        if fejl:
+                            for besked in fejl:
+                                st.error(besked)
+                        else:
+                            for index, (match, (blue, red)) in enumerate(zip(finales, final_results)):
+                                match['blue_score'] = int(blue)
+                                match['red_score'] = int(red)
+                                st.session_state[f'pp122_edit_final_{st.session_state.tid}_{index}'] = False
+                            save()  # Én fælles gemning til Supabase.
+                            st.success(f'Hele finalerunden er gemt ({len(finales)} kampe).')
+                            st.rerun()
                     if finales and all(m.get('blue_score') is not None and m.get('red_score') is not None for m in finales):
                         st.success('Alle placeringsfinaler er afviklet!')
 
