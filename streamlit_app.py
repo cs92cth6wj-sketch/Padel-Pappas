@@ -1374,6 +1374,50 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 }
 [role="option"] *,[role="listbox"] *{color:#213841!important;-webkit-text-fill-color:#213841!important;}
 
+
+/* 10.0 – Ret HELE select-komponenten, inkl. mørkt BaseWeb-felt.
+   Gælder begge rundevælgere i Kampe og Historik. */
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"],
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] > div > div,
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] > div > div > div,
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [role="combobox"],
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [aria-haspopup="listbox"],
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [data-baseweb="input"],
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [data-baseweb="base-input"]{
+ background:#ffffff!important;
+ background-color:#ffffff!important;
+ background-image:none!important;
+ color:#1d333b!important;
+ -webkit-text-fill-color:#1d333b!important;
+ box-shadow:none!important;
+}
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] > div:first-child,
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [role="combobox"]{
+ border:1px solid #d4e3e7!important;
+ border-radius:12px!important;
+ overflow:hidden!important;
+}
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"]:focus-within > div:first-child,
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [role="combobox"]:focus-within{
+ border-color:#51aa99!important;
+ box-shadow:0 0 0 3px #bfe8df85!important;
+}
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] span,
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] input,
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [role="combobox"] *{
+ color:#1d333b!important;
+ -webkit-text-fill-color:#1d333b!important;
+}
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"] svg{
+ color:#55727b!important;fill:currentColor!important;
+}
+/* Streamlit kan gengive hele inputfeltet i en BaseWeb input-container. */
+.stApp [data-testid="stSelectbox"] [data-baseweb="input"],
+.stApp [data-testid="stSelectbox"] [data-baseweb="base-input"]{
+ background:#ffffff!important;background-color:#ffffff!important;
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
