@@ -1,8 +1,10 @@
-# Padel Pappas 11.8 – Americano planlægges på forhånd; finale er ekstra
+# Padel Pappas 12.2 – Grafiske finalebaner med guld/sølv
 import html
 import json
 import secrets
 import random
+import math
+from collections import Counter
 import re
 import requests
 import streamlit as st
@@ -16,39 +18,45 @@ from engine import make_round, make_fixed_pairs_round, table
 # Den interaktive banes HTML er indbygget i denne fil.
 # Streamlit kan derfor indlaese den uden ekstra mapper i GitHub.
 _COURT_HTML_ZLIB_BASE64 = (
-    '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'
+    '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'
 )
 _court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
-_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v95'
+_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v122'
 _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
 if not _component_file.exists() or _component_file.read_bytes() != _court_html:
@@ -60,7 +68,7 @@ _APP_ICON_PATH = Path(__file__).parent / 'app_icon.png'
 _APP_ICON = Image.open(_APP_ICON_PATH) if _APP_ICON_PATH.exists() else '🎾'
 st.set_page_config(page_title='Padel Pappas', page_icon=_APP_ICON, layout='centered', initial_sidebar_state='collapsed')
 
-court_input = components.declare_component('padel_court_input_v95', path=str(_component_dir))
+court_input = components.declare_component('padel_court_input_v122', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
 DB_URL = str(st.secrets.get('SUPABASE_URL', '')).rstrip('/')
 DB_KEY = str(st.secrets.get('SUPABASE_SECRET_KEY', ''))
@@ -1538,7 +1546,7 @@ st.markdown(STYLE, unsafe_allow_html=True)
 
 def fresh():
     return {'title':'Søndagspadel','players':[],'format':'Mexicano','round_limit':7,'target':32,
-            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker','ranking_priority':'Point først','finale':None,'americano_schedule':[]}
+            'round':0,'matches':[],'history':[],'byes':[],'partner_mode':'Skiftende makker','ranking_priority':'Point først','finale':None,'finales':None,'americano_schedule':[]}
 
 
 def save():
@@ -1584,32 +1592,92 @@ def planned_americano(data):
             previous.extend(games)
         return plan
 
-    # Circle method: for a multiple of four, every player gets each other
-    # player once as a partner in the first N-1 rounds.
+    # A circle pairing guarantees distinct partners for the first N-1 rounds.
+    # A separate global search decides WHICH pairs play against each other:
+    # this changes no partners, only opponents and court assignments.
     if len(players) % 4 == 0:
         rng = random.Random(secrets.randbits(64))
         rng.shuffle(players)
         ring = list(players)
+        pair_rounds = []
         for round_idx in range(limit):
-            pairings = [(ring[i], ring[-1-i]) for i in range(len(ring)//2)]
-            # Distribute partner pairs into matches; keep opponent repeats low.
-            rng.shuffle(pairings)
-            games = []
-            while pairings:
-                a = pairings.pop()
-                def opponent_cost(b):
-                    return sum(sum(1 for m in previous if
-                                   (x in m['blue'] and y in m['red']) or
-                                   (x in m['red'] and y in m['blue']))
-                               for x in a for y in b)
-                b = min(pairings, key=lambda candidate: (opponent_cost(candidate), rng.random()))
-                pairings.remove(b)
-                games.append({'court':len(games)+1, 'blue':list(a), 'red':list(b),
-                              'blue_score':None, 'red_score':None})
-            plan.append({'matches':games, 'byes':[]})
-            previous.extend(games)
-            # Standard round-robin rotation with first player fixed.
-            ring = [ring[0],ring[-1],*ring[1:-1]]
+            pairs = [tuple(sorted((ring[i], ring[-1-i])))
+                     for i in range(len(ring)//2)]
+            rng.shuffle(pairs)
+            pair_rounds.append(pairs)
+            ring = [ring[0], ring[-1], *ring[1:-1]]
+
+        # Each match is two fixed pairs. Optimise the arrangements across
+        # *all* rounds, not greedily one round at a time.
+        def opponent_edges(p, q):
+            return [tuple(sorted((a, b))) for a in p for b in q]
+
+        def quality(counts):
+            # Repeated opponents are inevitable when 2*rounds > N-1.
+            # Penalise concentrated repeats, particularly 3+ meetings.
+            return sum(8 * max(0, c-1)**2 + 18 * max(0, c-2)**2
+                       for c in counts.values())
+
+        def build_counts(groups):
+            result = Counter()
+            for round_groups in groups:
+                for p, q in round_groups:
+                    result.update(opponent_edges(p, q))
+            return result
+
+        best_groups, best_quality = None, float('inf')
+        # Small bounded search; no costly optimisation when opening an
+        # existing tournament (the saved schedule is reused).
+        for restart in range(3):
+            groups = []
+            for pairs in pair_rounds:
+                shuffled = list(pairs)
+                rng.shuffle(shuffled)
+                groups.append([[shuffled[i], shuffled[i+1]]
+                               for i in range(0, len(shuffled), 2)])
+            counts = build_counts(groups)
+            current = quality(counts)
+            if current < best_quality:
+                best_quality = current
+                best_groups = [[(tuple(p), tuple(q)) for p, q in round_groups]
+                               for round_groups in groups]
+            steps = max(2500, min(7500, 120000 // max(1, limit)))
+            for step in range(steps):
+                rr = rng.randrange(limit)
+                if len(groups[rr]) < 2:
+                    break
+                i, j = rng.sample(range(len(groups[rr])), 2)
+                a, b = groups[rr][i], groups[rr][j]
+                side_a, side_b = rng.randrange(2), rng.randrange(2)
+                old_edges = opponent_edges(a[0], a[1]) + opponent_edges(b[0], b[1])
+                a[side_a], b[side_b] = b[side_b], a[side_a]
+                new_edges = opponent_edges(a[0], a[1]) + opponent_edges(b[0], b[1])
+                counts.subtract(old_edges)
+                counts.update(new_edges)
+                candidate = quality(counts)
+                # Simulated annealing permits improvements that require
+                # temporarily moving through a less favourable arrangement.
+                heat = max(0.35, 5.0 * (1.0-step/steps))
+                accept = candidate <= current or rng.random() < math.exp((current-candidate)/heat)
+                if accept:
+                    current = candidate
+                else:
+                    counts.subtract(new_edges)
+                    counts.update(old_edges)
+                    a[side_a], b[side_b] = b[side_b], a[side_a]
+                if current < best_quality:
+                    best_quality = current
+                    best_groups = [[(tuple(pair1), tuple(pair2))
+                                    for pair1, pair2 in round_groups]
+                                   for round_groups in groups]
+
+        for round_groups in best_groups:
+            matches = []
+            for court, (blue, red) in enumerate(round_groups, 1):
+                matches.append({'court': court, 'blue': list(blue),
+                                'red': list(red), 'blue_score': None,
+                                'red_score': None})
+            plan.append({'matches': matches, 'byes': []})
         return plan
 
     # Other group sizes require byes; optimise over the entire schedule.
@@ -2124,50 +2192,104 @@ with tab_games:
             elif unchanged:
                 st.success('Alle ordinære runder er færdige! Se stillingen eller spil finalen herunder.')
 
-            # Finale efter grundspillet. Holdes adskilt fra ordinære kampstatistikker.
+            # Placeringsfinaler efter grundspillet – én kamp pr. fire spillere.
+            # Grundspillets rangliste fryses ved oprettelsen og ændres ikke af finaleresultater.
             if d['round'] >= d['round_limit'] and unchanged:
                 st.divider()
-                st.subheader('🏆 Finale')
-                finale = d.get('finale')
-                if finale is None:
-                    ranking = standings(d)
-                    if len(ranking) >= 4:
-                        top4 = [r['name'] for r in ranking[:4]]
-                        st.caption('De fire bedst placerede i grundspillet kvalificerer sig. Nr. 1 + 3 møder nr. 2 + 4. Finalens resultat ændrer ikke grundspillets stilling.')
-                        st.write(f'**Blåt hold:** {top4[0]} + {top4[2]}')
-                        st.write(f'**Rødt hold:** {top4[1]} + {top4[3]}')
-                        if st.button('Start finale', type='primary', use_container_width=True):
-                            d['finale'] = {'blue':[top4[0],top4[2]], 'red':[top4[1],top4[3]], 'blue_score':None, 'red_score':None, 'court':1}
-                            save(); st.rerun()
-                    else:
-                        st.warning('Der kræves mindst fire spillere for at afvikle en finale.')
+                st.subheader('🏆 Placeringsfinaler')
+                finales = d.get('finales')
+                ranking = standings(d)
+                if finales is None:
+                    st.caption('Alle spillere får en ekstra placeringsfinale efter grundspillet: 1 + 3 mod 2 + 4, 5 + 7 mod 6 + 8 osv. Finalerne tæller ikke med i grundspillets stilling.')
+                    for offset in range(0, len(ranking) - 3, 4):
+                        group = ranking[offset:offset + 4]
+                        st.write(f'**Bane {offset // 4 + 1} · Placering {offset + 1}–{offset + 4}:** '
+                                 + html.escape(group[0]['name']) + ' + ' + html.escape(group[2]['name'])
+                                 + ' mod ' + html.escape(group[1]['name']) + ' + ' + html.escape(group[3]['name']))
+                    remaining = len(ranking) % 4
+                    if remaining:
+                        st.warning(f'{remaining} spiller(e) kan ikke indgå i en 2-mod-2-placeringsfinale. De øvrige kan stadig spille.')
+                    if len(ranking) >= 4 and st.button('Start placeringsfinaler', type='primary', use_container_width=True):
+                        built = []
+                        for offset in range(0, len(ranking) - 3, 4):
+                            group = ranking[offset:offset + 4]
+                            built.append({'blue': [group[0]['name'], group[2]['name']],
+                                          'red': [group[1]['name'], group[3]['name']],
+                                          'blue_score': None, 'red_score': None,
+                                          'court': offset // 4 + 1, 'rank_start': offset + 1})
+                        # Bevar evt. allerede gemt resultat fra den ældre enkeltfinale.
+                        old = d.get('finale')
+                        if isinstance(old, dict) and built and old.get('blue') == built[0]['blue'] and old.get('red') == built[0]['red']:
+                            built[0]['blue_score'] = old.get('blue_score')
+                            built[0]['red_score'] = old.get('red_score')
+                        d['finales'] = built
+                        save()
+                        st.rerun()
+                    elif len(ranking) < 4:
+                        st.warning('Der kræves mindst fire spillere for at afvikle placeringsfinaler.')
                 else:
-                    st.write('**Blåt hold:** ' + ' + '.join(finale['blue']))
-                    st.write('**Rødt hold:** ' + ' + '.join(finale['red']))
-                    if finale['blue_score'] is not None and finale['red_score'] is not None:
-                        st.metric('Finaleresultat', f"{finale['blue_score']} – {finale['red_score']}")
-                        if finale['blue_score'] == finale['red_score']:
-                            st.warning('Finalen står lige. Ret resultatet for at kåre en vinder.')
-                        else:
-                            winner = finale['blue'] if finale['blue_score'] > finale['red_score'] else finale['red']
-                            st.markdown('<div class="pp9-winners"><div>🏆 TURNERINGSVINDERE</div><strong>' + html.escape(' & '.join(winner)) + '</strong><small>Finalen er afsluttet</small></div>', unsafe_allow_html=True)
-                        if st.button('Ret finaleresultat'):
-                            finale['blue_score'] = None
-                            finale['red_score'] = None
-                            save(); st.rerun()
-                    else:
-                        st.caption('Indtast finalens score og gem den. Ved fast pointantal beregnes rødt holds score automatisk.')
-                        with st.form('finale_score_form'):
-                            blue_f = st.number_input('Blåt hold – finale', min_value=0, max_value=int(d['target']) if d['target'] else 200, value=0, step=1)
-                            if d['target']:
-                                red_f = int(d['target']) - int(blue_f)
-                                st.metric('Rødt hold – automatisk', red_f)
+                    st.caption('Én ekstra kamp pr. fire spillere. Finaleresultaterne påvirker ikke grundspillets stilling.')
+                    for index, match in enumerate(finales):
+                        court = match.get('court', index + 1)
+                        rank_start = match.get('rank_start', 4 * index + 1)
+                        is_championship = index == 0
+                        label = 'Mesterskabsfinale' if is_championship else f'Placering {rank_start}–{rank_start + 3}'
+                        st.markdown(f'#### Bane {court} · {label}')
+                        scored = match.get('blue_score') is not None and match.get('red_score') is not None
+                        edit_key = f'pp122_edit_final_{st.session_state.tid}_{index}'
+                        editing = st.session_state.get(edit_key, False)
+                        # Scoren præsenteres på den samme interaktive padelbane som grundspillet.
+                        # Kun bane 1 får mesterskabsfinalens guld/sølv-farver.
+                        final_key = f'pp122_court_final_{st.session_state.tid}_{index}_{int(editing)}_{int(scored)}'
+                        final_value = court_input(
+                            court=court, round='Finale', final_label=label,
+                            championship=is_championship,
+                            blue_players=match['blue'], red_players=match['red'],
+                            target=int(d['target']),
+                            blue_score=match.get('blue_score'), red_score=match.get('red_score'),
+                            default={'blue': match.get('blue_score'), 'red': match.get('red_score')},
+                            key=final_key,
+                        )
+                        final_value = final_value if isinstance(final_value, dict) else {}
+                        if scored and not editing:
+                            st.caption('✓ Resultat gemt · ' + str(match['blue_score']) + ' – ' + str(match['red_score']))
+                            if match['blue_score'] == match['red_score']:
+                                st.warning('Kampen står lige. Ret resultatet for at kåre et vinderhold.')
                             else:
-                                red_f = st.number_input('Rødt hold – finale', min_value=0, max_value=200, value=0, step=1)
-                            if st.form_submit_button('Gem finaleresultat', type='primary', use_container_width=True):
-                                finale['blue_score'] = int(blue_f)
-                                finale['red_score'] = int(red_f)
-                                save(); st.rerun()
+                                winner = match['blue'] if match['blue_score'] > match['red_score'] else match['red']
+                                if is_championship:
+                                    st.markdown('<div class="pp9-winners"><div>🏆 TURNERINGSVINDERE</div><strong>' + html.escape(' & '.join(winner)) + '</strong><small>Finalen er afsluttet</small></div>', unsafe_allow_html=True)
+                                else:
+                                    st.success('Vinder: ' + ' & '.join(winner))
+                            if st.button('✎ Ret resultat', key=f'edit_placement_final_{index}'):
+                                st.session_state[edit_key] = True
+                                st.rerun()
+                        else:
+                            upper = int(d['target']) if d['target'] else 200
+                            blue_value = final_value.get('blue')
+                            blue_valid = type(blue_value) is int and 0 <= blue_value <= upper
+                            if d['target']:
+                                red_value = int(d['target']) - blue_value if blue_valid else None
+                                red_valid = red_value is not None
+                            else:
+                                red_value = final_value.get('red')
+                                red_valid = type(red_value) is int and 0 <= red_value <= 200
+                            if st.button('💾 Gem finaleresultat', type='primary', use_container_width=True,
+                                         key=f'save_placement_final_{index}'):
+                                if not blue_valid or not red_valid:
+                                    st.error('Indtast en gyldig score på banen før du gemmer resultatet.')
+                                else:
+                                    match['blue_score'] = int(blue_value)
+                                    match['red_score'] = int(red_value)
+                                    st.session_state[edit_key] = False
+                                    save()
+                                    st.rerun()
+                            if editing and st.button('Annuller rettelse', key=f'cancel_placement_final_{index}'):
+                                st.session_state[edit_key] = False
+                                st.rerun()
+                        st.divider()
+                    if finales and all(m.get('blue_score') is not None and m.get('red_score') is not None for m in finales):
+                        st.success('Alle placeringsfinaler er afviklet!')
 
 
 with tab_table:
