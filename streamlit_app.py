@@ -1282,6 +1282,39 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
  border:0!important;box-shadow:none!important;outline:0!important;
 }
 
+
+/* 9.7 HISTORIK: Samme blå/røde bane, samme kort og navnerytme som Kampe */
+.pp97-card{background:#fff;border:1px solid #deeaed;border-radius:18px;padding:8px 9px 11px;margin:12px 0 3px;box-shadow:0 4px 18px #142e390b}
+.pp97-top{display:flex;justify-content:space-between;align-items:center;margin:2px 3px 9px;color:#26444c;font-size:14px}
+.pp97-pill{border:1px solid #aad8d0;background:#e9f7f4;color:#17655e;border-radius:30px;padding:6px 11px}
+.pp97-badge{font-size:12px;font-weight:700;border-radius:12px;padding:5px 8px;background:#e3f5ef;color:#157363}
+.pp97-badge.pending{background:#f4f6f7;color:#687c83}
+.pp97-court{position:relative;aspect-ratio:2/1;min-height:138px;max-height:225px;width:100%;border:3px solid #a8bec3;border-radius:12px;overflow:hidden;background:linear-gradient(90deg,#165b91 0%,#194a7a 49.7%,#792c38 50.3%,#95323f 100%)}
+.pp97-court::before{content:'';position:absolute;inset:8px;border:2px solid #fff9;pointer-events:none}
+.pp97-net{position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);width:5px;background:repeating-linear-gradient(to bottom,#f9ffff 0 4px,#688089 4px 7px);z-index:2}
+.pp97-service{position:absolute;top:8px;bottom:8px;width:2px;background:#e6f6fbdc;z-index:1}
+.pp97-service.left{left:15.25%}.pp97-service.right{left:84.75%}
+.pp97-midline{position:absolute;top:50%;height:2px;background:#e6f6fbdc;z-index:1}
+.pp97-midline.left{left:15.25%;width:34.75%}.pp97-midline.right{left:50%;width:34.75%}
+.pp97-vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;background:#102c32;border:2px solid #51dec4;border-radius:100px;width:36px;height:36px;display:grid;place-items:center;font-size:12px;font-weight:800;color:white!important}
+.pp97-team{position:absolute;top:14%;bottom:14%;width:43%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;z-index:4;pointer-events:none}
+.pp97-team.blue{left:0}.pp97-team.red{right:0}
+.pp97-name{color:#fff!important;-webkit-text-fill-color:#fff!important;letter-spacing:-.02em;text-align:center;max-width:98%;border-radius:8px;background:#082239b5;padding:6px 8px;font-weight:800;line-height:1.15;font-size:clamp(15px,3.1vw,22px);overflow-wrap:anywhere;text-shadow:0 1px 2px #000}
+.pp97-team.red .pp97-name{background:#401520b5}
+.pp97-score{position:absolute;top:50%;transform:translateY(-50%);width:24%;max-width:145px;min-width:66px;z-index:5;border-radius:10px;height:46px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:23px;font-weight:850;color:#fff!important;-webkit-text-fill-color:#fff!important;line-height:1;box-shadow:0 4px 13px #001b,0 0 0 2px #ffffff18}
+.pp97-score.blue{left:3.8%;background:rgba(10,50,94,.94);border:3px solid #76c5ff}
+.pp97-score.red{right:3.8%;background:rgba(121,32,49,.96);border:3px solid #ff9daa}
+.pp97-score.pending{font-size:20px}
+.pp97-foot{text-align:center;color:#617880;font-size:12px;margin:8px 0 2px}
+.pp97-edit{display:flex;justify-content:flex-end;margin:-4px 5px 11px}
+.pp97-edit [data-testid="stPopover"] button{font-size:13px!important;min-height:30px!important;padding:3px 10px!important;background:transparent!important;border:0!important;color:#526c77!important;box-shadow:none!important}
+@media(max-width:500px){
+ .pp97-court{min-height:135px;max-height:205px}
+ .pp97-team{top:12%;bottom:12%}
+ .pp97-name{padding:3px 4px;font-size:clamp(14px,3.45vw,18px)}
+ .pp97-score{height:42px;font-size:19px;width:23%;min-width:60px}
+}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
@@ -1719,32 +1752,75 @@ with tab_table:
                 if who in team:partners += [n for n in team if n!=who]
         st.caption('Makkere: '+(', '.join(partners) if partners else 'Ingen kampe endnu'))
 
+
+def pp97_history_court(match, round_number):
+    """En låst HTML-bane, med samme layout som den interaktive kampbane."""
+    def esc(value):
+        return html.escape(str(value), quote=True)
+    saved = match.get('blue_score') is not None and match.get('red_score') is not None
+    blue_score = esc(match['blue_score']) if saved else '–'
+    red_score = esc(match['red_score']) if saved else '–'
+    badge = '✓ Gemt' if saved else 'Afventer'
+    status_class = '' if saved else ' pending'
+    names = []
+    for team in ('blue','red'):
+        for name in match[team]:
+            names.append(f'<span class="pp97-name">{esc(name)}</span>')
+        # Supports shorter teams without breaking the court alignment.
+        while len(names) < (2 if team == 'blue' else 4):
+            names.append('<span class="pp97-name"></span>')
+    foot = 'Resultatet er gemt' if saved else 'Kampen er endnu ikke gemt som afgjort'
+    return (
+        '<div class="pp97-card"><div class="pp97-top">'
+        f'<span class="pp97-pill">Bane {esc(match["court"])}</span>'
+        f'<span>Runde {esc(round_number)} · <b class="pp97-badge{status_class}">{badge}</b></span>'
+        '</div><div class="pp97-court">'
+        '<div class="pp97-service left"></div><div class="pp97-service right"></div>'
+        '<div class="pp97-midline left"></div><div class="pp97-midline right"></div>'
+        '<div class="pp97-net"></div>'
+        f'<div class="pp97-team blue">{names[0]}{names[1]}</div>'
+        f'<div class="pp97-team red">{names[2]}{names[3]}</div>'
+        '<div class="pp97-vs">VS</div>'
+        f'<div class="pp97-score blue{status_class}">{blue_score}</div>'
+        f'<div class="pp97-score red{status_class}">{red_score}</div>'
+        '</div>'
+        f'<div class="pp97-foot">{foot}</div></div>'
+    )
+
 with tab_log:
-    with st.container(key='pp95_history'):
-        st.subheader('📜 Kamphistorik')
-        rounds=d['history']+([{'number':d['round'],'matches':d['matches']}] if d['matches'] else [])
-        if not rounds:st.info('Ingen runder spillet endnu.')
-        for rd in reversed(rounds):
-            with st.expander(f'Runde {rd["number"]}',expanded=rd['number']==d['round']):
-                for j,m in enumerate(rd['matches']):
-                    st.write(f"**Bane {m['court']}** · {', '.join(m['blue'])} vs {', '.join(m['red'])}")
-                    if m['blue_score'] is None:st.caption('Ikke afgjort')
-                    else:st.caption(f"Resultat: {m['blue_score']} – {m['red_score']}")
-                    with st.form(f"fix_{rd['number']}_{j}"):
-                        c1,c2=st.columns(2)
-                        newb=c1.number_input('Blå',min_value=0,
-                                             max_value=int(d['target']) if d['target'] else 200,
-                                             value=int(m['blue_score'] or 0))
-                        if d['target']:
-                            newr=int(d['target'])-newb
-                            c2.metric('Rød (beregnet)',newr)
-                            if m['blue_score'] is None:
-                                st.caption('Foreløbig beregning – kampen er ikke gemt som afgjort.')
+    st.subheader('📜 Kamphistorik')
+    rounds = d['history'] + ([{'number':d['round'],'matches':d['matches']}] if d['matches'] else [])
+    if not rounds:
+        st.info('Ingen runder spillet endnu.')
+    else:
+        round_numbers = [r['number'] for r in reversed(rounds)]
+        selected_round = st.selectbox('Vælg runde', round_numbers,
+                                      format_func=lambda n:f'Runde {n}',
+                                      key=f'pp97_hist_round_{st.session_state.get("tid","")}')
+        selected = next(r for r in rounds if r['number'] == selected_round)
+        st.caption('Visning af gemte og endnu ikke afgjorte kampe. Tryk Ret resultat for at ændre en score.')
+        for j, m in enumerate(selected['matches']):
+            st.markdown(pp97_history_court(m, selected_round), unsafe_allow_html=True)
+            with st.popover('✎ Ret resultat', use_container_width=False):
+                st.write(f'**Runde {selected_round} · Bane {m["court"]}**')
+                st.caption('Ændringer gemmes først, når du trykker Gem rettelse.')
+                with st.form(f"pp97_fix_{selected_round}_{j}"):
+                    c1,c2=st.columns(2)
+                    newb=c1.number_input('Blåt hold',min_value=0,
+                                         max_value=int(d['target']) if d['target'] else 200,
+                                         value=int(m['blue_score'] or 0),key=f'pp97_b_{selected_round}_{j}')
+                    if d['target']:
+                        newr=int(d['target'])-newb
+                        c2.metric('Rødt hold',newr)
+                    else:
+                        newr=c2.number_input('Rødt hold',min_value=0,max_value=200,
+                                             value=int(m['red_score'] or 0),key=f'pp97_r_{selected_round}_{j}')
+                    if st.form_submit_button('Gem rettelse', type='primary'):
+                        if d['target'] and newb+newr != d['target']:
+                            st.error(f'Scorerne skal tilsammen være {d["target"]} point.')
                         else:
-                            newr=c2.number_input('Rød',min_value=0,max_value=200,
-                                                 value=int(m['red_score'] or 0))
-                        if st.form_submit_button('Ret resultat'):
-                            if d['target'] and newb+newr!=d['target']:
-                                st.error(f'Kampens samlede point skal være {d["target"]}.')
-                            else:
-                                m['blue_score']=newb;m['red_score']=newr;save();st.success('Resultatet er rettet.');st.rerun()
+                            m['blue_score']=int(newb)
+                            m['red_score']=int(newr)
+                            save()
+                            st.success('Resultatet er gemt.')
+                            st.rerun()
