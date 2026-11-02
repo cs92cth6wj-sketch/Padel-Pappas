@@ -1338,6 +1338,42 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 .stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] svg {fill:#516B73!important;}
 .stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] > div {min-height:48px!important;}
 
+
+/* 9.9: Streamlit BaseWeb-rundevælgere i både Kampe og Historik. */
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"],
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="input"],
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="base-input"],
+.stApp [data-testid="stSelectbox"] div[role="combobox"],
+.stApp [data-testid="stSelectbox"] [aria-haspopup="listbox"] {
+ background-color:#FFFFFF!important;background:#FFFFFF!important;
+ color:#213841!important;-webkit-text-fill-color:#213841!important;
+ border-color:#D7E5E9!important;box-shadow:none!important;outline-color:transparent!important;
+}
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+.stApp [data-testid="stSelectbox"] [aria-haspopup="listbox"] {
+ border:1px solid #D7E5E9!important;border-radius:13px!important;min-height:48px!important;
+}
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div,
+.stApp [data-testid="stSelectbox"] [aria-haspopup="listbox"]:focus-visible{
+ border-color:#41B8A2!important;box-shadow:0 0 0 3px rgba(27,154,132,.15)!important;
+}
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] *,
+.stApp [data-testid="stSelectbox"] div[role="combobox"] *,
+.stApp [data-testid="stSelectbox"] [aria-haspopup="listbox"] *{
+ color:#213841!important;-webkit-text-fill-color:#213841!important;
+}
+.stApp [data-testid="stSelectbox"] svg{color:#516B73!important;fill:#516B73!important;}
+/* Options popup er portal-renderet uden for fanen. */
+[data-baseweb="popover"] [role="listbox"],
+[data-baseweb="popover"] [role="option"],
+[data-baseweb="menu"],
+[role="listbox"]{
+ background:#FFFFFF!important;color:#213841!important;-webkit-text-fill-color:#213841!important;
+}
+[role="option"] *,[role="listbox"] *{color:#213841!important;-webkit-text-fill-color:#213841!important;}
+
 </style>
 '''
 st.markdown(STYLE, unsafe_allow_html=True)
