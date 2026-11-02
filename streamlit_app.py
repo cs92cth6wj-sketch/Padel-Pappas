@@ -50,6 +50,7 @@ _COURT_HTML_ZLIB_BASE64 = (
     'OEKSbFaIS635L9j29Mj51KUrNVcaJgOgxCZlY0chL18S9aSqKAxbLUk5zxhudHvRhJi9Upktij/sY3HTxN7DbfQBmhhd828BTPGrHxcOtNXFu6uaza8u1K31'
     'Qv1583+mnUwv'
 )
+_court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
 _component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v80'
 _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
