@@ -1915,228 +1915,259 @@ if st.session_state.get('tid') and d.get('round', 0) > 0:
 tab_games,tab_table,tab_log=st.tabs(['🎾 Kampe','🏆 Stilling','📜 Historik'])
 with tab_games:
     completed_history = d.get('history', [])
-    current_round_label = f'Runde {d["round"]}' if d.get('round', 0) > 0 else 'Aktuel runde'
-    if completed_history:
+    current_number = int(d.get('round') or 0)
+    current_round_label = f'Runde {current_number}' if current_number > 0 else 'Aktuel runde'
+    schedule = d.get('americano_schedule') or []
+    show_all_americano = (d.get('format') == 'Americano' and current_number > 0
+                         and len(schedule) == int(d.get('round_limit') or 0))
+    # Alle ordinære Americano-runder vises straks efter turneringsstart.
+    # Fremtidige runder vises kun som låst program, uden scorefelter.
+    if show_all_americano:
+        choices = [f'Runde {n}' for n in range(1, int(d['round_limit']) + 1)]
+        st.caption('Hele Americano-programmet er planlagt. Kommende runder er kun til visning.')
+    elif completed_history:
         choices = [f'✓ Runde {r["number"]}' for r in sorted(completed_history, key=lambda r: r['number'])] + [current_round_label]
         st.caption('Se tidligere runder (resultater kan rettes under Historik)')
-        game_view_key = f'pp101_game_round_{st.session_state.get("tid", "")}'
-        if st.session_state.get(game_view_key) not in choices:
-            st.session_state[game_view_key] = current_round_label
+    else:
+        choices = []
+    game_view_key = f'pp101_game_round_{st.session_state.get("tid", "")}'
+    # Opdater valget til den netop startede runde, når appen går videre.
+    if st.session_state.get(game_view_key) not in choices:
+        st.session_state[game_view_key] = current_round_label
+    if choices:
         for start in range(0, len(choices), 4):
             columns = st.columns(min(4, len(choices) - start), gap='small')
             for column, choice in zip(columns, choices[start:start + 4]):
                 with column:
-                    if st.button(choice, key=f'pp101_g_{start}_{choice}',
+                    if st.button(choice, key=f'pp119_g_{start}_{choice}',
                                  type='primary' if st.session_state[game_view_key] == choice else 'secondary',
                                  use_container_width=True):
                         st.session_state[game_view_key] = choice
-        viewing = st.session_state[game_view_key]
-        if viewing != current_round_label:
-            previous_num = int(viewing.split()[-1])
-            previous = next((x for x in completed_history if x['number'] == previous_num), None)
+                        st.rerun()
+    viewing = st.session_state.get(game_view_key, current_round_label)
+    preview_only = bool(choices) and viewing != current_round_label
+    if preview_only:
+        preview_num = int(viewing.split()[-1])
+        if preview_num < current_number:
+            previous = next((x for x in completed_history if x['number'] == preview_num), None)
             if previous:
-                st.markdown(f'### Runde {previous_num} · Resultater')
+                st.markdown(f'### Runde {preview_num} · Resultater')
                 for pm in previous['matches']:
                     score = 'Afventer' if pm['blue_score'] is None else f'{pm["blue_score"]} – {pm["red_score"]}'
                     st.markdown('<div class="pp9-history-mini"><b>Bane '+str(pm['court'])+'</b><span>'+
                                 html.escape(' & '.join(pm['blue']))+' <strong>'+score+'</strong> '+
                                 html.escape(' & '.join(pm['red']))+'</span></div>', unsafe_allow_html=True)
                 st.caption('Resultater kan rettes under Historik.')
-    if not st.session_state.get('tid'):
-        st.info('Opret en turnering eller åbn en eksisterende via ID i venstremenuen.')
-    elif not d['players']:
-        st.info('Åbn menuen i venstre side og opret en turnering med mindst fire spillere.')
-    elif d['round']==0:
-        st.write(f"Klar til {d['format']} med {len(d['players'])} spillere.")
-        if st.button('Start turnering',type='primary',use_container_width=True):
-            new_round(d);save();st.rerun()
-    else:
-        # Første runde kan fordeles på ny, inden noget resultat er gemt.
-        # Gemte scorer og efterfølgende runder er altid beskyttet.
-        can_reshuffle = (d['round'] == 1 and not d['history'] and
-                         all(m.get('blue_score') is None and m.get('red_score') is None
-                             for m in d['matches']))
-        if can_reshuffle and d['format'] != 'Americano':
-            st.caption('Ikke tilfreds med fordelingen? Bland første runde igen, inden du gemmer resultater.')
-            if st.button('🔀 Bland hold igen', use_container_width=True,
-                         key=f"reshuffle_first_{st.session_state.tid}"):
-                previous_lineups = [
-                    (tuple(sorted(m['blue'])), tuple(sorted(m['red'])))
-                    for m in d['matches']
-                ]
-                # Prøv forskellige fordelinger, så knappen normalt giver en reel ændring.
-                for _ in range(10):
-                    if d.get('partner_mode') == 'Fast makker':
-                        pairs = [d['players'][k:k+2] for k in range(0,len(d['players']),2)]
-                        rng = random.Random(secrets.randbits(64))
-                        rng.shuffle(pairs)
-                        generated, byes = make_fixed_pairs_round(
-                            pairs, d['format'], [], round_number=0)
-                    else:
-                        order = list(d['players'])
-                        rng = random.Random(secrets.randbits(64))
-                        rng.shuffle(order)
-                        generated, byes = make_round(
-                            order, d['format'], [], seed=secrets.randbits(64))
-                    new_lineups = [
+        elif show_all_americano and preview_num > current_number:
+            planned = schedule[preview_num - 1]
+            if planned:
+                st.markdown(f'### Runde {preview_num} · Kommende kampe')
+                st.caption('Programmet er fastlagt. Resultater kan først indtastes, når runden er aktuel.')
+                for pm in planned['matches']:
+                    st.markdown('<div class="pp9-history-mini"><b>Bane '+str(pm['court'])+'</b><span>'+
+                                html.escape(' & '.join(pm['blue']))+' <strong>mod</strong> '+
+                                html.escape(' & '.join(pm['red']))+'</span></div>', unsafe_allow_html=True)
+                if planned.get('byes'):
+                    st.info('Sidder over: ' + ', '.join(planned['byes']))
+            else:
+                st.info('Denne runde blev oprettet før forudplanlægningen og kan ikke forhåndsvises.')
+    if not preview_only:
+        if not st.session_state.get('tid'):
+            st.info('Opret en turnering eller åbn en eksisterende via ID i venstremenuen.')
+        elif not d['players']:
+            st.info('Åbn menuen i venstre side og opret en turnering med mindst fire spillere.')
+        elif d['round']==0:
+            st.write(f"Klar til {d['format']} med {len(d['players'])} spillere.")
+            if st.button('Start turnering',type='primary',use_container_width=True):
+                new_round(d);save();st.rerun()
+        else:
+            # Første runde kan fordeles på ny, inden noget resultat er gemt.
+            # Gemte scorer og efterfølgende runder er altid beskyttet.
+            can_reshuffle = (d['round'] == 1 and not d['history'] and
+                             all(m.get('blue_score') is None and m.get('red_score') is None
+                                 for m in d['matches']))
+            if can_reshuffle and d['format'] != 'Americano':
+                st.caption('Ikke tilfreds med fordelingen? Bland første runde igen, inden du gemmer resultater.')
+                if st.button('🔀 Bland hold igen', use_container_width=True,
+                             key=f"reshuffle_first_{st.session_state.tid}"):
+                    previous_lineups = [
                         (tuple(sorted(m['blue'])), tuple(sorted(m['red'])))
-                        for m in generated
+                        for m in d['matches']
                     ]
-                    if new_lineups != previous_lineups:
-                        break
-                d['matches'] = generated
-                d['byes'] = byes
-                # Rundenummer, turnerings-ID og tidligere data ændres ikke.
-                save()
-                st.rerun()
-            st.caption('Ikke-gemte scores går tabt ved ny blanding.')
-        if d['byes']:
-            st.info('Sidder over denne runde: '+', '.join(d['byes']))
-        # Indtast alle kampresultater først. Hele runden gemmes i ét databasekald.
-        resultater = []
-        for i, m in enumerate(d['matches']):
-            # Stable frontend component keeps both inputs ON the court.
-            # The browser sends changes back to Python; "Gem runde" still saves
-            # all results together through the existing Supabase logic.
-            current_key = f"court_{st.session_state.tid}_{d['round']}_{i}_{'_'.join(m['blue'] + m['red'])}"
-            if m.get('blue_score') is not None and m.get('red_score') is not None:
-                st.markdown('<div class="pp9-saved">✓ Bane '+str(m['court'])+' · Gemt</div>', unsafe_allow_html=True)
-            component_scores = court_input(
-                court=m['court'], round=d['round'],
-                blue_players=m['blue'], red_players=m['red'],
-                target=int(d['target']),
-                blue_score=m['blue_score'], red_score=m['red_score'],
-                default={'blue': m['blue_score'], 'red': m['red_score']},
-                key=current_key,
-            )
-            component_scores = component_scores if isinstance(component_scores, dict) else {}
-            def safe_score(value, upper):
-                if type(value) is int and 0 <= value <= upper:
-                    return value
-                return None
-            v1 = safe_score(component_scores.get('blue'), int(d['target']) if d['target'] else 200)
-            if d['target']:
-                v2 = int(d['target']) - v1 if v1 is not None else None
-            else:
-                v2 = safe_score(component_scores.get('red'), 200)
-            if component_scores.get('blue') is not None and v1 is None:
-                st.warning(f"Bane {m['court']}: Blå score er ugyldig.")
-            if not d['target'] and component_scores.get('red') is not None and v2 is None:
-                st.warning(f"Bane {m['court']}: Rød score er ugyldig.")
-            resultater.append((v1, v2))
-            if d.get('partner_mode') == 'Fast makker':
-                st.caption('Faste makkerpar: Holdene kan ikke byttes enkeltvis under turneringen.')
-            else:
-                pass
-            if d.get('partner_mode') != 'Fast makker':
-                # Diskret redigeringslink direkte under banevisningen.
-                with st.container(key=f"court_edit_actions_{d['round']}_{i}"):
-                    with st.popover('✎ Rediger hold', use_container_width=False):
-                        p = d['players']
-                        chosen = st.multiselect('Vælg fire spillere', p, default=m['blue'] + m['red'],
-                                                key=f"edit_{d['round']}_{i}", max_selections=4)
-                        if len(chosen) == 4:
-                            if st.button('Byt makkerpar', key=f"swap_{d['round']}_{i}"):
-                                m['blue'] = [chosen[0], chosen[2]]
-                                m['red'] = [chosen[1], chosen[3]]
-                                m['blue_score'] = None
-                                m['red_score'] = None
-                                for colour in ('blue', 'red'):
-                                    st.session_state.pop(f"{colour}_{d['round']}_{i}", None)
-                                save()
-                                st.rerun()
-
-        st.divider()
-        st.subheader('Gem hele runden')
-        antal_klare = sum(
-            blue is not None and red is not None and
-            (not d['target'] or blue + red == d['target'])
-            for blue, red in resultater
-        )
-        st.caption(f'{antal_klare} af {len(resultater)} kampe har gyldige scores. ' + ('Indtast kun blåt holds point – rødt beregnes automatisk.' if d['target'] else 'Frit pointformat: indtast begge holds point.'))
-        if st.button('💾 Gem runde', type='primary', use_container_width=True,
-                     key=f"save_round_{d['round']}"):
-            fejl = []
-            for i, (blue, red) in enumerate(resultater):
-                bane = d['matches'][i]['court']
-                if blue is None or red is None:
-                    fejl.append(f'Bane {bane}: Der mangler et resultat.')
-                elif d['target'] and blue + red != d['target']:
-                    fejl.append(f"Bane {bane}: Scores skal tilsammen give {d['target']} point.")
-            if fejl:
-                for besked in fejl:
-                    st.error(besked)
-            else:
-                # Først nu opdateres kampene; der sendes kun ét PATCH til Supabase.
-                for m, (blue, red) in zip(d['matches'], resultater):
-                    m['blue_score'] = int(blue)
-                    m['red_score'] = int(red)
-                save()
-                st.success(f'Hele runde {d["round"]} er gemt ({len(resultater)} kampe).')
-                st.rerun()
-
-        done = all(m['blue_score'] is not None and m['red_score'] is not None
-                   for m in d['matches'])
-        # Nye rettelser i inputfelter kræver en ny samlet lagring, før næste runde.
-        unchanged = done and all(
-            (blue, red) == (m['blue_score'], m['red_score'])
-            for m, (blue, red) in zip(d['matches'], resultater)
-        )
-        if d['round'] < d['round_limit']:
-            if st.button('Næste runde →', type='primary', use_container_width=True,
-                         disabled=not unchanged):
-                new_round(d)
-                save()
-                st.rerun()
-            if not unchanged:
-                st.caption('Indtast alle scores og tryk Gem runde, før næste runde kan dannes.')
-        elif unchanged:
-            st.success('Alle ordinære runder er færdige! Se stillingen eller spil finalen herunder.')
-
-        # Finale efter grundspillet. Holdes adskilt fra ordinære kampstatistikker.
-        if d['round'] >= d['round_limit'] and unchanged:
-            st.divider()
-            st.subheader('🏆 Finale')
-            finale = d.get('finale')
-            if finale is None:
-                ranking = standings(d)
-                if len(ranking) >= 4:
-                    top4 = [r['name'] for r in ranking[:4]]
-                    st.caption('De fire bedst placerede i grundspillet kvalificerer sig. Nr. 1 + 3 møder nr. 2 + 4. Finalens resultat ændrer ikke grundspillets stilling.')
-                    st.write(f'**Blåt hold:** {top4[0]} + {top4[2]}')
-                    st.write(f'**Rødt hold:** {top4[1]} + {top4[3]}')
-                    if st.button('Start finale', type='primary', use_container_width=True):
-                        d['finale'] = {'blue':[top4[0],top4[2]], 'red':[top4[1],top4[3]], 'blue_score':None, 'red_score':None, 'court':1}
-                        save(); st.rerun()
-                else:
-                    st.warning('Der kræves mindst fire spillere for at afvikle en finale.')
-            else:
-                st.write('**Blåt hold:** ' + ' + '.join(finale['blue']))
-                st.write('**Rødt hold:** ' + ' + '.join(finale['red']))
-                if finale['blue_score'] is not None and finale['red_score'] is not None:
-                    st.metric('Finaleresultat', f"{finale['blue_score']} – {finale['red_score']}")
-                    if finale['blue_score'] == finale['red_score']:
-                        st.warning('Finalen står lige. Ret resultatet for at kåre en vinder.')
-                    else:
-                        winner = finale['blue'] if finale['blue_score'] > finale['red_score'] else finale['red']
-                        st.markdown('<div class="pp9-winners"><div>🏆 TURNERINGSVINDERE</div><strong>' + html.escape(' & '.join(winner)) + '</strong><small>Finalen er afsluttet</small></div>', unsafe_allow_html=True)
-                    if st.button('Ret finaleresultat'):
-                        finale['blue_score'] = None
-                        finale['red_score'] = None
-                        save(); st.rerun()
-                else:
-                    st.caption('Indtast finalens score og gem den. Ved fast pointantal beregnes rødt holds score automatisk.')
-                    with st.form('finale_score_form'):
-                        blue_f = st.number_input('Blåt hold – finale', min_value=0, max_value=int(d['target']) if d['target'] else 200, value=0, step=1)
-                        if d['target']:
-                            red_f = int(d['target']) - int(blue_f)
-                            st.metric('Rødt hold – automatisk', red_f)
+                    # Prøv forskellige fordelinger, så knappen normalt giver en reel ændring.
+                    for _ in range(10):
+                        if d.get('partner_mode') == 'Fast makker':
+                            pairs = [d['players'][k:k+2] for k in range(0,len(d['players']),2)]
+                            rng = random.Random(secrets.randbits(64))
+                            rng.shuffle(pairs)
+                            generated, byes = make_fixed_pairs_round(
+                                pairs, d['format'], [], round_number=0)
                         else:
-                            red_f = st.number_input('Rødt hold – finale', min_value=0, max_value=200, value=0, step=1)
-                        if st.form_submit_button('Gem finaleresultat', type='primary', use_container_width=True):
-                            finale['blue_score'] = int(blue_f)
-                            finale['red_score'] = int(red_f)
+                            order = list(d['players'])
+                            rng = random.Random(secrets.randbits(64))
+                            rng.shuffle(order)
+                            generated, byes = make_round(
+                                order, d['format'], [], seed=secrets.randbits(64))
+                        new_lineups = [
+                            (tuple(sorted(m['blue'])), tuple(sorted(m['red'])))
+                            for m in generated
+                        ]
+                        if new_lineups != previous_lineups:
+                            break
+                    d['matches'] = generated
+                    d['byes'] = byes
+                    # Rundenummer, turnerings-ID og tidligere data ændres ikke.
+                    save()
+                    st.rerun()
+                st.caption('Ikke-gemte scores går tabt ved ny blanding.')
+            if d['byes']:
+                st.info('Sidder over denne runde: '+', '.join(d['byes']))
+            # Indtast alle kampresultater først. Hele runden gemmes i ét databasekald.
+            resultater = []
+            for i, m in enumerate(d['matches']):
+                # Stable frontend component keeps both inputs ON the court.
+                # The browser sends changes back to Python; "Gem runde" still saves
+                # all results together through the existing Supabase logic.
+                current_key = f"court_{st.session_state.tid}_{d['round']}_{i}_{'_'.join(m['blue'] + m['red'])}"
+                if m.get('blue_score') is not None and m.get('red_score') is not None:
+                    st.markdown('<div class="pp9-saved">✓ Bane '+str(m['court'])+' · Gemt</div>', unsafe_allow_html=True)
+                component_scores = court_input(
+                    court=m['court'], round=d['round'],
+                    blue_players=m['blue'], red_players=m['red'],
+                    target=int(d['target']),
+                    blue_score=m['blue_score'], red_score=m['red_score'],
+                    default={'blue': m['blue_score'], 'red': m['red_score']},
+                    key=current_key,
+                )
+                component_scores = component_scores if isinstance(component_scores, dict) else {}
+                def safe_score(value, upper):
+                    if type(value) is int and 0 <= value <= upper:
+                        return value
+                    return None
+                v1 = safe_score(component_scores.get('blue'), int(d['target']) if d['target'] else 200)
+                if d['target']:
+                    v2 = int(d['target']) - v1 if v1 is not None else None
+                else:
+                    v2 = safe_score(component_scores.get('red'), 200)
+                if component_scores.get('blue') is not None and v1 is None:
+                    st.warning(f"Bane {m['court']}: Blå score er ugyldig.")
+                if not d['target'] and component_scores.get('red') is not None and v2 is None:
+                    st.warning(f"Bane {m['court']}: Rød score er ugyldig.")
+                resultater.append((v1, v2))
+                if d.get('partner_mode') == 'Fast makker':
+                    st.caption('Faste makkerpar: Holdene kan ikke byttes enkeltvis under turneringen.')
+                else:
+                    pass
+                if d.get('partner_mode') != 'Fast makker':
+                    # Diskret redigeringslink direkte under banevisningen.
+                    with st.container(key=f"court_edit_actions_{d['round']}_{i}"):
+                        with st.popover('✎ Rediger hold', use_container_width=False):
+                            p = d['players']
+                            chosen = st.multiselect('Vælg fire spillere', p, default=m['blue'] + m['red'],
+                                                    key=f"edit_{d['round']}_{i}", max_selections=4)
+                            if len(chosen) == 4:
+                                if st.button('Byt makkerpar', key=f"swap_{d['round']}_{i}"):
+                                    m['blue'] = [chosen[0], chosen[2]]
+                                    m['red'] = [chosen[1], chosen[3]]
+                                    m['blue_score'] = None
+                                    m['red_score'] = None
+                                    for colour in ('blue', 'red'):
+                                        st.session_state.pop(f"{colour}_{d['round']}_{i}", None)
+                                    save()
+                                    st.rerun()
+
+            st.divider()
+            st.subheader('Gem hele runden')
+            antal_klare = sum(
+                blue is not None and red is not None and
+                (not d['target'] or blue + red == d['target'])
+                for blue, red in resultater
+            )
+            st.caption(f'{antal_klare} af {len(resultater)} kampe har gyldige scores. ' + ('Indtast kun blåt holds point – rødt beregnes automatisk.' if d['target'] else 'Frit pointformat: indtast begge holds point.'))
+            if st.button('💾 Gem runde', type='primary', use_container_width=True,
+                         key=f"save_round_{d['round']}"):
+                fejl = []
+                for i, (blue, red) in enumerate(resultater):
+                    bane = d['matches'][i]['court']
+                    if blue is None or red is None:
+                        fejl.append(f'Bane {bane}: Der mangler et resultat.')
+                    elif d['target'] and blue + red != d['target']:
+                        fejl.append(f"Bane {bane}: Scores skal tilsammen give {d['target']} point.")
+                if fejl:
+                    for besked in fejl:
+                        st.error(besked)
+                else:
+                    # Først nu opdateres kampene; der sendes kun ét PATCH til Supabase.
+                    for m, (blue, red) in zip(d['matches'], resultater):
+                        m['blue_score'] = int(blue)
+                        m['red_score'] = int(red)
+                    save()
+                    st.success(f'Hele runde {d["round"]} er gemt ({len(resultater)} kampe).')
+                    st.rerun()
+
+            done = all(m['blue_score'] is not None and m['red_score'] is not None
+                       for m in d['matches'])
+            # Nye rettelser i inputfelter kræver en ny samlet lagring, før næste runde.
+            unchanged = done and all(
+                (blue, red) == (m['blue_score'], m['red_score'])
+                for m, (blue, red) in zip(d['matches'], resultater)
+            )
+            if d['round'] < d['round_limit']:
+                if st.button('Næste runde →', type='primary', use_container_width=True,
+                             disabled=not unchanged):
+                    new_round(d)
+                    st.session_state[game_view_key] = f'Runde {d["round"]}'
+                    save()
+                    st.rerun()
+                if not unchanged:
+                    st.caption('Indtast alle scores og tryk Gem runde, før næste runde kan dannes.')
+            elif unchanged:
+                st.success('Alle ordinære runder er færdige! Se stillingen eller spil finalen herunder.')
+
+            # Finale efter grundspillet. Holdes adskilt fra ordinære kampstatistikker.
+            if d['round'] >= d['round_limit'] and unchanged:
+                st.divider()
+                st.subheader('🏆 Finale')
+                finale = d.get('finale')
+                if finale is None:
+                    ranking = standings(d)
+                    if len(ranking) >= 4:
+                        top4 = [r['name'] for r in ranking[:4]]
+                        st.caption('De fire bedst placerede i grundspillet kvalificerer sig. Nr. 1 + 3 møder nr. 2 + 4. Finalens resultat ændrer ikke grundspillets stilling.')
+                        st.write(f'**Blåt hold:** {top4[0]} + {top4[2]}')
+                        st.write(f'**Rødt hold:** {top4[1]} + {top4[3]}')
+                        if st.button('Start finale', type='primary', use_container_width=True):
+                            d['finale'] = {'blue':[top4[0],top4[2]], 'red':[top4[1],top4[3]], 'blue_score':None, 'red_score':None, 'court':1}
                             save(); st.rerun()
+                    else:
+                        st.warning('Der kræves mindst fire spillere for at afvikle en finale.')
+                else:
+                    st.write('**Blåt hold:** ' + ' + '.join(finale['blue']))
+                    st.write('**Rødt hold:** ' + ' + '.join(finale['red']))
+                    if finale['blue_score'] is not None and finale['red_score'] is not None:
+                        st.metric('Finaleresultat', f"{finale['blue_score']} – {finale['red_score']}")
+                        if finale['blue_score'] == finale['red_score']:
+                            st.warning('Finalen står lige. Ret resultatet for at kåre en vinder.')
+                        else:
+                            winner = finale['blue'] if finale['blue_score'] > finale['red_score'] else finale['red']
+                            st.markdown('<div class="pp9-winners"><div>🏆 TURNERINGSVINDERE</div><strong>' + html.escape(' & '.join(winner)) + '</strong><small>Finalen er afsluttet</small></div>', unsafe_allow_html=True)
+                        if st.button('Ret finaleresultat'):
+                            finale['blue_score'] = None
+                            finale['red_score'] = None
+                            save(); st.rerun()
+                    else:
+                        st.caption('Indtast finalens score og gem den. Ved fast pointantal beregnes rødt holds score automatisk.')
+                        with st.form('finale_score_form'):
+                            blue_f = st.number_input('Blåt hold – finale', min_value=0, max_value=int(d['target']) if d['target'] else 200, value=0, step=1)
+                            if d['target']:
+                                red_f = int(d['target']) - int(blue_f)
+                                st.metric('Rødt hold – automatisk', red_f)
+                            else:
+                                red_f = st.number_input('Rødt hold – finale', min_value=0, max_value=200, value=0, step=1)
+                            if st.form_submit_button('Gem finaleresultat', type='primary', use_container_width=True):
+                                finale['blue_score'] = int(blue_f)
+                                finale['red_score'] = int(red_f)
+                                save(); st.rerun()
 
 
 with tab_table:
