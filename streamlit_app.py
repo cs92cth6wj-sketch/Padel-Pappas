@@ -55,7 +55,12 @@ _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
 if not _component_file.exists() or _component_file.read_bytes() != _court_html:
     _component_file.write_bytes(_court_html)
-st.set_page_config(page_title='Padel Pappas', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
+# Officielt Padel Pappas-logo som Streamlit favicon / browserikon.
+# Dette er ikke en garanti for iOS-hjemmeskaermsikon paa Streamlit Cloud.
+from PIL import Image
+_APP_ICON_PATH = Path(__file__).parent / 'app_icon.png'
+_APP_ICON = Image.open(_APP_ICON_PATH) if _APP_ICON_PATH.exists() else '🎾'
+st.set_page_config(page_title='Padel Pappas', page_icon=_APP_ICON, layout='centered', initial_sidebar_state='collapsed')
 
 court_input = components.declare_component('padel_court_input_v93', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
