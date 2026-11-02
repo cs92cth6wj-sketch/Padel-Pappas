@@ -1,4 +1,4 @@
-"""Padel Samlet 2.0 — independently implemented mobile-first tournament app."""
+""Padel Samlet 2.0 — independently implemented mobile-first tournament app."""
 import html
 import json
 import secrets
@@ -16,41 +16,44 @@ from engine import make_round, make_fixed_pairs_round, table
 # Den interaktive banes HTML er indbygget i denne fil.
 # Streamlit kan derfor indlaese den uden ekstra mapper i GitHub.
 _COURT_HTML_ZLIB_BASE64 = (
-    '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')
+    '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'
+    'gCn+tOPCgba6eHfVs/nNlb61Xun/NPwfDZwSuA=='
+)
 _court_html = zlib.decompress(base64.b64decode(_COURT_HTML_ZLIB_BASE64))
-_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v57'
+_component_dir = Path(tempfile.gettempdir()) / 'padel_pappas_court_v80'
 _component_dir.mkdir(parents=True, exist_ok=True)
 _component_file = _component_dir / 'index.html'
 if not _component_file.exists() or _component_file.read_bytes() != _court_html:
     _component_file.write_bytes(_court_html)
-st.set_page_config(page_title='Padel Samlet', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
+st.set_page_config(page_title='Padel Pappas', page_icon='🎾', layout='centered', initial_sidebar_state='collapsed')
 
-court_input = components.declare_component('padel_court_input_v57', path=str(_component_dir))
+court_input = components.declare_component('padel_court_input_v80', path=str(_component_dir))
 # Server-side Supabase credentials are read only from Streamlit Secrets.
 DB_URL = str(st.secrets.get('SUPABASE_URL', '')).rstrip('/')
 DB_KEY = str(st.secrets.get('SUPABASE_SECRET_KEY', ''))
@@ -879,6 +882,79 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
   bottom:-8px!important; left:0!important; right:0!important; height:9px!important;
   background:#090d12!important; border:0!important; border-radius:0!important;
   pointer-events:none!important; z-index:50!important;
+}
+
+
+/* PADEL PAPPAS 8.0 · LIGHT EDITION · placed last to override legacy dark rules */
+:root{color-scheme:light!important}
+html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data-testid="stMainBlockContainer"]{
+ background:#FAFBFC!important;color:#182431!important;
+}
+[data-testid="stHeader"],[data-testid="stToolbar"]{background:#FAFBFC!important;box-shadow:0 1px 0 #E8EEF1!important}
+[data-testid="stSidebar"],[data-testid="stSidebarContent"]{background:#F0F5F6!important;color:#172A2D!important}
+.stApp p,.stApp li,.stApp label,.stApp span:not([class*="name"]):not(.podium-rank),
+.stApp [data-testid="stMarkdownContainer"]{color:#26363D}
+.stApp h1,.stApp h2,.stApp h3,.stApp h4{color:#17242E!important}
+.stApp [data-testid="stCaptionContainer"],.stApp [data-testid="stCaptionContainer"] p{color:#64757E!important}
+.stApp a{color:#117A78!important}
+.stApp [data-testid="stMarkdownContainer"] hr,.stApp hr{border-color:#E5ECF0!important}
+.p7-hero{background:linear-gradient(118deg,#FFFFFF 45%,#E6F7F5 100%)!important;border:1px solid #E0EBEE!important;border-radius:20px!important;box-shadow:0 7px 25px #1934440c!important}
+.p7-hero .hero-title,.hero-title{color:#162631!important}
+.p7-hero .subtitle,.subtitle{color:#6A7C85!important}
+.brand{color:#147E75!important}
+.p7-id{background:#E7F6F3!important;border:1px solid #B7DBD6!important;color:#17695E!important}
+.p7-stat,.p7-stats .p7-stat{background:#FFFFFF!important;border:1px solid #DEE9ED!important;border-radius:16px!important;box-shadow:0 4px 18px #213d4a0d!important}
+.p7-stat strong{color:#192B33!important}
+.p7-stat small{color:#697D85!important}
+.p71-section-title{color:#14252C!important}
+.p71-section-title span{color:#69808A!important}
+.stApp [data-testid="stTabs"] [role="tablist"],.stApp [data-baseweb="tab-list"]{border:0!important;background:transparent!important;box-shadow:none!important}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"],
+.stApp [data-baseweb="tab-list"] [data-baseweb="tab"]{
+ background:#FFFFFF!important;border:1px solid #DCE8EA!important;color:#263B42!important;
+ -webkit-text-fill-color:#263B42!important;border-radius:15px!important;box-shadow:0 4px 15px #10262f0b!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
+.stApp [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"]{
+ background:#137F75!important;border:2px solid #137F75!important;
+ color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;box-shadow:0 4px 14px #086f652b!important;
+}
+.stApp [data-testid="stTabs"] [role="tablist"] [role="tab"] *,
+.stApp [data-baseweb="tab-list"] [data-baseweb="tab"] *{color:inherit!important;-webkit-text-fill-color:inherit!important}
+.stApp [data-baseweb="tab-highlight"],.stApp [data-baseweb="tab-border"],
+.stApp [data-testid="stTabs"] [class*="highlight"],.stApp [data-testid="stTabs"] [class*="indicator"]{display:none!important;height:0!important;opacity:0!important}
+.padel-real-card,.court-card{background:#FFFFFF!important;border:1px solid #DFEAEE!important;border-radius:18px!important;box-shadow:0 8px 27px #1c384016!important}
+.padel-real-top,.court-top{color:#18343A!important}
+.padel-score-foot{color:#627781!important}
+.standing-row{background:#FFFFFF!important;border:1px solid #E1EBED!important;color:#20323B!important;box-shadow:0 3px 12px #2439450c!important}
+.standing-row.top{background:#EAF8F4!important;border-color:#9ED9CD!important}
+.standing-row .standing-person{color:#172B34!important}
+.standing-heading{color:#4A606A!important}
+.podium-card{background:#FFFFFF!important;border:1px solid #DCE7EA!important;box-shadow:0 5px 18px #17292f12!important}
+.podium-card.winner{background:linear-gradient(150deg,#DDF5ED,#F9FFFC)!important;border-color:#73C5B0!important}
+.podium-name,.podium-score{color:#19313A!important}
+.podium-label{color:#546B72!important}
+[data-testid="stExpander"]{background:#FFFFFF!important;border:1px solid #DFE9ED!important;border-radius:15px!important}
+[data-testid="stExpander"] summary,[data-testid="stExpander"] summary *{color:#233840!important;-webkit-text-fill-color:#233840!important}
+.stApp [data-testid="stButton"] button[kind="primary"],.stApp [data-testid="stFormSubmitButton"] button[kind="primary"]{
+ background:#138377!important;color:#FFFFFF!important;border:1px solid #0F786E!important;box-shadow:0 3px 12px #07695c22!important;
+}
+.stApp [data-testid="stButton"] button[kind="secondary"],.stApp [data-testid="stFormSubmitButton"] button[kind="secondary"]{
+ background:#ECF8F6!important;color:#17665D!important;border:1px solid #92C9C2!important;box-shadow:none!important;
+}
+.stApp [data-testid="stButton"] button[kind="secondary"] *,.stApp [data-testid="stFormSubmitButton"] button[kind="secondary"] *{color:#17665D!important;-webkit-text-fill-color:#17665D!important}
+.stApp [data-testid="stButton"] button[kind="primary"] *,.stApp [data-testid="stFormSubmitButton"] button[kind="primary"] *{color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important}
+.stApp [data-testid="stTextInput"] input,.stApp [data-testid="stNumberInput"] input,
+.stApp [data-testid="stTextArea"] textarea,.stApp [data-baseweb="select"]>div{
+ background:#FFFFFF!important;color:#172E36!important;-webkit-text-fill-color:#172E36!important;border-color:#D9E5E9!important;
+}
+.stApp [data-testid="stTextInput"] input::placeholder{color:#8B9BA2!important}
+.stApp [data-baseweb="popover"],.stApp [data-baseweb="menu"],.stApp [role="listbox"]{background:#FFFFFF!important;color:#1D343A!important}
+.stApp [data-testid="stDataFrame"],.stApp [data-testid="stTable"]{background:#FFFFFF!important;color:#1C3239!important}
+.stApp [data-testid="stAlert"]{border-radius:12px!important}
+@media(max-width:520px){
+ .p7-hero{border-radius:15px!important}
+ .p7-stat{border-radius:12px!important}
 }
 
 </style>
