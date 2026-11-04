@@ -221,73 +221,6 @@ def signup_roster(day):
                   key=lambda item: (item.get('created_at', ''), item.get('name', '').casefold()))
 
 
-def signup_players():
-    """Shared named roster, persisted using the existing Supabase table."""
-    rows = signup_db_list('PLAYER-')
-    return sorted([{'id': r['id'], **(r.get('data') or {})} for r in rows
-                   if (r.get('data') or {}).get('kind') == 'padel_player'],
-                  key=lambda p: p.get('name', '').casefold())
-
-
-def signup_player_id(name):
-    canonical = ' '.join(str(name).casefold().split())
-    return 'PLAYER-' + hashlib.sha256(canonical.encode('utf-8')).hexdigest()[:20].upper()
-
-
-def signup_player_admin():
-    st.markdown('#### Fælles spillerliste')
-    st.caption('Opret de 36 spillere én gang. Spillerne vælger derefter deres eget navn ved tilmelding.')
-    try:
-        players = signup_players()
-    except requests.RequestException as exc:
-        st.error(f'Kunne ikke hente spillerlisten: {exc}')
-        return
-    st.caption(f'{len(players)} spillere i listen')
-    with st.form('su_add_players_form'):
-        raw = st.text_area('Tilføj spillere – ét fuldt navn pr. linje',
-                           placeholder='Jan Henriksen\nSimon Jakobsen\nMorten Aslak', height=125)
-        submit = st.form_submit_button('Gem spillere', use_container_width=True)
-    if submit:
-        names = [' '.join(x.split()) for x in raw.splitlines() if x.strip()]
-        unique = {signup_player_id(x): x for x in names if len(x) >= 3}
-        already = {p['id'] for p in players}
-        added = 0
-        for player_id, name in unique.items():
-            if player_id in already:
-                continue
-            try:
-                db_save(player_id, {'kind':'padel_player','name':name}, create=True)
-                added += 1
-            except requests.HTTPError as exc:
-                if exc.response is None or exc.response.status_code != 409:
-                    st.error(f'Kunne ikke gemme {name}: {exc}')
-                    break
-            except (requests.RequestException, ValueError) as exc:
-                st.error(f'Kunne ikke gemme {name}: {exc}')
-                break
-        if added:
-            st.success(f'{added} nye spillere er tilføjet.')
-            st.rerun()
-    if players:
-        with st.expander(f'Administrér de {len(players)} spillere', expanded=False):
-            for player in players:
-                a,b=st.columns([5,1])
-                a.write(player['name'])
-                if b.button('Fjern', key='su_rm_player_'+player['id']):
-                    try:
-                        signup_db_delete(player['id'])
-                        st.rerun()
-                    except requests.RequestException as exc:
-                        st.error(f'Kunne ikke fjerne spilleren: {exc}')
-
-
-def signup_delete_day(day):
-    """Delete registrations first, then the day; do not touch tournament records."""
-    for record in signup_roster(day):
-        signup_db_delete(record['id'])
-    signup_db_delete(signup_day_id(day))
-
-
 def signup_admin_ok():
     pin = str(st.secrets.get('PADEL_ADMIN_PIN', '')).strip()
     if not pin:
@@ -359,470 +292,323 @@ def signup_default_sunday():
     return today + timedelta(days=(6 - today.weekday()) % 7 or 7)
 
 
-def signup_screen():
-    # The signup view deliberately has its own light control theme.
-    # This stylesheet is only injected on signup pages (other tournament screens unchanged).
-    st.markdown('''<style>
-      .signup-heading{border:1px solid #d8e9e5;background:linear-gradient(120deg,#ffffff,#e9f7f4);padding:18px;border-radius:20px;margin-bottom:15px}
-      .signup-heading h2{margin:0 0 5px;color:#1a4c4b;font-size:27px}
-      .signup-heading p{margin:0;color:#567273}
-      .signup-roster{background:#f5faf9;border-radius:14px;padding:12px 14px;line-height:1.9;color:#274c50}
-      .stApp {color-scheme:light!important}
-      .stApp [data-testid="stExpander"],
-      .stApp [data-testid="stExpander"] details,
-      .stApp [data-testid="stExpanderDetails"],
-      .stApp [data-testid="stForm"],
-      .stApp [data-testid="stVerticalBlockBorderWrapper"]{
-        background:#ffffff!important;border-color:#d9e8e6!important;color:#243b40!important;
-        box-shadow:none!important;border-radius:17px!important;
-      }
-      .stApp [data-testid="stExpander"] summary,
-      .stApp [data-testid="stExpander"] summary *{color:#245b58!important;-webkit-text-fill-color:#245b58!important;background:transparent!important}
-      .stApp [data-testid="stForm"] label,
-      .stApp [data-testid="stForm"] label *,
-      .stApp [data-testid="stExpander"] label,
-      .stApp [data-testid="stExpander"] label *{color:#29454a!important;-webkit-text-fill-color:#29454a!important}
-      .stApp [data-testid="stForm"] input,
-      .stApp [data-testid="stExpander"] input,
-      .stApp [data-testid="stTextInput"] input,
-      .stApp [data-testid="stTimeInput"] input,
-      .stApp [data-testid="stNumberInput"] input,
-      .stApp [data-baseweb="select"] > div,
-      .stApp [data-baseweb="base-input"],
-      .stApp [data-baseweb="input"] {
-        color-scheme:light!important;background:#ffffff!important;color:#253d43!important;
-        -webkit-text-fill-color:#253d43!important;border-color:#c9dedb!important;
-        border-radius:12px!important;box-shadow:none!important;
-      }
-      .stApp [data-baseweb="select"] *{color:#253d43!important;-webkit-text-fill-color:#253d43!important}
-      /* The select dropdown is portaled outside the form on many iPhones. */
-      [role="listbox"], [data-baseweb="popover"], [data-baseweb="menu"],
-      [data-baseweb="menu"] [role="option"] {
-        background:#ffffff!important;color:#253d43!important;
-        -webkit-text-fill-color:#253d43!important;color-scheme:light!important;
-      }
-      [data-baseweb="menu"] [role="option"]:hover {background:#eaf6f3!important}
-      .stApp [data-testid="stNumberInput"] button,
-      .stApp [data-testid="stTimeInput"] button{
-        background:#f2f8f6!important;color:#23645c!important;border-color:#c9dedb!important;
-      }
-      .stApp [data-testid="stNumberInput"] button *,
-      .stApp [data-testid="stTimeInput"] button *{color:#23645c!important;-webkit-text-fill-color:#23645c!important;stroke:#23645c!important}
-      .stApp [data-baseweb="input"]:focus-within,
-      .stApp [data-baseweb="select"]:focus-within{border-color:#17877a!important;box-shadow:0 0 0 1px #17877a!important}
-      .stApp [data-testid="stCodeBlock"],
-      .stApp [data-testid="stCode"],
-      .stApp code {background:#edf7f5!important;color:#235e5a!important;-webkit-text-fill-color:#235e5a!important}
-      .stApp [data-testid="stCodeBlock"] *{color:#235e5a!important;-webkit-text-fill-color:#235e5a!important}
-      .stApp [data-testid="stAlert"] {border-radius:15px!important}
-      .stApp [data-testid="stExpander"] {margin-top:14px!important}
-      .stApp [data-testid="stForm"] {padding:12px!important}
-      .stApp [data-testid="stTimeInput"] input {font-size:16px!important}
-      .stApp [data-testid="stNumberInput"] input {font-size:18px!important}
-      @media(max-width:600px){
-        .stApp [data-testid="stForm"]{padding:10px!important}
-        .signup-heading h2{font-size:24px}
-        .stApp [data-testid="stHorizontalBlock"]{gap:9px!important}
-      }
-      /* 13.3: Fix legacy dark theme rules with enough specificity.
-         These rules are injected exclusively for the signup screen. */
-      .stApp [data-testid="stExpander"] details,
-      .stApp [data-testid="stExpander"] details > summary,
-      .stApp [data-testid="stExpander"] summary,
-      .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"],
-      .stApp [data-testid="stExpander"] [data-testid="stVerticalBlock"],
-      .stApp [data-testid="stExpander"] [data-testid="stForm"],
-      .stApp [data-testid="stForm"] {
-        background-color:#FFFFFF!important;
-        color:#20383C!important;
-        -webkit-text-fill-color:#20383C!important;
-        border-color:#DAE8E5!important;
-        box-shadow:none!important;
-      }
-      .stApp [data-testid="stExpander"] summary,
-      .stApp [data-testid="stExpander"] summary *,
-      .stApp [data-testid="stExpander"] [data-testid="stExpanderToggleIcon"],
-      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"],
-      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"] *,
-      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"] label,
-      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"] label * ,
-      .stApp [data-testid="stForm"] [data-testid="stWidgetLabel"] *,
-      .stApp [data-testid="stForm"] label *{
-        color:#213C40!important;
-        -webkit-text-fill-color:#213C40!important;
-        fill:#213C40!important;
-        opacity:1!important;
-      }
-      .stApp [data-testid="stExpander"] [data-testid="stTimeInput"] input,
-      .stApp [data-testid="stExpander"] [data-testid="stTextInput"] input,
-      .stApp [data-testid="stExpander"] [data-testid="stNumberInput"] input,
-      .stApp [data-testid="stForm"] [data-testid="stTimeInput"] input,
-      .stApp [data-testid="stForm"] [data-testid="stTextInput"] input,
-      .stApp [data-testid="stForm"] [data-testid="stNumberInput"] input,
-      .stApp [data-testid="stExpander"] [data-baseweb="input"],
-      .stApp [data-testid="stExpander"] [data-baseweb="base-input"],
-      .stApp [data-testid="stForm"] [data-baseweb="input"],
-      .stApp [data-testid="stForm"] [data-baseweb="base-input"],
-      .stApp [data-testid="stTimeInput"] div[data-baseweb="input"],
-      .stApp [data-testid="stTimeInput"] div[data-baseweb="base-input"],
-      .stApp [data-testid="stTimeInput"] input {
-        background:#FFFFFF!important;
-        background-color:#FFFFFF!important;
-        color:#20383C!important;
-        -webkit-text-fill-color:#20383C!important;
-        border-color:#C8DDDA!important;
-        color-scheme:light!important;
-        opacity:1!important;
-      }
-      .stApp [data-testid="stExpander"] [data-baseweb="select"],
-      .stApp [data-testid="stExpander"] [data-baseweb="select"] > div,
-      .stApp [data-testid="stForm"] [data-baseweb="select"],
-      .stApp [data-testid="stForm"] [data-baseweb="select"] > div,
-      .stApp [data-testid="stSelectbox"] [data-baseweb="select"],
-      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div,
-      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] div[role="combobox"] {
-        background:#FFFFFF!important;
-        background-color:#FFFFFF!important;
-        color:#20383C!important;
-        -webkit-text-fill-color:#20383C!important;
-        border-color:#C8DDDA!important;
-        color-scheme:light!important;
-      }
-      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] span,
-      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] svg {
-        color:#20383C!important;
-        -webkit-text-fill-color:#20383C!important;
-        fill:#456B68!important;
-      }
-      .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button,
-      .stApp [data-testid="stForm"] [data-testid="stFormSubmitButton"] button {
-        background:#147F75!important;
-        color:#FFFFFF!important;
-        -webkit-text-fill-color:#FFFFFF!important;
-        border-color:#147F75!important;
-      }
-      .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button *,
-      .stApp [data-testid="stForm"] [data-testid="stFormSubmitButton"] button * {
-        color:#FFFFFF!important;
-        -webkit-text-fill-color:#FFFFFF!important;
-      }
-      /* Mobile signup fields must stay readable regardless of legacy theme. */
-      .stApp [data-testid="stExpander"] [data-testid="stTextInput"] input,
-      .stApp [data-testid="stForm"] [data-testid="stTextInput"] input {
-        background:#ffffff!important;color:#20383C!important;
-        -webkit-text-fill-color:#20383C!important;
-        border:1px solid #C8DDDA!important;opacity:1!important;
-      }
-      .stApp [data-testid="stExpander"] {border:1px solid #D8E8E5!important;border-radius:17px!important;overflow:hidden!important}
-      .stApp [data-testid="stExpander"] summary{padding:12px 15px!important}
-      .stApp [data-testid="stExpander"] summary:hover{background:#EFF8F6!important}
-    </style>''', unsafe_allow_html=True)
+# Fælles spillerliste: lagres én gang i eksisterende Supabase-tabel.
+# Startlisten kan rettes af administratoren, uden at gamle turneringsdata ændres.
+SIGNUP_MEMBERS_ID = 'MEMBERS-PADEL-PAPPAS'
+SIGNUP_DEFAULT_MEMBERS = [
+    'Anders Skjoldgaard', 'Asbjørn Røven', 'Christian Lillienskov',
+    'Christian Schumacher', 'Christian Vestesen', 'Christopher Hazra',
+    'Claus Bay', 'Daniel Braad-Sørensen', 'Dinesan Rasiah',
+    'Emil Ankersen', 'Henrik Knudsen', 'Henrik Olsen',
+    'Jacob Lauridsen', 'Jan Henriksen', 'Janus Krøjgård',
+    'Jesper Sørensen', 'Kasper Enevoldsen', 'Kasper Mikkelsen',
+    'Lars Golfprofil', 'Lasse Møller', 'Martin Graversen',
+    'Martin Andersen', 'Mathias Smedegaard', 'Michael Grumstrup',
+    'Mick Bisgaard', 'Morten Aslak', 'Morten Hansen',
+    'Peter Aamann', 'Peter Pedersen', 'Rasmus Jørgensen',
+    'Rasmus Fyenbo', 'Rasmus Laursen', 'Senthu Ariyanayagam',
+    'Simon Jakobsen', 'Søren Rubach', 'Thomas Overgaard', 'Tue Thomsen',
+]
+
+
+def signup_members():
+    try:
+        return sorted(db_load(SIGNUP_MEMBERS_ID).get('members', SIGNUP_DEFAULT_MEMBERS), key=str.casefold)
+    except ValueError:
+        return sorted(SIGNUP_DEFAULT_MEMBERS, key=str.casefold)
+
+
+def signup_save_members(members):
+    members = sorted(set(members), key=str.casefold)
+    payload = {'kind': 'padel_members', 'members': members}
+    try:
+        db_save(SIGNUP_MEMBERS_ID, payload)
+    except (ValueError, RuntimeError):
+        db_save(SIGNUP_MEMBERS_ID, payload, create=True)
+
+
+def signup_ui_css():
     st.markdown("""<style>
-       /* v13.6: visual hierarchy aligned to the light landing page */
-       .signup-heading{background:linear-gradient(115deg,#ffffff,#e8f7f3)!important;
-          padding:24px 22px!important;border:1px solid #d4e6e3!important;border-radius:26px!important}
-       .signup-heading h2{color:#22363a!important;font-weight:800!important;font-size:clamp(24px,5vw,35px)!important}
-       .signup-heading p{font-size:15px!important;line-height:1.45!important}
-       .su136-card{border:1px solid #d8e8e5;border-radius:20px;background:#fff;
-          padding:16px 18px;margin:12px 0;box-shadow:0 2px 8px #0d55440a}
-       .su136-card-title{font-weight:750;font-size:19px;color:#203e40;margin-bottom:7px}
-       .su136-meta{color:#61787b;font-size:14px;margin-bottom:9px}
-       .su136-pill{display:inline-block;color:#176f61;background:#e6f6f1;border:1px solid #b9dbd4;
-          padding:5px 12px;border-radius:99px;font-size:13px;margin:4px 6px 4px 0}
-       .su136-progress{height:9px;background:#e6eeeb;border-radius:20px;overflow:hidden;margin:12px 0}
-       .su136-progress div{height:100%;background:#16877c;border-radius:20px}
-       .signup-roster{background:#f5fbf9!important;padding:14px 16px!important;border-radius:15px!important}
-       .stApp [data-testid="stTextInput"] input,.stApp [data-testid="stTextArea"] textarea{
-          background:#fff!important;color:#243c40!important;-webkit-text-fill-color:#243c40!important}
-       .stApp [data-testid="stAlert"]{background:#edf8f5!important;color:#274a4a!important}
-       </style>""", unsafe_allow_html=True)
-    st.markdown('<div class="signup-heading"><h2>🎾 Søndagspadel · Tilmelding</h2><p>Se kommende spilledage og hvem der er tilmeldt.</p></div>', unsafe_allow_html=True)
-    raw_day = st.query_params.get('signup', 'all')
-    # Immediately following creation, favour the date saved by the app over a
-    # transient/stale browser query-string value on iOS.
-    pending_day = st.session_state.pop('signup_navigation_pending', None)
-    day = signup_parse_day(pending_day or raw_day)
-    if day is None:
-        st.warning('Tilmeldingslinket indeholder en ugyldig dato. Åbn oversigten igen.')
-        st.caption(f'Modtaget datoværdi: {str(raw_day)[:64]}')
-        if st.button('← Til alle spilledage', key='signup_bad_day_back'):
-            signup_open('all')
-        st.stop()
-    if day == 'all':
-        if st.button('← Til forsiden', key='su_back_home'):
-            st.query_params.clear(); st.rerun()
-        try:
-            upcoming = signup_day_rows()
-        except (requests.RequestException, ValueError) as exc:
-            st.error(f'Kunne ikke hente spilledage: {exc}'); st.stop()
-        st.caption('Del denne faste tilmeldingsoversigt i Messenger:')
-        st.text_input('Tilmeldingslink – hold fingeren på teksten for at kopiere',
-                      value='https://padel-pappas.streamlit.app/?signup=all',
-                      key='su_signup_link_display')
-        st.link_button('↗ Åbn tilmeldingslink',
-                       'https://padel-pappas.streamlit.app/?signup=all',
-                       use_container_width=True)
-        if not upcoming:
-            st.info('Der er endnu ingen kommende spilledage. Kig forbi igen senere.')
-        for entry in upcoming:
-            date_str = entry['date']
+    .stApp {color-scheme:light!important}
+    .pp14-head{background:linear-gradient(120deg,#fff,#eaf8f5);border:1px solid #cfe6e1;
+      border-radius:24px;padding:22px 22px 18px;margin:0 0 18px;color:#263c40}
+    .pp14-head h1{font-size:clamp(29px,7vw,40px)!important;letter-spacing:-.04em!important;
+      color:#20393e!important;margin:0 0 5px!important}
+    .pp14-head p{font-size:16px;color:#627a7d;margin:0}
+    .pp14-day{background:#fff;border:1px solid #d6e8e4;border-radius:22px;
+      padding:20px 18px;margin:12px 0 8px;box-shadow:0 4px 22px #245e5310}
+    .pp14-daytop{display:flex;align-items:start;justify-content:space-between;gap:8px}
+    .pp14-day h2{font-size:clamp(22px,5.5vw,29px)!important;line-height:1.17!important;
+      color:#233c40!important;margin:0!important}
+    .pp14-muted{color:#688185;font-size:14px;margin-top:6px}
+    .pp14-badge{border-radius:99px;background:#e4f7ed;color:#207258;font-size:13px;
+      font-weight:750;padding:5px 10px;white-space:nowrap}
+    .pp14-badge.closed{background:#fff1e9;color:#97603f}
+    .pp14-badge.cancelled{background:#fcebec;color:#b44955}
+    .pp14-stats{display:flex;align-items:baseline;justify-content:space-between;margin:16px 0 7px;color:#284044}
+    .pp14-stats b{font-size:22px}
+    .pp14-track{height:9px;background:#e3eeeb;border-radius:99px;overflow:hidden}
+    .pp14-track span{display:block;height:100%;background:#168577;border-radius:99px}
+    .pp14-roster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+    .pp14-player{border-radius:12px;background:#eff8f5;border:1px solid #e0f0ec;
+      padding:10px 9px;color:#29474a;font-size:clamp(11px,3vw,14px);font-weight:600;
+      display:flex;gap:7px;align-items:center;min-width:0;overflow-wrap:anywhere}
+    .pp14-check{font-weight:bold;color:#15917b;flex-shrink:0}
+    .pp14-free{border-radius:13px;background:#f3f8f7;padding:13px 15px;margin-top:12px;
+      display:flex;justify-content:space-between;color:#425e61}
+    .pp14-free strong{color:#203f42;font-size:19px}
+    .pp14-caption{font-size:13px;color:#6a8184;margin-top:11px}
+    .pp14-day [data-testid='stAlert']{border-radius:12px}
+    .stApp [data-testid='stExpander'],.stApp [data-testid='stForm'],
+    .stApp [data-testid='stVerticalBlockBorderWrapper']{background:#fff!important;
+      border-color:#d9e8e4!important;color:#263e42!important;border-radius:17px!important}
+    .stApp [data-testid='stWidgetLabel'] *, .stApp [data-testid='stForm'] label *,
+    .stApp [data-testid='stExpander'] summary *{color:#284247!important;
+      -webkit-text-fill-color:#284247!important;opacity:1!important}
+    .stApp [data-testid='stTextInput'] input,
+    .stApp [data-testid='stNumberInput'] input,
+    .stApp [data-baseweb='input'],.stApp [data-baseweb='base-input'],
+    .stApp [data-baseweb='select']>div{background:#fff!important;color:#243e42!important;
+      -webkit-text-fill-color:#243e42!important;border-color:#c7ddda!important;
+      color-scheme:light!important;border-radius:11px!important}
+    .stApp [data-baseweb='select'] *{color:#243e42!important;
+      -webkit-text-fill-color:#243e42!important}
+    [data-baseweb='popover'],[data-baseweb='menu'],[role='listbox'],[role='option']{
+      background:#fff!important;color:#243e42!important;color-scheme:light!important}
+    .stApp [data-testid='stNumberInput'] button{background:#eaf6f3!important;color:#166f65!important}
+    .stApp button[kind='primary'], .stApp [data-testid='stFormSubmitButton'] button[kind='primary']{
+      background:#128478!important;color:white!important;-webkit-text-fill-color:white!important;
+      border:1px solid #128478!important}
+    .stApp [data-testid='stTextInput'] input::placeholder{color:#869a9a!important;
+      -webkit-text-fill-color:#869a9a!important}
+    @media(max-width:540px){.pp14-day{padding:16px 13px}.pp14-roster{gap:7px}}
+    </style>""", unsafe_allow_html=True)
+
+
+def signup_member_admin():
+    st.markdown('#### Fast spillerliste')
+    st.caption('Ret listen én gang. Ét navn pr. linje. Alle spillere vælger derefter deres navn ved tilmelding.')
+    members = signup_members()
+    with st.form('pp14_members_edit'):
+        raw = st.text_area('Gruppens spillere', value='\n'.join(members), height=240)
+        if st.form_submit_button('Gem spillerliste', use_container_width=True):
+            names=[' '.join(x.split()) for x in raw.splitlines() if x.strip()]
+            if not names:
+                st.error('Spillerlisten må ikke være tom.')
+            elif len({x.casefold() for x in names}) != len(names):
+                st.error('Der er dubletter i spillerlisten.')
+            else:
+                try:
+                    signup_save_members(names)
+                    st.success(f'Spillerlisten er gemt med {len(names)} spillere.')
+                    st.rerun()
+                except (requests.RequestException, ValueError, RuntimeError) as exc:
+                    st.error(f'Kunne ikke gemme listen: {exc}')
+
+
+def signup_day_card(item, registered, detail=False):
+    date_str = item['date']
+    day_obj = date.fromisoformat(date_str)
+    days = ('Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag')
+    caption = days[day_obj.weekday()] + ' ' + day_obj.strftime('%d.%m.%Y')
+    cap=max(1,int(item.get('capacity',16)))
+    count=len(registered)
+    cancelled=bool(item.get('cancelled'))
+    closed=bool(item.get('closed')) or signup_now_local() >= signup_datetime(item.get('deadline'), datetime.combine(day_obj,time(20,0)))
+    status='Aflyst' if cancelled else 'Lukket' if closed else 'Fuldt' if count>=cap else 'Åben'
+    badge_class=' cancelled' if cancelled else ' closed' if status in ('Lukket','Fuldt') else ''
+    chips = ''.join('<div class="pp14-player"><span class="pp14-check">✓</span><span>'+
+                    html.escape(x.get('name',''))+'</span></div>' for x in registered)
+    roster = '<div class="pp14-roster">'+chips+'</div>' if registered else '<div class="pp14-caption">Ingen tilmeldte endnu</div>'
+    pct=min(100,round(100*count/cap))
+    st.markdown(f"""<div class="pp14-day">
+      <div class="pp14-daytop"><div><h2>{html.escape(caption)}</h2>
+        <div class="pp14-muted">{html.escape(item.get('start','20:00'))}–{html.escape(item.get('end','22:00'))}</div>
+      </div><span class="pp14-badge{badge_class}">{status}</span></div>
+      <div class="pp14-stats"><strong>Tilmeldte</strong><b>{count} / {cap}</b></div>
+      <div class="pp14-track"><span style="width:{pct}%"></span></div>
+      {roster}
+      <div class="pp14-free"><span>Ledige pladser</span><strong>{max(0,cap-count)}</strong></div>
+      </div>""",unsafe_allow_html=True)
+
+
+def signup_admin_day(item, registered):
+    day=item['date']
+    st.markdown('#### Rediger spilledag')
+    with st.form(f'pp14_edit_{day}'):
+        title=st.text_input('Navn',value=item.get('title','Søndagspadel'),key=f'pp14_title_{day}')
+        a,b=st.columns(2)
+        start=a.text_input('Start',value=item.get('start','20:00'),key=f'pp14_start_{day}')
+        end=b.text_input('Slut',value=item.get('end','22:00'),key=f'pp14_end_{day}')
+        capacity=st.number_input('Antal pladser',min_value=1,max_value=100,value=int(item.get('capacity',16)),key=f'pp14_cap_{day}')
+        reg_dt=signup_datetime(item.get('deadline'),datetime.combine(date.fromisoformat(day),time(20,0)))
+        cancel_dt=signup_cancel_deadline(item)
+        dates=signup_date_choices(min(signup_today(),reg_dt.date(),cancel_dt.date()),date.fromisoformat(day))
+        reg_date=st.selectbox('Tilmeldingsfrist – dato',dates,index=dates.index(reg_dt.date()),format_func=signup_date_label,key=f'pp14_regday_{day}')
+        reg_time=st.text_input('Tilmeldingsfrist – tid',value=reg_dt.strftime('%H:%M'),key=f'pp14_regtime_{day}')
+        cancel_date=st.selectbox('Afbudsfrist – dato',dates,index=dates.index(cancel_dt.date()),format_func=signup_date_label,key=f'pp14_canday_{day}')
+        cancel_time=st.text_input('Afbudsfrist – tid',value=cancel_dt.strftime('%H:%M'),key=f'pp14_cantime_{day}')
+        saved=st.form_submit_button('Gem ændringer',type='primary',use_container_width=True)
+    if saved:
+        times=[signup_parse_time_text(x) for x in (start,end,reg_time,cancel_time)]
+        if any(x is None for x in times) or times[0]>=times[1]:
+            st.error('Kontrollér klokkeslæt – fx 20:00 til 22:00.')
+        elif max(datetime.combine(reg_date,times[2]),datetime.combine(cancel_date,times[3]))>datetime.combine(date.fromisoformat(day),times[0]):
+            st.error('Fristerne skal ligge før spilledagens start.')
+        else:
+            item.update(title=title.strip() or 'Søndagspadel',start=times[0].strftime('%H:%M'),end=times[1].strftime('%H:%M'),capacity=int(capacity),deadline=datetime.combine(reg_date,times[2]).isoformat(timespec='minutes'),cancel_deadline=datetime.combine(cancel_date,times[3]).isoformat(timespec='minutes'))
             try:
-                registered = signup_roster(date_str)
-            except requests.RequestException:
-                registered = []
-            count = len(registered)
-            capacity = int(entry.get('capacity', 16))
-            cancelled = bool(entry.get('cancelled'))
-            label_date = date.fromisoformat(date_str).strftime('%d.%m.%Y')
-            title = html.escape(entry.get('title', 'Søndagspadel'))
-            status = 'Aflyst' if cancelled else ('Fuldt' if count >= capacity else f'{max(0,capacity-count)} ledige pladser')
-            chips = ''.join('<span class="su136-pill">'+html.escape(x.get('name',''))+'</span>' for x in registered)
-            st.markdown(
-                f'<div class="su136-card"><div class="su136-card-title">{title} · {label_date}</div>'
-                f'<div class="su136-meta">{html.escape(entry.get("start","20:00"))}–{html.escape(entry.get("end","22:00"))} · '
-                f'{count} / {capacity} tilmeldte · {status}</div>'
-                f'<div class="su136-progress"><div style="width:{min(100, 100*count/max(1,capacity)):.1f}%"></div></div>'
-                f'{chips if chips else "<span class=\"su136-meta\">Ingen tilmeldte endnu</span>"}'
-                '</div>', unsafe_allow_html=True)
-            if st.button('Se spilledag og deltagere', key=f'su_open_{date_str}', use_container_width=True):
-                signup_open(date_str)
-        with st.expander('🔒 Administration · spilledage og spillere', expanded=False):
+                db_save(signup_day_id(day),item)
+                st.success('Ændringerne er gemt. Alle eksisterende tilmeldinger bevares.')
+                st.rerun()
+            except (requests.RequestException,ValueError) as exc:
+                st.error(f'Kunne ikke gemme: {exc}')
+    a,b=st.columns(2)
+    if a.button('Åbn tilmelding' if item.get('closed') else 'Luk tilmelding',key=f'pp14_toggle_{day}',use_container_width=True):
+        item['closed']=not bool(item.get('closed'))
+        try: db_save(signup_day_id(day),item);st.rerun()
+        except (requests.RequestException,ValueError) as exc: st.error(str(exc))
+    if b.button('Genåbn spilledag' if item.get('cancelled') else 'Aflys spilledag',key=f'pp14_cancel_{day}',use_container_width=True):
+        item['cancelled']=not bool(item.get('cancelled'))
+        try: db_save(signup_day_id(day),item);st.rerun()
+        except (requests.RequestException,ValueError) as exc: st.error(str(exc))
+    if item.get('cancelled'):
+        st.warning('Spilledagen er aflyst og kan ikke modtage nye tilmeldinger. Tilmeldte er bevaret, så du kan orientere dem.')
+    st.markdown('#### Tilmeldinger')
+    for rec in registered:
+        a,b=st.columns([4,1]);a.write(rec['name'])
+        if b.button('Fjern',key='pp14_remove_'+rec['id']):
+            try: signup_db_delete(rec['id']);st.rerun()
+            except requests.RequestException as exc: st.error(str(exc))
+    st.markdown('#### Slet spilledag permanent')
+    st.caption('Brug kun sletning til fejlrettelser. Ved aflysning anbefales Aflys spilledag ovenfor.')
+    confirmed=st.checkbox(f'Jeg vil slette {signup_date_label(date.fromisoformat(day))} og alle tilmeldinger',key=f'pp14_confirm_{day}')
+    if st.button('Slet dato permanent',disabled=not confirmed,key=f'pp14_delete_{day}'):
+        try:
+            # Slet deltagerne først og datoen sidst, så delvis fejl ikke skjuler data.
+            for rec in registered: signup_db_delete(rec['id'])
+            signup_db_delete(signup_day_id(day))
+            signup_open('all')
+        except requests.RequestException as exc:
+            st.error(f'Datoen blev ikke slettet helt: {exc}')
+
+
+def signup_screen():
+    signup_ui_css()
+    st.markdown('<div class="pp14-head"><h1>Padel Pappas</h1><p>Kommende spilledage og tilmeldinger</p></div>',unsafe_allow_html=True)
+    pending=st.session_state.pop('signup_navigation_pending',None)
+    day=signup_parse_day(pending or st.query_params.get('signup','all'))
+    if day is None:
+        st.error('Linket indeholder en ugyldig dato.')
+        if st.button('← Til alle spilledage'): signup_open('all')
+        st.stop()
+    if day=='all':
+        if st.button('← Til forsiden',key='pp14_home'):
+            st.query_params.clear();st.rerun()
+        st.caption('Del den faste tilmeldingsoversigt i Messenger:')
+        signup_url='https://padel-pappas.streamlit.app/?signup=all'
+        st.text_input('Tilmeldingslink',value=signup_url,key='pp14_shareurl')
+        try: days=signup_day_rows()
+        except (requests.RequestException, ValueError) as exc:
+            st.error(f'Kunne ikke hente spilledage: {exc}');st.stop()
+        if not days: st.info('Der er endnu ingen kommende spilledage.')
+        for item in days:
+            try: regs=signup_roster(item['date'])
+            except requests.RequestException: regs=[]
+            signup_day_card(item,regs)
+            if st.button('Se spilledag / tilmeld',key='pp14_open_'+item['date'],use_container_width=True):
+                signup_open(item['date'])
+        with st.expander('🔒 Administration',expanded=False):
             if signup_admin_login():
                 signup_create_form()
-                st.divider()
-                signup_player_admin()
-    else:
-        if st.button('← Alle kommende spilledage', key='su_back_list'):
-            signup_open('all')
-        if st.session_state.pop('signup_created_date', None) == day:
-            st.success('Spilledagen er oprettet. Du kan nu dele tilmeldingen med gruppen.')
-        try:
-            item = db_load(signup_day_id(day))
-        except (requests.RequestException, ValueError) as exc:
-            st.error(f'Spilledagen blev ikke fundet: {exc}'); st.stop()
-        if item.get('kind') != 'padel_day':
-            st.error('Spilledagen blev ikke fundet.'); st.stop()
-        if day < signup_today().isoformat():
-            st.info('Denne spilledag er afsluttet og er ikke længere åben for tilmelding.')
-            st.stop()
-        try:
-            registered = signup_roster(day)
-        except requests.RequestException as exc:
-            st.error(f'Kunne ikke hente tilmeldinger: {exc}'); st.stop()
-        capacity=int(item.get('capacity',16))
-        st.subheader(f'{item.get("title", "Søndagspadel")} · {date.fromisoformat(day).strftime("%d.%m.%Y")}')
-        st.caption(f'{item.get("start", "20:00")}–{item.get("end", "22:00")} · {len(registered)} af {capacity} pladser')
-        st.progress(min(1.0, len(registered)/max(1,capacity)))
-        if item.get('cancelled'):
-            st.error('SPILLEDAGEN ER AFLYST – tilmelding er lukket.')
-        if registered:
-            st.markdown('**Tilmeldte spillere**')
-            st.markdown('<div class="signup-roster">' + '<br>'.join(f'{i}. {html.escape(x.get("name", ""))}' for i,x in enumerate(registered,1)) + '</div>', unsafe_allow_html=True)
+                with st.expander('Rediger fast spillerliste',expanded=False): signup_member_admin()
+        st.caption('Padel Pappas 8362 · Ingen betaling ved tilmelding')
+        st.stop()
+    if st.button('← Alle kommende spilledage',key='pp14_back'):
+        signup_open('all')
+    try:
+        item=db_load(signup_day_id(day))
+        if item.get('kind')!='padel_day': raise ValueError('Spilledagen blev ikke fundet.')
+        registered=signup_roster(day)
+    except (requests.RequestException,ValueError) as exc:
+        st.error(f'Kunne ikke hente spilledagen: {exc}');st.stop()
+    if day<signup_today().isoformat():
+        st.info('Spilledagen er afsluttet. Den vises ikke længere i oversigten.')
+        st.stop()
+    if st.session_state.pop('signup_created_date',None)==day:
+        st.success('Spilledagen er oprettet.')
+    signup_day_card(item,registered,detail=True)
+    deadline=signup_datetime(item.get('deadline'),datetime.combine(date.fromisoformat(day),time(20,0)))
+    cancel_deadline=signup_cancel_deadline(item)
+    st.caption('Tilmeldingsfrist: '+deadline.strftime('%d.%m. kl. %H:%M')+' · Afbudsfrist: '+cancel_deadline.strftime('%d.%m. kl. %H:%M'))
+    cancellation_token=str(st.query_params.get('cancel','')).strip()
+    if cancellation_token:
+        st.markdown('#### Meld afbud')
+        if signup_now_local()>cancel_deadline:
+            st.warning('Afbudsfristen er overskredet. Kontakt arrangøren.')
         else:
-            st.info('Ingen er tilmeldt endnu.')
-        deadline = signup_datetime(item.get('deadline'), datetime.combine(date.fromisoformat(day), time.fromisoformat(item.get('start', '20:00'))))
-        deadline_passed = signup_now_local() >= deadline
-        cancel_deadline = signup_cancel_deadline(item)
-        st.caption('Tilmeldingsfrist: ' + deadline.strftime('%d.%m. kl. %H:%M') +
-                   ' · Afbudsfrist: ' + cancel_deadline.strftime('%d.%m. kl. %H:%M'))
-        if item.get('cancelled'):
-            st.error('Denne spilledag er aflyst af arrangøren.')
-        elif item.get('closed') or deadline_passed:
-            st.warning('Tilmeldingen er lukket.')
-        elif len(registered) >= capacity:
-            st.warning('Alle pladser er optaget.')
-        else:
-            try:
-                all_players = signup_players()
-            except requests.RequestException as exc:
-                st.error(f'Kunne ikke hente spillerlisten: {exc}')
-                all_players = []
-            current_ids = {r['id'] for r in registered}
-            available_players = [player['name'] for player in all_players
-                                 if signup_name_id(day, player['name']) not in current_ids]
-            if not all_players:
-                st.info('Spillerlisten er endnu tom. Arrangøren skal først oprette gruppens spillere under Administration.')
-            elif not available_players:
-                st.info('Alle spillere fra listen er allerede tilmeldt.')
-            else:
-                with st.form('signup_register'):
-                    name = st.selectbox('Vælg dit navn', available_players,
-                                        index=None, placeholder='Find dit navn på listen')
-                    submitted = st.form_submit_button('Tilmeld mig', type='primary', use_container_width=True)
-                if submitted and not name:
-                    st.warning('Vælg dit navn på listen først.')
-                    submitted = False
-            if 'submitted' in locals() and submitted:
-                clean = ' '.join(name.split())
-                if len(clean) < 3:
-                    st.error('Indtast dit navn (mindst 3 tegn).')
-                elif signup_name_id(day,clean) in {r['id'] for r in registered}:
-                    st.warning('Navnet er allerede tilmeldt.')
-                else:
-                    cancel_token = secrets.token_urlsafe(24)
-                    record={'kind':'padel_registration','date':day,'name':clean,
-                            'created_at':datetime.now(ZoneInfo('Europe/Copenhagen')).isoformat(),
-                            'cancel_hash':hashlib.sha256(cancel_token.encode('utf-8')).hexdigest()}
+            matching=next((r for r in registered if r.get('cancel_hash') and secrets.compare_digest(str(r['cancel_hash']),hashlib.sha256(cancellation_token.encode()).hexdigest())),None)
+            if matching:
+                st.info('Du er ved at afmelde '+matching['name'])
+                if st.button('Bekræft afbud',key='pp14_selfcancel',type='primary'):
                     try:
-                        # Genindlæs lige før oprettelsen (bedst muligt uden særlig SQL-transaction).
-                        fresh_roster = signup_roster(day)
-                        if len(fresh_roster) >= capacity:
-                            st.warning('Sidste plads blev netop taget. Opdater oversigten.')
+                        signup_db_delete(matching['id']);st.query_params.pop('cancel',None);st.rerun()
+                    except requests.RequestException as exc: st.error(str(exc))
+            else: st.warning('Afbudslinket er ugyldigt eller allerede brugt.')
+    if item.get('cancelled'):
+        st.error('Denne spilledag er aflyst. Nye tilmeldinger er lukket.')
+    elif item.get('closed') or signup_now_local()>=deadline:
+        st.info('Tilmeldingen er lukket.')
+    elif len(registered)>=int(item.get('capacity',16)):
+        st.info('Alle pladser er optaget.')
+    else:
+        try: members=signup_members()
+        except requests.RequestException as exc:
+            st.error(f'Kunne ikke hente spillerlisten: {exc}');members=[]
+        taken={r.get('name','').casefold() for r in registered}
+        available=[x for x in members if x.casefold() not in taken]
+        if not available: st.info('Alle spillere på listen er allerede tilmeldt.')
+        else:
+            with st.form('pp14_join'):
+                selected=st.selectbox('Vælg dit navn',['']+available,format_func=lambda x:x or 'Find dit navn på listen')
+                submit=st.form_submit_button('Tilmeld mig',type='primary',use_container_width=True)
+            if submit:
+                if not selected: st.warning('Vælg dit navn først.')
+                else:
+                    token=secrets.token_urlsafe(24)
+                    record={'kind':'padel_registration','date':day,'name':selected,
+                        'created_at':datetime.now(ZoneInfo('Europe/Copenhagen')).isoformat(),
+                        'cancel_hash':hashlib.sha256(token.encode()).hexdigest()}
+                    try:
+                        newest=signup_roster(day)
+                        current=db_load(signup_day_id(day))
+                        if current.get('closed') or current.get('cancelled') or signup_now_local()>=signup_datetime(current.get('deadline'),deadline):
+                            st.warning('Tilmeldingen er netop lukket.')
+                        elif len(newest)>=int(current.get('capacity',16)):
+                            st.warning('Den sidste plads er netop taget.')
+                        elif any(r.get('name','').casefold()==selected.casefold() for r in newest):
+                            st.warning('Du er allerede tilmeldt.')
                         else:
-                            db_save(signup_name_id(day,clean), record, create=True)
-                            st.session_state[f'su_link_{day}'] = (clean, cancel_token)
+                            db_save(signup_name_id(day,selected),record,create=True)
+                            st.session_state[f'su_link_{day}']=(selected,token)
                             st.rerun()
                     except requests.HTTPError as exc:
-                        if exc.response is not None and exc.response.status_code == 409:
-                            st.warning('Dette navn er allerede tilmeldt.')
-                        else:
-                            st.error(f'Tilmelding mislykkedes: {exc}')
-                    except (requests.RequestException, ValueError) as exc:
-                        st.error(f'Tilmelding mislykkedes: {exc}')
-        # Name selection is not authentication. Cancellation still requires the private token.
-        # A private cancellation link is issued once at signup. The secret
-        # appears neither in the roster nor in the public database record.
-        recent = st.session_state.get(f'su_link_{day}')
-        if recent:
-            st.success(f'{recent[0]} er tilmeldt!')
-            st.info('Gem dit personlige afbudslink nu. Du skal bruge det, hvis du vil melde fra senere.')
-            st.code(signup_cancel_url(day, recent[1]), language=None)
-            if st.button('Jeg har gemt mit afbudslink', key='su_link_ack'):
-                st.session_state.pop(f'su_link_{day}', None)
-                st.rerun()
-
-        cancellation_token = str(st.query_params.get('cancel', '')).strip()
-        if cancellation_token:
-            st.markdown('#### Meld afbud')
-            if signup_now_local() > cancel_deadline:
-                st.warning('Afbudsfristen er overskredet. Kontakt arrangøren.')
-            else:
-                match = next((r for r in registered if r.get('cancel_hash') and
-                              secrets.compare_digest(str(r['cancel_hash']),
-                                  hashlib.sha256(cancellation_token.encode('utf-8')).hexdigest())), None)
-                if match:
-                    st.info(f'Du er ved at afmelde {match["name"]}.')
-                    if st.button('Bekræft afbud', type='primary', key='su_confirm_cancel'):
-                        try:
-                            signup_db_delete(match['id'])
-                            st.query_params.pop('cancel', None)
-                            st.success('Dit afbud er registreret.')
-                            st.rerun()
-                        except requests.RequestException as exc:
-                            st.error(f'Afbud mislykkedes: {exc}')
-                else:
-                    st.warning('Afbudslinket er ugyldigt eller allerede brugt.')
-        elif signup_now_local() <= cancel_deadline:
-            st.caption('Afbud: Åbn dit personlige afbudslink fra tilmeldingen. Har du mistet det, kan arrangøren hjælpe.')
-        else:
-            st.caption('Afbudsfristen er overskredet. Kontakt arrangøren ved ændringer.')
-
-        with st.expander('🔒 Administration', expanded=False):
-            if signup_admin_login():
-                st.markdown('**Rediger spilledag**')
-                with st.form(f'su_edit_day_{day}'):
-                    new_capacity = st.number_input('Antal pladser', min_value=1, max_value=100,
-                        value=int(item.get('capacity',16)), step=1, key=f'su_edit_capacity_{day}')
-                    reg_dt = signup_datetime(item.get('deadline'),
-                        datetime.combine(date.fromisoformat(day), time(20,0)))
-                    cancel_dt = signup_cancel_deadline(item)
-                    edit_dates = signup_date_choices(min(signup_today(), reg_dt.date(), cancel_dt.date()), date.fromisoformat(day))
-                    a,b = st.columns(2)
-                    reg_date = a.selectbox('Tilmeldingsfrist – dato', edit_dates,
-                        index=edit_dates.index(reg_dt.date()), format_func=signup_date_label,
-                        key=f'su_edit_reg_date_{day}')
-                    reg_time_text = b.text_input('Klokkeslæt', value=reg_dt.strftime('%H:%M'),
-                        key=f'su_edit_reg_time_{day}')
-                    a,b = st.columns(2)
-                    cancel_date = a.selectbox('Afbudsfrist – dato', edit_dates,
-                        index=edit_dates.index(cancel_dt.date()), format_func=signup_date_label,
-                        key=f'su_edit_cancel_date_{day}')
-                    cancel_time_text = b.text_input('Klokkeslæt', value=cancel_dt.strftime('%H:%M'),
-                        key=f'su_edit_cancel_time_{day}')
-                    save_settings = st.form_submit_button('Gem ændringer', use_container_width=True)
-                if save_settings:
-                    reg_time = signup_parse_time_text(reg_time_text)
-                    cancel_time = signup_parse_time_text(cancel_time_text)
-                    if reg_time is None or cancel_time is None:
-                        st.error('Ugyldigt klokkeslæt. Brug fx 16:00.')
-                        st.stop()
-                    registration_cutoff = datetime.combine(reg_date, reg_time)
-                    cancellation_cutoff = datetime.combine(cancel_date, cancel_time)
-                    start_dt = datetime.combine(date.fromisoformat(day), time.fromisoformat(item.get('start','20:00')))
-                    if registration_cutoff > start_dt or cancellation_cutoff > start_dt:
-                        st.error('Fristerne kan ikke ligge efter spillets starttidspunkt.')
-                    else:
-                        item['capacity'] = int(new_capacity)
-                        item['deadline'] = registration_cutoff.isoformat(timespec='minutes')
-                        item['cancel_deadline'] = cancellation_cutoff.isoformat(timespec='minutes')
-                        try:
-                            db_save(signup_day_id(day), item)
-                            if new_capacity < len(registered):
-                                st.warning(f'Der er allerede {len(registered)} tilmeldte. De bevares, men der åbnes ingen nye pladser.')
-                            else:
-                                st.success('Spilledagen er opdateret.')
-                            st.rerun()
-                        except (requests.RequestException, ValueError) as exc:
-                            st.error(f'Kunne ikke gemme ændringer: {exc}')
-                st.caption('Du kan sætte kapaciteten både op og ned. Eksisterende tilmeldinger slettes aldrig automatisk.')
-                st.markdown('**Administrér tilmeldinger**')
-                st.caption('Fjern en tilmelding ved afbud. Dette ændrer ikke allerede startede turneringer.')
-                for record in registered:
-                    a,b = st.columns([4,1])
-                    a.write(record['name'])
-                    if b.button('Fjern', key='su_del_'+record['id']):
-                        try:
-                            signup_db_delete(record['id'])
-                            st.rerun()
-                        except requests.RequestException as exc:
-                            st.error(f'Kunne ikke fjerne: {exc}')
-                st.markdown('#### Aflys eller slet spilledag')
-                st.caption('Aflysning beholder deltagere og historik, men lukker tilmelding. Sletning fjerner også tilmeldingerne permanent.')
-                if item.get('cancelled'):
-                    st.warning('Spilledagen er aflyst, men stadig synlig i oversigten.')
-                    if st.button('Genåbn spilledag', key='su_restore_'+day):
-                        item['cancelled'] = False
-                        item['closed'] = False
-                        db_save(signup_day_id(day), item)
-                        st.rerun()
-                else:
-                    if st.button('Aflys spilledag', key='su_cancel_day_'+day):
-                        st.session_state['su_confirm_cancel_day_'+day] = True
-                    if st.session_state.get('su_confirm_cancel_day_'+day):
-                        st.warning('Bekræft aflysningen. Tilmeldte bliver ikke automatisk kontaktet – giv også besked i Messenger.')
-                        if st.button('Ja, aflys spilledagen', type='primary', key='su_cancel_confirm_'+day):
-                            try:
-                                item['cancelled'] = True
-                                item['closed'] = True
-                                db_save(signup_day_id(day), item)
-                                st.session_state.pop('su_confirm_cancel_day_'+day, None)
-                                st.rerun()
-                            except (requests.RequestException, ValueError) as exc:
-                                st.error(f'Kunne ikke aflyse: {exc}')
-                if st.button('Slet spilledag permanent', key='su_delete_day_'+day):
-                    st.session_state['su_confirm_delete_day_'+day] = True
-                if st.session_state.get('su_confirm_delete_day_'+day):
-                    st.error('Dette sletter spilledagen og alle dens tilmeldinger permanent. En allerede startet turnering ændres ikke.')
-                    with st.form('su_delete_confirm_form_'+day):
-                        confirmation = st.text_input('Skriv SLET for at bekræfte')
-                        do_delete = st.form_submit_button('Slet dato og tilmeldinger')
-                    if do_delete:
-                        if confirmation.strip().upper() != 'SLET':
-                            st.error('Skriv SLET præcist for at bekræfte.')
-                        else:
-                            try:
-                                signup_delete_day(day)
-                                st.session_state.pop('su_confirm_delete_day_'+day,None)
-                                signup_open('all')
-                            except (requests.RequestException, ValueError) as exc:
-                                st.error(f'Kunne ikke slette alt: {exc}')
-                if st.button('Luk tilmelding', key='su_close'):
-                    item['closed'] = True
-                    try:
-                        db_save(signup_day_id(day),item)
-                        st.rerun()
+                        if exc.response is not None and exc.response.status_code==409:
+                            st.warning('Du er allerede tilmeldt.')
+                        else: st.error(f'Tilmelding mislykkedes: {exc}')
                     except (requests.RequestException,ValueError) as exc:
-                        st.error(f'Kunne ikke lukke: {exc}')
+                        st.error(f'Tilmelding mislykkedes: {exc}')
+    recent=st.session_state.get(f'su_link_{day}')
+    if recent:
+        st.success(recent[0]+' er tilmeldt!')
+        st.info('Gem dit personlige afbudslink. Det giver mulighed for afbud indtil fristen.')
+        st.text_input('Dit personlige afbudslink',value=signup_cancel_url(day,recent[1]),key=f'pp14_cancel_link_{day}')
+        if st.button('Jeg har gemt linket',key=f'pp14_ack_{day}'):
+            st.session_state.pop(f'su_link_{day}',None);st.rerun()
+    elif not cancellation_token and signup_now_local()<=cancel_deadline:
+        st.caption('Afbud: Brug dit personlige afbudslink fra tilmeldingen. Arrangøren kan hjælpe, hvis linket er mistet.')
+    with st.expander('🔒 Administration',expanded=False):
+        if signup_admin_login(): signup_admin_day(item,registered)
     st.caption('Padel Pappas 8362 · Ingen betaling ved tilmelding')
     st.stop()
 
