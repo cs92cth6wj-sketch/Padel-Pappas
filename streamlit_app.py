@@ -1022,8 +1022,107 @@ def signup_design_155():
     </style>""",unsafe_allow_html=True)
 
 
+def signup_design_170():
+    """Sidste, konsekvente designlag til spilledage; ingen ændringer i tilmeldingslogik."""
+    st.markdown("""<style>
+    :root {color-scheme:light!important;--pp-green:#005C43;--pp-mint:#edf8f4;--pp-border:#cfe4dc;}
+    .stApp,[data-testid="stAppViewContainer"]{background:#f8fbfa!important;color-scheme:light!important}
+    /* Kompakte kort uden mørke, indlejrede kanter */
+    .stApp [data-testid="stForm"],.stApp [data-testid="stExpander"],
+    .stApp [data-testid="stVerticalBlockBorderWrapper"]{
+      background:#fff!important;border:1px solid #d6e8e1!important;
+      border-radius:18px!important;box-shadow:none!important}
+    .stApp [data-testid="stForm"]{padding:14px 16px!important}
+    .stApp [data-testid="stExpander"]{margin:5px 0!important}
+    .stApp [data-testid="stExpander"] summary{padding:12px 16px!important}
+    .stApp [data-testid="stVerticalBlock"]{row-gap:.55rem!important}
+    .stApp [data-testid="stWidgetLabel"]{margin-bottom:3px!important}
+    .stApp [data-testid="stWidgetLabel"] p{font-weight:600!important;color:#005C43!important}
+    /* Tekst, dato, tid, tal, adgangskode og valg: samme lyse felt og tynde kant */
+    .stApp [data-baseweb="input"],.stApp [data-baseweb="base-input"],
+    .stApp [data-baseweb="textarea"],.stApp [data-baseweb="select"],
+    .stApp [data-baseweb="select"]>div,
+    .stApp [data-testid="stTextInput"]>div>div,
+    .stApp [data-testid="stDateInput"]>div>div,
+    .stApp [data-testid="stTimeInput"]>div>div,
+    .stApp [data-testid="stNumberInput"]>div>div{
+      background:#fff!important;background-color:#fff!important;
+      border:1px solid #cfe4dc!important;border-radius:12px!important;
+      box-shadow:none!important;color-scheme:light!important;
+      color:#20383d!important;-webkit-text-fill-color:#20383d!important}
+    .stApp [data-baseweb="input"] input,.stApp [data-baseweb="base-input"] input,
+    .stApp [data-baseweb="select"] input,.stApp [data-baseweb="select"] [role="combobox"],
+    .stApp [data-baseweb="textarea"] textarea,
+    .stApp input,.stApp textarea{
+      background:#fff!important;background-color:#fff!important;color:#20383d!important;
+      -webkit-text-fill-color:#20383d!important;caret-color:#005C43!important;
+      border:0!important;outline:0!important;box-shadow:none!important;color-scheme:light!important}
+    .stApp [data-baseweb="input"]:focus-within,
+    .stApp [data-baseweb="select"]:focus-within,
+    .stApp [data-baseweb="textarea"]:focus-within{
+      border-color:#005C43!important;box-shadow:0 0 0 2px #005c4322!important}
+    /* Fjern de sorte endestykker ved password, kalender, tid og +/- */
+    .stApp [data-baseweb="input"] button,
+    .stApp [data-baseweb="select"] button,
+    .stApp [data-testid="stNumberInput"] button,
+    .stApp [data-testid="stDateInput"] button,
+    .stApp [data-testid="stTimeInput"] button{
+      background:#edf8f4!important;background-color:#edf8f4!important;
+      border:0!important;box-shadow:none!important;color:#005C43!important;
+      -webkit-text-fill-color:#005C43!important;border-radius:0 10px 10px 0!important}
+    .stApp [data-baseweb="input"] button svg,
+    .stApp [data-baseweb="select"] svg,
+    .stApp [data-testid="stNumberInput"] button svg{
+      color:#005C43!important;fill:#005C43!important;stroke:#005C43!important}
+    /* Spillerlisten er en Streamlit-popover (ikke en mørk selectbox) */
+    .stApp [data-testid="stPopover"]>button,
+    .stApp [data-testid="stPopover"] button[data-testid="stBaseButton-secondary"]{
+      background:#fff!important;background-color:#fff!important;
+      border:1px solid #cfe4dc!important;color:#005C43!important;
+      -webkit-text-fill-color:#005C43!important;box-shadow:none!important;
+      font-weight:650!important;min-height:49px!important}
+    .stApp [data-testid="stPopover"]>button *,
+    .stApp [data-testid="stPopover"]>button p{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
+    [data-testid="stPopoverBody"],[data-testid="stPopoverBody"]>div,
+    [data-testid="stPopoverBody"] [data-testid="stVerticalBlock"],
+    [data-baseweb="popover"],[data-baseweb="menu"],[role="listbox"],[role="option"]{
+      background:#fff!important;background-color:#fff!important;color:#005C43!important;
+      -webkit-text-fill-color:#005C43!important;color-scheme:light!important}
+    /* Alle handlinger har samme højde, font og radius */
+    .stApp [data-testid="stButton"] button,
+    .stApp [data-testid="stFormSubmitButton"] button{
+      min-height:49px!important;border-radius:13px!important;
+      font-size:15px!important;font-weight:750!important;box-shadow:none!important}
+    .stApp [data-testid="stButton"] button[kind="primary"],
+    .stApp [data-testid="stFormSubmitButton"] button[kind="primary"],
+    .stApp button[data-testid="stBaseButton-primary"]{
+      background:#005C43!important;background-color:#005C43!important;
+      border:1px solid #005C43!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+    .stApp [data-testid="stButton"] button[kind="primary"] *,
+    .stApp [data-testid="stFormSubmitButton"] button[kind="primary"] *{
+      color:#fff!important;-webkit-text-fill-color:#fff!important}
+    .stApp [data-testid="stButton"] button:not([kind="primary"]),
+    .stApp [data-testid="stFormSubmitButton"] button:not([kind="primary"]){
+      background:#edf8f4!important;border:1px solid #b8d9ce!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important}
+    /* Diskrete små knapper for navigation og administration */
+    .stApp [class*="st-key-pp15_rem_"] button,
+    .stApp [class*="st-key-pp15_delwait_"] button{
+      min-height:35px!important;height:35px!important;width:42px!important;
+      background:#fff6f5!important;border:1px solid #f1d5d2!important}
+    .pp15-header{margin-bottom:10px!important;padding:16px 18px!important}
+    .pp15-day{padding:16px!important;margin:8px 0!important}
+    .pp15-meta{margin:8px 3px 10px!important}
+    @media(max-width:600px){
+      .stApp .block-container{padding-left:14px!important;padding-right:14px!important}
+      .stApp [data-testid="stForm"]{padding:13px!important}
+      .stApp [data-testid="stVerticalBlock"]{row-gap:.48rem!important}
+    }
+    </style>""",unsafe_allow_html=True)
+
+
 def signup_screen():
-    signup_ui_css();signup_design_155();signup_header()
+    signup_ui_css();signup_design_155();signup_design_170();signup_header()
     pending=st.session_state.pop('signup_navigation_pending',None)
     if st.query_params.get('player'):
         candidate=str(st.query_params.get('player'))
