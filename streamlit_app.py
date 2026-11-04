@@ -2955,6 +2955,39 @@ if not st.session_state.get('tid'):
       .stApp [class*="st-key-pp11_new_btn"] button::after,
       .stApp [class*="st-key-pp11_open_btn"] button::after{right:14px!important}
     }
+    /* PP 15.9: Entydig prioritet: én mørkegrøn CTA, to lyse CTA'er. */
+    .pp156-features{margin-bottom:15px!important}
+    .pp154-section{margin-top:17px!important;margin-bottom:12px!important}
+    .stApp div.st-key-su_home_open button,
+    .stApp [class~="st-key-su_home_open"] button,
+    .stApp [class*="st-key-su_home_open"] button{
+      background:#006e53!important;background-image:linear-gradient(105deg,#007a5c,#00634b)!important;
+      border:1px solid #006e53!important;color:#ffffff!important;
+      -webkit-text-fill-color:#ffffff!important;
+      box-shadow:0 7px 17px rgba(0,105,79,.16)!important;
+    }
+    .stApp div.st-key-su_home_open button *,
+    .stApp [class*="st-key-su_home_open"] button *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+    .stApp div.st-key-pp11_new_btn button,
+    .stApp div.st-key-pp11_open_btn button,
+    .stApp [class*="st-key-pp11_new_btn"] button,
+    .stApp [class*="st-key-pp11_open_btn"] button{
+      background:#eef9f5!important;background-image:linear-gradient(105deg,#f6fcf9,#e9f7f1)!important;
+      border:1px solid #a9d8ca!important;color:#17383a!important;
+      -webkit-text-fill-color:#17383a!important;box-shadow:none!important;
+    }
+    .stApp [class*="st-key-pp11_new_btn"] button *,
+    .stApp [class*="st-key-pp11_open_btn"] button *{color:#17383a!important;-webkit-text-fill-color:#17383a!important}
+    .stApp [class*="st-key-su_home_open"] button::before{filter:brightness(0) invert(1)!important}
+    .stApp [class*="st-key-su_home_open"] button::after{color:#fff!important;-webkit-text-fill-color:#fff!important}
+    .stApp [class*="st-key-pp11_new_btn"] button::before,
+    .stApp [class*="st-key-pp11_new_btn"] button::after,
+    .stApp [class*="st-key-pp11_open_btn"] button::before,
+    .stApp [class*="st-key-pp11_open_btn"] button::after{color:#006b53!important;-webkit-text-fill-color:#006b53!important}
+    @media(max-width:520px){
+      .pp156-features{margin-bottom:13px!important}
+      .pp154-section{margin-top:15px!important;margin-bottom:10px!important}
+    }
     </style>
     <div class="pp156-hero">
       <div class="pp156-wave"></div>
@@ -2972,10 +3005,10 @@ if not st.session_state.get('tid'):
         st.session_state.pp11_landing_mode=None
     if st.session_state.pp11_landing_mode is None:
         st.markdown('<div class="pp154-section">Find din næste spilledag</div>', unsafe_allow_html=True)
-        if st.button('Spilledage og tilmelding', use_container_width=True, key='su_home_open'):
+        if st.button('Spilledage og tilmelding', type='primary', use_container_width=True, key='su_home_open'):
             signup_open('all')
         st.markdown('<div class="pp154-section">Spil en turnering</div>', unsafe_allow_html=True)
-        if st.button('Opret ny turnering',type='primary',use_container_width=True,key='pp11_new_btn'):
+        if st.button('Opret ny turnering',type='secondary',use_container_width=True,key='pp11_new_btn'):
             st.session_state.pp11_landing_mode='new';st.rerun()
         if st.button('Åbn eksisterende turnering',use_container_width=True,key='pp11_open_btn'):
             st.session_state.pp11_landing_mode='open';st.rerun()
