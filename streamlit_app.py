@@ -239,12 +239,88 @@ def signup_open(day):
     st.rerun()
 
 
+def signup_date_choices(first_day, last_day):
+    """Readable date choices without iOS native date-picker / keyboard conflicts."""
+    first = min(first_day, last_day)
+    last = max(first_day, last_day)
+    return [first + timedelta(days=i) for i in range((last - first).days + 1)]
+
+
+def signup_date_label(day):
+    weekdays = ('Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn')
+    return f'{weekdays[day.weekday()]} {day.strftime("%d.%m.%Y")}'
+
+
+def signup_default_sunday():
+    today = signup_today()
+    return today + timedelta(days=(6 - today.weekday()) % 7 or 7)
+
+
 def signup_screen():
+    # The signup view deliberately has its own light control theme.
+    # This stylesheet is only injected on signup pages (other tournament screens unchanged).
     st.markdown('''<style>
       .signup-heading{border:1px solid #d8e9e5;background:linear-gradient(120deg,#ffffff,#e9f7f4);padding:18px;border-radius:20px;margin-bottom:15px}
       .signup-heading h2{margin:0 0 5px;color:#1a4c4b;font-size:27px}
       .signup-heading p{margin:0;color:#567273}
       .signup-roster{background:#f5faf9;border-radius:14px;padding:12px 14px;line-height:1.9;color:#274c50}
+      .stApp {color-scheme:light!important}
+      .stApp [data-testid="stExpander"],
+      .stApp [data-testid="stExpander"] details,
+      .stApp [data-testid="stExpanderDetails"],
+      .stApp [data-testid="stForm"],
+      .stApp [data-testid="stVerticalBlockBorderWrapper"]{
+        background:#ffffff!important;border-color:#d9e8e6!important;color:#243b40!important;
+        box-shadow:none!important;border-radius:17px!important;
+      }
+      .stApp [data-testid="stExpander"] summary,
+      .stApp [data-testid="stExpander"] summary *{color:#245b58!important;-webkit-text-fill-color:#245b58!important;background:transparent!important}
+      .stApp [data-testid="stForm"] label,
+      .stApp [data-testid="stForm"] label *,
+      .stApp [data-testid="stExpander"] label,
+      .stApp [data-testid="stExpander"] label *{color:#29454a!important;-webkit-text-fill-color:#29454a!important}
+      .stApp [data-testid="stForm"] input,
+      .stApp [data-testid="stExpander"] input,
+      .stApp [data-testid="stTextInput"] input,
+      .stApp [data-testid="stTimeInput"] input,
+      .stApp [data-testid="stNumberInput"] input,
+      .stApp [data-baseweb="select"] > div,
+      .stApp [data-baseweb="base-input"],
+      .stApp [data-baseweb="input"] {
+        color-scheme:light!important;background:#ffffff!important;color:#253d43!important;
+        -webkit-text-fill-color:#253d43!important;border-color:#c9dedb!important;
+        border-radius:12px!important;box-shadow:none!important;
+      }
+      .stApp [data-baseweb="select"] *{color:#253d43!important;-webkit-text-fill-color:#253d43!important}
+      /* The select dropdown is portaled outside the form on many iPhones. */
+      [role="listbox"], [data-baseweb="popover"], [data-baseweb="menu"],
+      [data-baseweb="menu"] [role="option"] {
+        background:#ffffff!important;color:#253d43!important;
+        -webkit-text-fill-color:#253d43!important;color-scheme:light!important;
+      }
+      [data-baseweb="menu"] [role="option"]:hover {background:#eaf6f3!important}
+      .stApp [data-testid="stNumberInput"] button,
+      .stApp [data-testid="stTimeInput"] button{
+        background:#f2f8f6!important;color:#23645c!important;border-color:#c9dedb!important;
+      }
+      .stApp [data-testid="stNumberInput"] button *,
+      .stApp [data-testid="stTimeInput"] button *{color:#23645c!important;-webkit-text-fill-color:#23645c!important;stroke:#23645c!important}
+      .stApp [data-baseweb="input"]:focus-within,
+      .stApp [data-baseweb="select"]:focus-within{border-color:#17877a!important;box-shadow:0 0 0 1px #17877a!important}
+      .stApp [data-testid="stCodeBlock"],
+      .stApp [data-testid="stCode"],
+      .stApp code {background:#edf7f5!important;color:#235e5a!important;-webkit-text-fill-color:#235e5a!important}
+      .stApp [data-testid="stCodeBlock"] *{color:#235e5a!important;-webkit-text-fill-color:#235e5a!important}
+      .stApp [data-testid="stAlert"] {border-radius:15px!important}
+      .stApp [data-testid="stExpander"] {margin-top:14px!important}
+      .stApp [data-testid="stForm"] {padding:12px!important}
+      .stApp [data-testid="stTimeInput"] input {font-size:16px!important}
+      .stApp [data-testid="stNumberInput"] input {font-size:18px!important}
+      @media(max-width:600px){
+        .stApp [data-testid="stForm"]{padding:10px!important}
+        .signup-heading h2{font-size:24px}
+        .stApp [data-testid="stHorizontalBlock"]{gap:9px!important}
+      }
     </style>''', unsafe_allow_html=True)
     st.markdown('<div class="signup-heading"><h2>🎾 Søndagspadel · Tilmelding</h2><p>Se kommende spilledage og hvem der er tilmeldt.</p></div>', unsafe_allow_html=True)
     day = str(st.query_params.get('signup', 'all'))
@@ -255,8 +331,18 @@ def signup_screen():
             upcoming = signup_day_rows()
         except (requests.RequestException, ValueError) as exc:
             st.error(f'Kunne ikke hente spilledage: {exc}'); st.stop()
-        st.caption('Fast link til alle spilledage – del det i Messenger:')
+        st.caption('Del denne faste tilmeldingsoversigt i Messenger:')
         st.code('https://padel-pappas.streamlit.app/?signup=all', language=None)
+        if st.button('📋 Kopiér tilmeldingslink', key='su_copy_signup_link', use_container_width=True):
+            st.components.v1.html("""<script>
+              const link='https://padel-pappas.streamlit.app/?signup=all';
+              const tryCopy=async()=>{
+                try { await navigator.clipboard.writeText(link); }
+                catch(e) { const t=document.createElement('textarea');t.value=link;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove(); }
+              };
+              tryCopy();
+            </script>""", height=0)
+            st.info('Hvis iPhone blokerer kopiering, brug kopieringsikonet i linkfeltet ovenfor.')
         if not upcoming:
             st.info('Der er endnu ingen kommende spilledage. Kig forbi igen senere.')
         for entry in upcoming:
@@ -274,7 +360,7 @@ def signup_screen():
                     st.markdown(', '.join(html.escape(x.get('name','')) for x in registered))
                 if st.button('Se og tilmeld', key=f'su_open_{date_str}', use_container_width=True):
                     signup_open(date_str)
-        with st.expander('Administrér spilledage'):
+        with st.expander('🔒 Administration – opret spilledag', expanded=False):
             if signup_admin_login():
                 signup_create_form()
     else:
@@ -381,7 +467,7 @@ def signup_screen():
         else:
             st.caption('Afbudsfristen er overskredet. Kontakt arrangøren ved ændringer.')
 
-        with st.expander('Administration'):
+        with st.expander('🔒 Administration', expanded=False):
             if signup_admin_login():
                 st.markdown('**Rediger spilledag**')
                 with st.form(f'su_edit_day_{day}'):
@@ -390,18 +476,19 @@ def signup_screen():
                     reg_dt = signup_datetime(item.get('deadline'),
                         datetime.combine(date.fromisoformat(day), time(20,0)))
                     cancel_dt = signup_cancel_deadline(item)
+                    edit_dates = signup_date_choices(min(signup_today(), reg_dt.date(), cancel_dt.date()), date.fromisoformat(day))
                     a,b = st.columns(2)
-                    reg_date = a.date_input('Tilmeldingsfrist – dato', value=reg_dt.date(),
-                                            max_value=date.fromisoformat(day),
-                                            key=f'su_edit_reg_date_{day}')
-                    reg_time = b.time_input('Tilmeldingsfrist – klokkeslæt', value=reg_dt.time(),
-                                            key=f'su_edit_reg_time_{day}')
+                    reg_date = a.selectbox('Tilmeldingsfrist – dato', edit_dates,
+                        index=edit_dates.index(reg_dt.date()), format_func=signup_date_label,
+                        key=f'su_edit_reg_date_{day}')
+                    reg_time = b.time_input('Klokkeslæt', value=reg_dt.time(),
+                        key=f'su_edit_reg_time_{day}', step=1800)
                     a,b = st.columns(2)
-                    cancel_date = a.date_input('Afbudsfrist – dato', value=cancel_dt.date(),
-                                               max_value=date.fromisoformat(day),
-                                               key=f'su_edit_cancel_date_{day}')
-                    cancel_time = b.time_input('Afbudsfrist – klokkeslæt', value=cancel_dt.time(),
-                                               key=f'su_edit_cancel_time_{day}')
+                    cancel_date = a.selectbox('Afbudsfrist – dato', edit_dates,
+                        index=edit_dates.index(cancel_dt.date()), format_func=signup_date_label,
+                        key=f'su_edit_cancel_date_{day}')
+                    cancel_time = b.time_input('Klokkeslæt', value=cancel_dt.time(),
+                        key=f'su_edit_cancel_time_{day}', step=1800)
                     save_settings = st.form_submit_button('Gem ændringer', use_container_width=True)
                 if save_settings:
                     registration_cutoff = datetime.combine(reg_date, reg_time)
@@ -447,23 +534,40 @@ def signup_screen():
 
 def signup_create_form():
     st.markdown('**Opret ny spilledag**')
+    today = signup_today()
+    dates = signup_date_choices(today, today + timedelta(days=120))
+    preferred = signup_default_sunday()
+    chosen = st.selectbox('Spilledato', dates,
+        index=dates.index(preferred), format_func=signup_date_label,
+        key='su_create_day_date')
+    st.caption('Vælg dato på listen. Ingen mørk kalender eller iPhone-tastatur.')
+
     with st.form('su_create_day'):
-        chosen = st.date_input('Spilledato', value=signup_today()+timedelta(days=4), min_value=signup_today())
         title = st.text_input('Navn', value='Søndagspadel')
         a,b=st.columns(2)
-        start = a.time_input('Start', value=time(20,0))
-        end = b.time_input('Slut', value=time(22,0))
+        start = a.time_input('Start', value=time(20,0), step=1800)
+        end = b.time_input('Slut', value=time(22,0), step=1800)
         capacity = st.number_input('Antal pladser', min_value=4,max_value=100,value=16,step=4)
-        deadline = st.date_input('Tilmeldingsfrist (dato)',value=chosen,min_value=signup_today(),max_value=chosen)
-        deadline_time = st.time_input('Tilmeldingsfrist (klokkeslæt)',value=time(16,0))
-        cancel_date = st.date_input('Afbudsfrist (dato)',value=chosen,min_value=signup_today(),max_value=chosen)
-        cancel_time = st.time_input('Afbudsfrist (klokkeslæt)',value=time(18,0))
-        create = st.form_submit_button('Opret spilledag',type='primary')
+        cutoff_dates = signup_date_choices(today, chosen)
+        reg_default = max(today, chosen-timedelta(days=3))
+        cancel_default = max(today, chosen-timedelta(days=1))
+        a,b = st.columns(2)
+        deadline = a.selectbox('Tilmeldingsfrist', cutoff_dates,
+            index=cutoff_dates.index(reg_default), format_func=signup_date_label,
+            key=f'su_create_reg_date_{chosen.isoformat()}')
+        deadline_time = b.time_input('Klokkeslæt', value=time(16,0), step=1800)
+        a,b = st.columns(2)
+        cancel_date = a.selectbox('Afbudsfrist', cutoff_dates,
+            index=cutoff_dates.index(cancel_default), format_func=signup_date_label,
+            key=f'su_create_cancel_date_{chosen.isoformat()}')
+        cancel_time = b.time_input('Klokkeslæt', value=time(18,0), step=1800)
+        create = st.form_submit_button('Opret spilledag',type='primary',use_container_width=True)
     if create:
         if start >= end:
             st.error('Sluttidspunkt skal være senere end starttidspunkt.')
             return
-        if datetime.combine(deadline, deadline_time) > datetime.combine(chosen, start) or datetime.combine(cancel_date, cancel_time) > datetime.combine(chosen, start):
+        if (datetime.combine(deadline, deadline_time) > datetime.combine(chosen, start) or
+                datetime.combine(cancel_date, cancel_time) > datetime.combine(chosen, start)):
             st.error('Tilmeldings- og afbudsfristen skal være inden spilledagens start.')
             return
         record={'kind':'padel_day','title':title.strip() or 'Søndagspadel',
