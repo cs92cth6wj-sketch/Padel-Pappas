@@ -178,6 +178,19 @@ def signup_datetime(value, fallback):
         return fallback
 
 
+def signup_parse_time_text(value):
+    """Accept 20:00, 20.00 or 2000 (also 20) and return a datetime.time."""
+    raw = str(value).strip().replace('.', ':')
+    if re.fullmatch(r'\d{3,4}', raw):
+        raw = raw[:-2] + ':' + raw[-2:]
+    elif re.fullmatch(r'\d{1,2}', raw):
+        raw += ':00'
+    try:
+        return time.fromisoformat(raw)
+    except (ValueError, TypeError):
+        return None
+
+
 def signup_cancel_deadline(item):
     # Backwards compatible: older days use the original registration deadline.
     default = item.get('deadline') or (item['date'] + 'T' + item.get('start', '20:00'))
@@ -195,7 +208,7 @@ def signup_day_rows(include_old=False):
     for row in rows:
         data = row.get('data') or {}
         day = str(data.get('date', ''))
-        if data.get('kind') == 'padel_day' and re.fullmatch(r'\\d{4}-\\d{2}-\\d{2}', day):
+        if data.get('kind') == 'padel_day' and re.fullmatch(r'\d{4}-\d{2}-\d{2}', day):
             if include_old or day >= signup_today().isoformat():
                 result.append(data)
     return sorted(result, key=lambda item: (item['date'], item.get('start', '20:00')))
@@ -426,6 +439,13 @@ def signup_screen():
         color:#FFFFFF!important;
         -webkit-text-fill-color:#FFFFFF!important;
       }
+      /* Mobile signup fields must stay readable regardless of legacy theme. */
+      .stApp [data-testid="stExpander"] [data-testid="stTextInput"] input,
+      .stApp [data-testid="stForm"] [data-testid="stTextInput"] input {
+        background:#ffffff!important;color:#20383C!important;
+        -webkit-text-fill-color:#20383C!important;
+        border:1px solid #C8DDDA!important;opacity:1!important;
+      }
       .stApp [data-testid="stExpander"] {border:1px solid #D8E8E5!important;border-radius:17px!important;overflow:hidden!important}
       .stApp [data-testid="stExpander"] summary{padding:12px 15px!important}
       .stApp [data-testid="stExpander"] summary:hover{background:#EFF8F6!important}
@@ -594,16 +614,21 @@ def signup_screen():
                     reg_date = a.selectbox('Tilmeldingsfrist – dato', edit_dates,
                         index=edit_dates.index(reg_dt.date()), format_func=signup_date_label,
                         key=f'su_edit_reg_date_{day}')
-                    reg_time = b.time_input('Klokkeslæt', value=reg_dt.time(),
-                        key=f'su_edit_reg_time_{day}', step=1800)
+                    reg_time_text = b.text_input('Klokkeslæt', value=reg_dt.strftime('%H:%M'),
+                        key=f'su_edit_reg_time_{day}')
                     a,b = st.columns(2)
                     cancel_date = a.selectbox('Afbudsfrist – dato', edit_dates,
                         index=edit_dates.index(cancel_dt.date()), format_func=signup_date_label,
                         key=f'su_edit_cancel_date_{day}')
-                    cancel_time = b.time_input('Klokkeslæt', value=cancel_dt.time(),
-                        key=f'su_edit_cancel_time_{day}', step=1800)
+                    cancel_time_text = b.text_input('Klokkeslæt', value=cancel_dt.strftime('%H:%M'),
+                        key=f'su_edit_cancel_time_{day}')
                     save_settings = st.form_submit_button('Gem ændringer', use_container_width=True)
                 if save_settings:
+                    reg_time = signup_parse_time_text(reg_time_text)
+                    cancel_time = signup_parse_time_text(cancel_time_text)
+                    if reg_time is None or cancel_time is None:
+                        st.error('Ugyldigt klokkeslæt. Brug fx 16:00.')
+                        st.stop()
                     registration_cutoff = datetime.combine(reg_date, reg_time)
                     cancellation_cutoff = datetime.combine(cancel_date, cancel_time)
                     start_dt = datetime.combine(date.fromisoformat(day), time.fromisoformat(item.get('start','20:00')))
@@ -658,8 +683,8 @@ def signup_create_form():
     with st.form('su_create_day'):
         title = st.text_input('Navn', value='Søndagspadel')
         a,b=st.columns(2)
-        start = a.time_input('Start', value=time(20,0), step=1800)
-        end = b.time_input('Slut', value=time(22,0), step=1800)
+        start_text = a.text_input('Start (kl.)', value='20:00', key='su_create_start_txt')
+        end_text = b.text_input('Slut (kl.)', value='22:00', key='su_create_end_txt')
         capacity = st.number_input('Antal pladser', min_value=4,max_value=100,value=16,step=4)
         cutoff_dates = signup_date_choices(today, chosen)
         reg_default = max(today, chosen-timedelta(days=3))
@@ -668,14 +693,21 @@ def signup_create_form():
         deadline = a.selectbox('Tilmeldingsfrist', cutoff_dates,
             index=cutoff_dates.index(reg_default), format_func=signup_date_label,
             key=f'su_create_reg_date_{chosen.isoformat()}')
-        deadline_time = b.time_input('Klokkeslæt', value=time(16,0), step=1800)
+        deadline_time_text = b.text_input('Klokkeslæt', value='16:00', key='su_create_reg_time_txt')
         a,b = st.columns(2)
         cancel_date = a.selectbox('Afbudsfrist', cutoff_dates,
             index=cutoff_dates.index(cancel_default), format_func=signup_date_label,
             key=f'su_create_cancel_date_{chosen.isoformat()}')
-        cancel_time = b.time_input('Klokkeslæt', value=time(18,0), step=1800)
+        cancel_time_text = b.text_input('Klokkeslæt', value='18:00', key='su_create_cancel_time_txt')
         create = st.form_submit_button('Opret spilledag',type='primary',use_container_width=True)
     if create:
+        start = signup_parse_time_text(start_text)
+        end = signup_parse_time_text(end_text)
+        deadline_time = signup_parse_time_text(deadline_time_text)
+        cancel_time = signup_parse_time_text(cancel_time_text)
+        if any(value is None for value in (start, end, deadline_time, cancel_time)):
+            st.error('Ugyldigt klokkeslæt. Brug fx 20:00 eller 20.00.')
+            return
         if start >= end:
             st.error('Sluttidspunkt skal være senere end starttidspunkt.')
             return
@@ -695,7 +727,9 @@ def signup_create_form():
             signup_open(chosen.isoformat())
         except requests.HTTPError as exc:
             if exc.response is not None and exc.response.status_code == 409:
-                st.error('Der er allerede oprettet en spilledag på denne dato.')
+                st.warning('Spilledagen findes allerede. Du kan åbne den i stedet for at oprette den igen.')
+                if st.button('Åbn eksisterende spilledag', key='su_open_existing_after_duplicate'):
+                    signup_open(chosen.isoformat())
             else:
                 st.error(f'Kunne ikke oprette: {exc}')
         except (requests.RequestException,ValueError) as exc:
