@@ -3054,6 +3054,17 @@ if not st.session_state.get('tid'):
       .stApp [class*="st-key-pp11_new_btn"] button::after,
       .stApp [class*="st-key-pp11_open_btn"] button::after{right:13px!important}
     }
+    /* PP 16.1: final typografisk balance og præcis centrering. */
+    .pp156-hero{box-sizing:border-box!important;width:100%!important;margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important;text-align:center!important}
+    .pp156-logo{position:relative;top:9px!important;display:block!important;margin-left:auto!important;margin-right:auto!important;margin-bottom:22px!important}
+    .pp156-hero h1{display:block!important;width:100%!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important;text-align:center!important;text-indent:0!important;transform:none!important;letter-spacing:-.045em!important}
+    .pp156-hero p{display:block!important;max-width:650px!important;margin-left:auto!important;margin-right:auto!important;text-align:center!important;font-size:clamp(17px,3.8vw,21px)!important;line-height:1.46!important;font-weight:520!important;letter-spacing:-.012em!important}
+    @media(max-width:520px){
+      .pp156-hero{padding-top:13px!important}
+      .pp156-logo{top:7px!important;margin-bottom:21px!important}
+      .pp156-hero h1{font-size:clamp(32px,8.5vw,43px)!important;margin-bottom:14px!important}
+      .pp156-hero p{font-size:clamp(16px,4.2vw,19px)!important;line-height:1.47!important;max-width:95%!important;margin-bottom:19px!important}
+    }
     </style>
     <div class="pp156-hero">
       <div class="pp156-wave"></div>
