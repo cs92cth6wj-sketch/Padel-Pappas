@@ -1268,7 +1268,12 @@ def signup_screen():
             if st.button('Se spilledag og tilmeld dig →',key='pp15_open_'+d['date'],type='primary',use_container_width=True):signup_open(d['date'])
         with st.expander('Del tilmeldingsoversigten',expanded=False):
             st.caption('Kopiér linket herunder og del det i Messenger.')
-            st.code(SIGNUP_BASE_URL+'?signup=all',language=None)
+            signup_share_link = SIGNUP_BASE_URL + '?signup=all'
+            st.text_input('Link til tilmeldingsoversigten', value=signup_share_link,
+                          key='pp183_signup_share_link', label_visibility='collapsed',
+                          help='Tryk i feltet, markér adressen, og kopiér den.')
+            st.link_button('Åbn tilmeldingsoversigten ↗', signup_share_link,
+                           use_container_width=True)
         signup_admin()
         st.caption('Padel Pappas 8362 · Ingen betaling ved tilmelding')
         st.stop()
@@ -3680,7 +3685,9 @@ if st.session_state.get('tid'):
     with st.container(key='pp116_share_actions'):
         with st.popover('↗ Del turnering', use_container_width=False):
             st.caption('Kopiér dette link og send det til deltagerne:')
-            st.code(f'https://padel-pappas.streamlit.app/?id={st.session_state.tid}', language=None)
+            st.text_input('Link til turneringen',
+                          value=f'https://padel-pappas.streamlit.app/?id={st.session_state.tid}',
+                          key='pp183_tournament_share_link', label_visibility='collapsed')
             st.caption('Alle med turnerings-ID kan redigere resultaterne.')
 played_rounds = len(d.get('history', []))
 if d.get('matches') and all(m.get('blue_score') is not None and m.get('red_score') is not None for m in d['matches']):
