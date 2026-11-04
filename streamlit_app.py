@@ -13,6 +13,9 @@ from pathlib import Path
 import base64
 import zlib
 import tempfile
+import hashlib
+from datetime import datetime, date, time, timedelta
+from zoneinfo import ZoneInfo
 from engine import make_round, make_fixed_pairs_round, table
 
 # Den interaktive banes HTML er indbygget i denne fil.
@@ -115,6 +118,370 @@ def db_save(tid, data, create=False):
     result = db_request('POST' if create else 'PATCH',tid,data)
     if not result:
         raise RuntimeError('Turneringen blev ikke gemt. Prøv igen.')
+
+
+# Tilmelding lagres som separate poster i den EKSISTERENDE tournaments-tabel.
+# DAY-YYYYMMDD = spilledag, REG-YYYYMMDD-XXXXXXXXXXXX = én deltagers tilmelding.
+# Uafhængige poster undgår at overskrive andre spilleres samtidige tilmeldinger.
+def signup_db_list(prefix):
+    response = requests.get(
+        f'{DB_URL}/rest/v1/tournaments',
+        headers=signup_db_headers(),
+        params={'id': f'like.{prefix}*', 'select': 'id,data', 'order': 'id.asc', 'limit': '1000'},
+        timeout=12,
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def signup_db_headers():
+    headers = {'apikey': DB_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json'}
+    if not DB_KEY.startswith('sb_secret_'):
+        headers['Authorization'] = f'Bearer {DB_KEY}'
+    return headers
+
+
+def signup_db_delete(record_id):
+    response = requests.delete(
+        f'{DB_URL}/rest/v1/tournaments', headers=signup_db_headers(),
+        params={'id': f'eq.{record_id}'}, timeout=12,
+    )
+    response.raise_for_status()
+
+
+def signup_today():
+    return datetime.now(ZoneInfo('Europe/Copenhagen')).date()
+
+
+def signup_day_id(day):
+    return 'DAY-' + day.replace('-', '')
+
+
+def signup_reg_prefix(day):
+    return 'REG-' + day.replace('-', '') + '-'
+
+
+def signup_name_id(day, name):
+    # Deterministisk ID: samme navn kan ikke tilmeldes to gange til samme spilledag.
+    canonical = ' '.join(name.casefold().split())
+    return signup_reg_prefix(day) + hashlib.sha256(canonical.encode('utf-8')).hexdigest()[:12].upper()
+
+
+def signup_now_local():
+    return datetime.now(ZoneInfo('Europe/Copenhagen')).replace(tzinfo=None)
+
+
+def signup_datetime(value, fallback):
+    try:
+        return datetime.fromisoformat(str(value))
+    except (ValueError, TypeError):
+        return fallback
+
+
+def signup_cancel_deadline(item):
+    # Backwards compatible: older days use the original registration deadline.
+    default = item.get('deadline') or (item['date'] + 'T' + item.get('start', '20:00'))
+    return signup_datetime(item.get('cancel_deadline') or default,
+                           datetime.combine(date.fromisoformat(item['date']), time(20, 0)))
+
+
+def signup_cancel_url(day, token):
+    return f'https://padel-pappas.streamlit.app/?signup={day}&cancel={token}'
+
+
+def signup_day_rows(include_old=False):
+    rows = signup_db_list('DAY-')
+    result = []
+    for row in rows:
+        data = row.get('data') or {}
+        day = str(data.get('date', ''))
+        if data.get('kind') == 'padel_day' and re.fullmatch(r'\\d{4}-\\d{2}-\\d{2}', day):
+            if include_old or day >= signup_today().isoformat():
+                result.append(data)
+    return sorted(result, key=lambda item: (item['date'], item.get('start', '20:00')))
+
+
+def signup_roster(day):
+    rows = signup_db_list(signup_reg_prefix(day))
+    return sorted([{'id': row['id'], **row.get('data', {})} for row in rows
+                   if (row.get('data') or {}).get('kind') == 'padel_registration'],
+                  key=lambda item: (item.get('created_at', ''), item.get('name', '').casefold()))
+
+
+def signup_admin_ok():
+    pin = str(st.secrets.get('PADEL_ADMIN_PIN', '')).strip()
+    if not pin:
+        return False
+    return bool(st.session_state.get('signup_admin'))
+
+
+def signup_admin_login():
+    if signup_admin_ok():
+        return True
+    if not str(st.secrets.get('PADEL_ADMIN_PIN', '')).strip():
+        st.info('For at oprette spilledage: Tilføj PADEL_ADMIN_PIN under Streamlit Secrets.')
+        return False
+    with st.form('signup_admin_login'):
+        pin = st.text_input('Admin-PIN', type='password')
+        ok = st.form_submit_button('Lås administration op')
+    if ok:
+        if secrets.compare_digest(pin, str(st.secrets['PADEL_ADMIN_PIN'])):
+            st.session_state.signup_admin = True
+            st.rerun()
+        else:
+            st.error('Forkert PIN.')
+    return False
+
+
+def signup_open(day):
+    st.query_params.clear()
+    st.query_params['signup'] = day
+    st.rerun()
+
+
+def signup_screen():
+    st.markdown('''<style>
+      .signup-heading{border:1px solid #d8e9e5;background:linear-gradient(120deg,#ffffff,#e9f7f4);padding:18px;border-radius:20px;margin-bottom:15px}
+      .signup-heading h2{margin:0 0 5px;color:#1a4c4b;font-size:27px}
+      .signup-heading p{margin:0;color:#567273}
+      .signup-roster{background:#f5faf9;border-radius:14px;padding:12px 14px;line-height:1.9;color:#274c50}
+    </style>''', unsafe_allow_html=True)
+    st.markdown('<div class="signup-heading"><h2>🎾 Søndagspadel · Tilmelding</h2><p>Se kommende spilledage og hvem der er tilmeldt.</p></div>', unsafe_allow_html=True)
+    day = str(st.query_params.get('signup', 'all'))
+    if day == 'all':
+        if st.button('← Til forsiden', key='su_back_home'):
+            st.query_params.clear(); st.rerun()
+        try:
+            upcoming = signup_day_rows()
+        except (requests.RequestException, ValueError) as exc:
+            st.error(f'Kunne ikke hente spilledage: {exc}'); st.stop()
+        st.caption('Fast link til alle spilledage – del det i Messenger:')
+        st.code('https://padel-pappas.streamlit.app/?signup=all', language=None)
+        if not upcoming:
+            st.info('Der er endnu ingen kommende spilledage. Kig forbi igen senere.')
+        for entry in upcoming:
+            date_str = entry['date']
+            try:
+                registered = signup_roster(date_str)
+            except requests.RequestException:
+                registered = []
+            count = len(registered)
+            capacity = int(entry.get('capacity', 16))
+            with st.container(border=True):
+                st.markdown(f'**{html.escape(entry.get("title", "Søndagspadel"))} · {date.fromisoformat(date_str).strftime("%d.%m.%Y")}**')
+                st.caption(f'{entry.get("start", "20:00")}–{entry.get("end", "22:00")} · {count}/{capacity} tilmeldte' + (' · Fuldt' if count >= capacity else ''))
+                if registered:
+                    st.markdown(', '.join(html.escape(x.get('name','')) for x in registered))
+                if st.button('Se og tilmeld', key=f'su_open_{date_str}', use_container_width=True):
+                    signup_open(date_str)
+        with st.expander('Administrér spilledage'):
+            if signup_admin_login():
+                signup_create_form()
+    else:
+        if not re.fullmatch(r'\\d{4}-\\d{2}-\\d{2}', day):
+            st.error('Ugyldig spilledato.'); st.stop()
+        if st.button('← Alle kommende spilledage', key='su_back_list'):
+            signup_open('all')
+        try:
+            item = db_load(signup_day_id(day))
+        except (requests.RequestException, ValueError) as exc:
+            st.error(f'Spilledagen blev ikke fundet: {exc}'); st.stop()
+        if item.get('kind') != 'padel_day':
+            st.error('Spilledagen blev ikke fundet.'); st.stop()
+        if day < signup_today().isoformat():
+            st.info('Denne spilledag er afsluttet og er ikke længere åben for tilmelding.')
+            st.stop()
+        try:
+            registered = signup_roster(day)
+        except requests.RequestException as exc:
+            st.error(f'Kunne ikke hente tilmeldinger: {exc}'); st.stop()
+        capacity=int(item.get('capacity',16))
+        st.subheader(f'{item.get("title", "Søndagspadel")} · {date.fromisoformat(day).strftime("%d.%m.%Y")}')
+        st.caption(f'{item.get("start", "20:00")}–{item.get("end", "22:00")} · {len(registered)} af {capacity} pladser')
+        st.progress(min(1.0, len(registered)/max(1,capacity)))
+        if registered:
+            st.markdown('**Tilmeldte spillere**')
+            st.markdown('<div class="signup-roster">' + '<br>'.join(f'{i}. {html.escape(x.get("name", ""))}' for i,x in enumerate(registered,1)) + '</div>', unsafe_allow_html=True)
+        else:
+            st.info('Ingen er tilmeldt endnu.')
+        deadline = signup_datetime(item.get('deadline'), datetime.combine(date.fromisoformat(day), time.fromisoformat(item.get('start', '20:00'))))
+        deadline_passed = signup_now_local() >= deadline
+        cancel_deadline = signup_cancel_deadline(item)
+        st.caption('Tilmeldingsfrist: ' + deadline.strftime('%d.%m. kl. %H:%M') +
+                   ' · Afbudsfrist: ' + cancel_deadline.strftime('%d.%m. kl. %H:%M'))
+        if item.get('closed') or deadline_passed:
+            st.warning('Tilmeldingen er lukket.')
+        elif len(registered) >= capacity:
+            st.warning('Alle pladser er optaget.')
+        else:
+            with st.form('signup_register'):
+                name = st.text_input('Dit fulde navn', placeholder='Fornavn Efternavn', max_chars=80)
+                submitted = st.form_submit_button('Tilmeld mig', type='primary', use_container_width=True)
+            if submitted:
+                clean = ' '.join(name.split())
+                if len(clean) < 3:
+                    st.error('Indtast dit navn (mindst 3 tegn).')
+                elif signup_name_id(day,clean) in {r['id'] for r in registered}:
+                    st.warning('Navnet er allerede tilmeldt.')
+                else:
+                    cancel_token = secrets.token_urlsafe(24)
+                    record={'kind':'padel_registration','date':day,'name':clean,
+                            'created_at':datetime.now(ZoneInfo('Europe/Copenhagen')).isoformat(),
+                            'cancel_hash':hashlib.sha256(cancel_token.encode('utf-8')).hexdigest()}
+                    try:
+                        # Genindlæs lige før oprettelsen (bedst muligt uden særlig SQL-transaction).
+                        fresh_roster = signup_roster(day)
+                        if len(fresh_roster) >= capacity:
+                            st.warning('Sidste plads blev netop taget. Opdater oversigten.')
+                        else:
+                            db_save(signup_name_id(day,clean), record, create=True)
+                            st.session_state[f'su_link_{day}'] = (clean, cancel_token)
+                            st.rerun()
+                    except requests.HTTPError as exc:
+                        if exc.response is not None and exc.response.status_code == 409:
+                            st.warning('Dette navn er allerede tilmeldt.')
+                        else:
+                            st.error(f'Tilmelding mislykkedes: {exc}')
+                    except (requests.RequestException, ValueError) as exc:
+                        st.error(f'Tilmelding mislykkedes: {exc}')
+        # A private cancellation link is issued once at signup. The secret
+        # appears neither in the roster nor in the public database record.
+        recent = st.session_state.get(f'su_link_{day}')
+        if recent:
+            st.success(f'{recent[0]} er tilmeldt!')
+            st.info('Gem dit personlige afbudslink nu. Du skal bruge det, hvis du vil melde fra senere.')
+            st.code(signup_cancel_url(day, recent[1]), language=None)
+            if st.button('Jeg har gemt mit afbudslink', key='su_link_ack'):
+                st.session_state.pop(f'su_link_{day}', None)
+                st.rerun()
+
+        cancellation_token = str(st.query_params.get('cancel', '')).strip()
+        if cancellation_token:
+            st.markdown('#### Meld afbud')
+            if signup_now_local() > cancel_deadline:
+                st.warning('Afbudsfristen er overskredet. Kontakt arrangøren.')
+            else:
+                match = next((r for r in registered if r.get('cancel_hash') and
+                              secrets.compare_digest(str(r['cancel_hash']),
+                                  hashlib.sha256(cancellation_token.encode('utf-8')).hexdigest())), None)
+                if match:
+                    st.info(f'Du er ved at afmelde {match["name"]}.')
+                    if st.button('Bekræft afbud', type='primary', key='su_confirm_cancel'):
+                        try:
+                            signup_db_delete(match['id'])
+                            st.query_params.pop('cancel', None)
+                            st.success('Dit afbud er registreret.')
+                            st.rerun()
+                        except requests.RequestException as exc:
+                            st.error(f'Afbud mislykkedes: {exc}')
+                else:
+                    st.warning('Afbudslinket er ugyldigt eller allerede brugt.')
+        elif signup_now_local() <= cancel_deadline:
+            st.caption('Afbud: Åbn dit personlige afbudslink fra tilmeldingen. Har du mistet det, kan arrangøren hjælpe.')
+        else:
+            st.caption('Afbudsfristen er overskredet. Kontakt arrangøren ved ændringer.')
+
+        with st.expander('Administration'):
+            if signup_admin_login():
+                st.markdown('**Rediger spilledag**')
+                with st.form(f'su_edit_day_{day}'):
+                    new_capacity = st.number_input('Antal pladser', min_value=1, max_value=100,
+                        value=int(item.get('capacity',16)), step=1, key=f'su_edit_capacity_{day}')
+                    reg_dt = signup_datetime(item.get('deadline'),
+                        datetime.combine(date.fromisoformat(day), time(20,0)))
+                    cancel_dt = signup_cancel_deadline(item)
+                    a,b = st.columns(2)
+                    reg_date = a.date_input('Tilmeldingsfrist – dato', value=reg_dt.date(),
+                                            max_value=date.fromisoformat(day),
+                                            key=f'su_edit_reg_date_{day}')
+                    reg_time = b.time_input('Tilmeldingsfrist – klokkeslæt', value=reg_dt.time(),
+                                            key=f'su_edit_reg_time_{day}')
+                    a,b = st.columns(2)
+                    cancel_date = a.date_input('Afbudsfrist – dato', value=cancel_dt.date(),
+                                               max_value=date.fromisoformat(day),
+                                               key=f'su_edit_cancel_date_{day}')
+                    cancel_time = b.time_input('Afbudsfrist – klokkeslæt', value=cancel_dt.time(),
+                                               key=f'su_edit_cancel_time_{day}')
+                    save_settings = st.form_submit_button('Gem ændringer', use_container_width=True)
+                if save_settings:
+                    registration_cutoff = datetime.combine(reg_date, reg_time)
+                    cancellation_cutoff = datetime.combine(cancel_date, cancel_time)
+                    start_dt = datetime.combine(date.fromisoformat(day), time.fromisoformat(item.get('start','20:00')))
+                    if registration_cutoff > start_dt or cancellation_cutoff > start_dt:
+                        st.error('Fristerne kan ikke ligge efter spillets starttidspunkt.')
+                    else:
+                        item['capacity'] = int(new_capacity)
+                        item['deadline'] = registration_cutoff.isoformat(timespec='minutes')
+                        item['cancel_deadline'] = cancellation_cutoff.isoformat(timespec='minutes')
+                        try:
+                            db_save(signup_day_id(day), item)
+                            if new_capacity < len(registered):
+                                st.warning(f'Der er allerede {len(registered)} tilmeldte. De bevares, men der åbnes ingen nye pladser.')
+                            else:
+                                st.success('Spilledagen er opdateret.')
+                            st.rerun()
+                        except (requests.RequestException, ValueError) as exc:
+                            st.error(f'Kunne ikke gemme ændringer: {exc}')
+                st.caption('Du kan sætte kapaciteten både op og ned. Eksisterende tilmeldinger slettes aldrig automatisk.')
+                st.markdown('**Administrér tilmeldinger**')
+                st.caption('Fjern en tilmelding ved afbud. Dette ændrer ikke allerede startede turneringer.')
+                for record in registered:
+                    a,b = st.columns([4,1])
+                    a.write(record['name'])
+                    if b.button('Fjern', key='su_del_'+record['id']):
+                        try:
+                            signup_db_delete(record['id'])
+                            st.rerun()
+                        except requests.RequestException as exc:
+                            st.error(f'Kunne ikke fjerne: {exc}')
+                if st.button('Luk tilmelding', key='su_close'):
+                    item['closed'] = True
+                    try:
+                        db_save(signup_day_id(day),item)
+                        st.rerun()
+                    except (requests.RequestException,ValueError) as exc:
+                        st.error(f'Kunne ikke lukke: {exc}')
+    st.caption('Padel Pappas 8362 · Ingen betaling ved tilmelding')
+    st.stop()
+
+
+def signup_create_form():
+    st.markdown('**Opret ny spilledag**')
+    with st.form('su_create_day'):
+        chosen = st.date_input('Spilledato', value=signup_today()+timedelta(days=4), min_value=signup_today())
+        title = st.text_input('Navn', value='Søndagspadel')
+        a,b=st.columns(2)
+        start = a.time_input('Start', value=time(20,0))
+        end = b.time_input('Slut', value=time(22,0))
+        capacity = st.number_input('Antal pladser', min_value=4,max_value=100,value=16,step=4)
+        deadline = st.date_input('Tilmeldingsfrist (dato)',value=chosen,min_value=signup_today(),max_value=chosen)
+        deadline_time = st.time_input('Tilmeldingsfrist (klokkeslæt)',value=time(16,0))
+        cancel_date = st.date_input('Afbudsfrist (dato)',value=chosen,min_value=signup_today(),max_value=chosen)
+        cancel_time = st.time_input('Afbudsfrist (klokkeslæt)',value=time(18,0))
+        create = st.form_submit_button('Opret spilledag',type='primary')
+    if create:
+        if start >= end:
+            st.error('Sluttidspunkt skal være senere end starttidspunkt.')
+            return
+        if datetime.combine(deadline, deadline_time) > datetime.combine(chosen, start) or datetime.combine(cancel_date, cancel_time) > datetime.combine(chosen, start):
+            st.error('Tilmeldings- og afbudsfristen skal være inden spilledagens start.')
+            return
+        record={'kind':'padel_day','title':title.strip() or 'Søndagspadel',
+                'date':chosen.isoformat(),'start':start.strftime('%H:%M'),
+                'end':end.strftime('%H:%M'),'capacity':int(capacity),
+                'deadline':deadline.isoformat()+'T'+deadline_time.strftime('%H:%M'),
+                'cancel_deadline':cancel_date.isoformat()+'T'+cancel_time.strftime('%H:%M'),
+                'closed':False}
+        try:
+            db_save(signup_day_id(chosen.isoformat()),record,create=True)
+            signup_open(chosen.isoformat())
+        except requests.HTTPError as exc:
+            if exc.response is not None and exc.response.status_code == 409:
+                st.error('Der er allerede oprettet en spilledag på denne dato.')
+            else:
+                st.error(f'Kunne ikke oprette: {exc}')
+        except (requests.RequestException,ValueError) as exc:
+            st.error(f'Kunne ikke oprette: {exc}')
 
 
 # Public editing is deliberately enabled: anybody who knows a tournament ID can edit it.
@@ -1767,6 +2134,10 @@ if not DB_READY:
     st.error('Appen kræver Streamlit Secrets med SUPABASE_URL og SUPABASE_SECRET_KEY. Se README.md.')
     st.stop()
 
+# Tilmeldingsvisningen har sit eget åbne link og ændrer ikke turneringernes oprindelige flow.
+if st.query_params.get('signup'):
+    signup_screen()
+
 # A shared URL works even after Streamlit restarts. Reload on tournament change.
 url_id=normalize_id(st.query_params.get('id',''))
 if url_id and url_id != st.session_state.get('tid'):
@@ -1811,6 +2182,8 @@ if not st.session_state.get('tid'):
     if 'pp11_landing_mode' not in st.session_state:
         st.session_state.pp11_landing_mode=None
     if st.session_state.pp11_landing_mode is None:
+        if st.button('📅 Spilledage og tilmelding', use_container_width=True, key='su_home_open'):
+            signup_open('all')
         if st.button('＋ Opret ny turnering',type='primary',use_container_width=True,key='pp11_new_btn'):
             st.session_state.pp11_landing_mode='new';st.rerun()
         if st.button('↗ Åbn eksisterende turnering',use_container_width=True,key='pp11_open_btn'):
@@ -1837,11 +2210,32 @@ if not st.session_state.get('tid'):
             st.session_state.pp11_landing_mode=None;st.rerun()
     else:
         st.subheader('Opret ny turnering')
+        signup_source = st.radio('Hvor kommer spillerne fra?', ['Skriv spillere manuelt', 'Hent fra spilledag'], horizontal=True, key='su_player_source')
+        selected_day = None
+        imported_players = []
+        if signup_source == 'Hent fra spilledag':
+            try:
+                days = signup_day_rows(include_old=True)
+                if days:
+                    labels = {f'{day["date"]} · {day.get("title","Søndagspadel")}': day['date'] for day in reversed(days)}
+                    selected_label = st.selectbox('Vælg spilledag', list(labels), key='su_selected_day')
+                    selected_day = labels[selected_label]
+                    imported_players = [r['name'] for r in signup_roster(selected_day)]
+                    st.caption(f'{len(imported_players)} tilmeldte bliver indlæst.')
+                    if imported_players:
+                        st.write(', '.join(imported_players))
+                else:
+                    st.info('Ingen spilledage oprettet endnu. Brug Tilmelding på forsiden.')
+            except requests.RequestException as exc:
+                st.error(f'Kunne ikke hente tilmeldinger: {exc}')
         with st.form('pp11_new_form'):
             id_choice=st.radio('Turnerings-ID',['Vælg selv','Generér automatisk'],horizontal=True)
             chosen_id=st.text_input('Dit turnerings-ID',placeholder='F.eks. PADEL1/11',help='3-32 tegn; kun bogstaver, tal, /, - og _.')
             title=st.text_input('Turneringens navn',value='Søndagspadel')
-            raw=st.text_area('Spillere – én pr. linje',height=170,placeholder='Jan\nTue\nLasse\nMia')
+            if signup_source == 'Hent fra spilledag':
+                raw='\n'.join(imported_players)
+            else:
+                raw=st.text_area('Spillere – én pr. linje',height=170,placeholder='Jan\nTue\nLasse\nMia')
             fmt=st.radio('Turneringsform',['Mexicano','Americano'],horizontal=True)
             partner=st.radio('Makkertype',['Skiftende makker','Fast makker'],horizontal=True,
                             help='Ved fast makker skrives parrene to og to i spillerlisten.')
@@ -1862,6 +2256,8 @@ if not st.session_state.get('tid'):
                 data=fresh()
                 data.update(title=title.strip() or 'Padelturnering',players=players,format=fmt,
                             partner_mode=partner,ranking_priority=ranking,round_limit=int(rounds),target=int(target))
+                if selected_day:
+                    data['signup_date'] = selected_day
                 try:
                     db_save(tid,data,create=True)
                     st.session_state.tid=tid
@@ -5098,4 +5494,4 @@ with tab_log:
                                 m['red_score']=int(newr)
                                 save()
                                 st.success('Resultatet er gemt.')
-        
+                                st.rerun()
