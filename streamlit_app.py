@@ -233,9 +233,32 @@ def signup_admin_login():
     return False
 
 
+def signup_parse_day(value):
+    """Accept normal dates and older route formats; never raise on malformed links."""
+    raw = str(value or '').strip()
+    if raw.lower() == 'all':
+        return 'all'
+    # Handle both a normal ISO date and the stored DAY-YYYYMMDD identifier.
+    if re.fullmatch(r'DAY-\d{8}', raw, flags=re.IGNORECASE):
+        raw = raw[4:8] + '-' + raw[8:10] + '-' + raw[10:12]
+    elif re.fullmatch(r'\d{8}', raw):
+        raw = raw[:4] + '-' + raw[4:6] + '-' + raw[6:]
+    try:
+        parsed = date.fromisoformat(raw)
+    except (TypeError, ValueError):
+        return None
+    return parsed.isoformat()
+
+
 def signup_open(day):
+    normalized = signup_parse_day(day)
+    if normalized is None:
+        st.error('Kunne ikke åbne spilledagen. Gå tilbage til oversigten og prøv igen.')
+        return
+    # Session state helps on iOS when Streamlit momentarily reruns with an old URL.
+    st.session_state['signup_navigation_pending'] = normalized
     st.query_params.clear()
-    st.query_params['signup'] = day
+    st.query_params['signup'] = normalized
     st.rerun()
 
 
@@ -408,7 +431,17 @@ def signup_screen():
       .stApp [data-testid="stExpander"] summary:hover{background:#EFF8F6!important}
     </style>''', unsafe_allow_html=True)
     st.markdown('<div class="signup-heading"><h2>🎾 Søndagspadel · Tilmelding</h2><p>Se kommende spilledage og hvem der er tilmeldt.</p></div>', unsafe_allow_html=True)
-    day = str(st.query_params.get('signup', 'all'))
+    raw_day = st.query_params.get('signup', 'all')
+    # Immediately following creation, favour the date saved by the app over a
+    # transient/stale browser query-string value on iOS.
+    pending_day = st.session_state.pop('signup_navigation_pending', None)
+    day = signup_parse_day(pending_day or raw_day)
+    if day is None:
+        st.warning('Tilmeldingslinket indeholder en ugyldig dato. Åbn oversigten igen.')
+        st.caption(f'Modtaget datoværdi: {str(raw_day)[:64]}')
+        if st.button('← Til alle spilledage', key='signup_bad_day_back'):
+            signup_open('all')
+        st.stop()
     if day == 'all':
         if st.button('← Til forsiden', key='su_back_home'):
             st.query_params.clear(); st.rerun()
@@ -444,10 +477,10 @@ def signup_screen():
             if signup_admin_login():
                 signup_create_form()
     else:
-        if not re.fullmatch(r'\\d{4}-\\d{2}-\\d{2}', day):
-            st.error('Ugyldig spilledato.'); st.stop()
         if st.button('← Alle kommende spilledage', key='su_back_list'):
             signup_open('all')
+        if st.session_state.pop('signup_created_date', None) == day:
+            st.success('Spilledagen er oprettet. Du kan nu dele tilmeldingen med gruppen.')
         try:
             item = db_load(signup_day_id(day))
         except (requests.RequestException, ValueError) as exc:
@@ -658,6 +691,7 @@ def signup_create_form():
                 'closed':False}
         try:
             db_save(signup_day_id(chosen.isoformat()),record,create=True)
+            st.session_state['signup_created_date'] = chosen.isoformat()
             signup_open(chosen.isoformat())
         except requests.HTTPError as exc:
             if exc.response is not None and exc.response.status_code == 409:
