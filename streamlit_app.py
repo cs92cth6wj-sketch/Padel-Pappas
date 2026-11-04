@@ -925,9 +925,10 @@ def signup_wait_panel(item,registered,waiting):
     if st.session_state.get(name_key) not in available:
         st.session_state[name_key]=remembered if remembered in available else None
     st.markdown('**Vælg dit navn**')
-    with st.popover('✓ '+st.session_state[name_key] if st.session_state[name_key] else 'Vælg fra spillerlisten',use_container_width=True):
-        st.caption('Tryk på dit navn – listen er sorteret alfabetisk.')
-        st.radio('Spillere',available,index=None,key=name_key,label_visibility='collapsed')
+    with st.container(key='pp18_player_picker'):
+      with st.popover('✓ '+st.session_state[name_key] if st.session_state[name_key] else 'Vælg fra spillerlisten',use_container_width=True):
+          st.caption('Tryk på dit navn – listen er sorteret alfabetisk.')
+          st.radio('Spillere',available,index=None,key=name_key,label_visibility='collapsed')
     selected=st.session_state.get(name_key)
     with st.form('pp15_signup'):
         pin=st.text_input('Vælg personlig kode (6–8 cifre)',type='password',max_chars=8,help='Bruges hvis du senere vil melde afbud fra samme side.')
@@ -1121,8 +1122,62 @@ def signup_design_170():
     </style>""",unsafe_allow_html=True)
 
 
+def signup_design_180():
+    """Fælles visuel finish kun på spilledagsvisningerne."""
+    st.markdown("""<style>
+    :root{--pp18-green:#005C43;--pp18-border:#bfd9d0;--pp18-light:#edf8f4}
+    .pp18-list-heading{margin:8px 0 16px;text-align:left}
+    .pp18-list-heading h1{font-size:clamp(27px,5vw,36px)!important;line-height:1.16!important;
+      color:#20343a!important;font-weight:800!important;margin:0 0 7px!important}
+    .pp18-list-heading p{font-size:16px!important;color:#52706b!important;margin:0!important}
+    /* Streamlit-popover: målret selve knappen, ikke kun dens indpakning */
+    .stApp [class*="st-key-pp18_player_picker"] [data-testid="stPopover"] button,
+    .stApp [class*="st-key-pp18_player_picker"] [data-testid="stPopover"] button[kind],
+    .stApp [class*="st-key-pp18_player_picker"] [data-testid="stPopover"] button[data-testid],
+    .stApp [class*="st-key-pp18_player_picker"] button{
+      background:#fff!important;background-color:#fff!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
+      border:1px solid #bfd9d0!important;border-radius:13px!important;
+      box-shadow:none!important;min-height:49px!important;font-size:15px!important;
+      font-weight:650!important}
+    .stApp [class*="st-key-pp18_player_picker"] button *,
+    .stApp [class*="st-key-pp18_player_picker"] button p,
+    .stApp [class*="st-key-pp18_player_picker"] button span,
+    .stApp [class*="st-key-pp18_player_picker"] button svg{
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
+      stroke:#005C43!important}
+    /* Primære handlinger er altid mørkegrønne og med hvid fed tekst */
+    .stApp [data-testid="stFormSubmitButton"] button[kind="primary"],
+    .stApp [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primary"],
+    .stApp [data-testid="stButton"] button[kind="primary"],
+    .stApp [data-testid="stButton"] button[data-testid="stBaseButton-primary"]{
+      background:#005C43!important;background-color:#005C43!important;
+      border:1px solid #005C43!important;border-radius:14px!important;
+      color:white!important;-webkit-text-fill-color:white!important;
+      min-height:51px!important;font-weight:750!important;font-size:16px!important;
+      box-shadow:none!important}
+    .stApp [data-testid="stFormSubmitButton"] button[kind="primary"] *,
+    .stApp [data-testid="stButton"] button[kind="primary"] *{
+      color:#fff!important;-webkit-text-fill-color:#fff!important}
+    /* Sekundære handlinger forbliver lyse */
+    .stApp [data-testid="stButton"] button:not([kind="primary"]):not([data-testid="stBaseButton-primary"]){
+      border-radius:14px!important;box-shadow:none!important}
+    .stApp [data-testid="stTextInput"] input,
+    .stApp [data-testid="stTextArea"] textarea{
+      border-radius:12px!important;box-shadow:none!important}
+    .stApp [data-testid="stForm"]{padding:12px 15px!important;border-radius:17px!important}
+    .stApp [data-testid="stExpander"]{border-radius:16px!important}
+    .pp15-day{margin-bottom:7px!important}
+    @media(max-width:600px){
+      .pp18-list-heading{margin:6px 0 12px}
+      .stApp [data-testid="stForm"]{padding:11px 13px!important}
+      .stApp [data-testid="stVerticalBlock"]{row-gap:.43rem!important}
+    }
+    </style>""",unsafe_allow_html=True)
+
+
 def signup_screen():
-    signup_ui_css();signup_design_155();signup_design_170();signup_header()
+    signup_ui_css();signup_design_155();signup_design_170();signup_design_180()
     pending=st.session_state.pop('signup_navigation_pending',None)
     if st.query_params.get('player'):
         candidate=str(st.query_params.get('player'))
@@ -1137,13 +1192,13 @@ def signup_screen():
             st.query_params.clear();st.rerun()
         try:days=signup_day_rows()
         except requests.RequestException as exc:st.error('Kunne ikke hente spilledage: '+str(exc));st.stop()
-        st.markdown('<div class="pp15-subtitle">Kommende spilledage · '+str(len(days))+'</div>',unsafe_allow_html=True)
+        st.markdown('<div class="pp18-list-heading"><h1>Kommende spilledage</h1><p>Se kommende spilledage og tilmeld dig.</p></div>',unsafe_allow_html=True)
         if not days:st.info('Der er endnu ingen kommende spilledage.')
         for d in days:
             try: regs=signup_roster(d['date'])
             except requests.RequestException: regs=[]
             signup_day_card(d,regs,detail=False)
-            if st.button('Se deltagere og tilmelding →',key='pp15_open_'+d['date'],use_container_width=True):signup_open(d['date'])
+            if st.button('Se spilledag og tilmeld dig →',key='pp15_open_'+d['date'],type='primary',use_container_width=True):signup_open(d['date'])
         with st.expander('Del tilmeldingsoversigten',expanded=False):
             st.caption('Kopiér linket herunder og del det i Messenger.')
             st.code(SIGNUP_BASE_URL+'?signup=all',language=None)
