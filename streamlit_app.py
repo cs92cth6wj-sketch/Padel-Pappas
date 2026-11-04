@@ -337,66 +337,66 @@ SIGNUP_LOGO_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAEAAElEQVR42nT9e
 def signup_ui_css():
     # Kun tilmeldingssiden kalder denne CSS; turneringsbaner og resultater bevares.
     st.markdown('''<style>
-    .stApp{background:#f8fbfa!important;color:#263c40!important;color-scheme:light!important}
+    .stApp{background:#f8fbfa!important;color:#005C43!important;color-scheme:light!important}
     .block-container{max-width:800px!important;padding-top:1rem!important}
     .stApp h1,.stApp h2,.stApp h3,.stApp h4{color:#20383d!important;letter-spacing:-.035em!important}
-    .stApp p,.stApp label,.stApp [data-testid="stMarkdownContainer"]{color:#293f43}
+    .stApp p,.stApp label,.stApp [data-testid="stMarkdownContainer"]{color:#005C43}
     .pp15-header{display:flex;justify-content:space-between;align-items:center;gap:10px;
       background:linear-gradient(120deg,#fff 12%,#eaf8f4);border:1px solid #d3e8e2;
       padding:22px;border-radius:23px;margin-bottom:14px}
-    .pp15-kicker{font-size:11px;font-weight:800;letter-spacing:.2em;color:#148477}
+    .pp15-kicker{font-size:11px;font-weight:800;letter-spacing:.2em;color:#005C43}
     .pp15-header h1{font-size:clamp(29px,7vw,42px)!important;line-height:1.1;margin:7px 0!important}
     .pp15-header p{font-size:14px;color:#718388;margin:0}
     .pp15-brand{width:70px;height:70px;object-fit:contain}
     .pp15-day{background:white;border:1px solid #d7e8e3;border-radius:22px;
       padding:18px;margin:10px 0 0;box-shadow:0 5px 18px rgba(29,74,66,.04)}
     .pp15-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-    .pp15-date{font-size:clamp(20px,5.5vw,27px);font-weight:800;line-height:1.16;color:#253d41}
+    .pp15-date{font-size:clamp(20px,5.5vw,27px);font-weight:800;line-height:1.16;color:#005C43}
     .pp15-time{font-size:14px;color:#6d8587;margin-top:5px}
-    .pp15-pill{border-radius:99px;font-size:12px;font-weight:800;padding:6px 10px;background:#e6f8ed;color:#186c55;white-space:nowrap}
+    .pp15-pill{border-radius:99px;font-size:12px;font-weight:800;padding:6px 10px;background:#e6f8ed;color:#005C43;white-space:nowrap}
     .pp15-pill.full{background:#fff0dc;color:#9b6426}
     .pp15-pill.closed{background:#edf1f3;color:#5c6972}
     .pp15-pill.cancel{background:#fff0f0;color:#ab434d}
-    .pp15-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:13px 0 7px;font-size:14px;color:#40595d}
-    .pp15-row strong{font-size:22px;color:#243e42}
+    .pp15-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:13px 0 7px;font-size:14px;color:#005C43}
+    .pp15-row strong{font-size:22px;color:#005C43}
     .pp15-track{height:8px;background:#e6eeeb;border-radius:99px;overflow:hidden}
-    .pp15-track>span{display:block;height:100%;border-radius:99px;background:#178777}
+    .pp15-track>span{display:block;height:100%;border-radius:99px;background:#005C43}
     .pp15-names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:13px}
     .pp15-name{display:flex;gap:7px;align-items:center;min-width:0;padding:10px 9px;
       background:#eff8f4;border:1px solid #dfefe9;border-radius:11px;
-      font-size:clamp(11px,2.9vw,13px);font-weight:670;color:#284b4b;overflow-wrap:anywhere}
-    .pp15-tick{font-size:14px;color:#158874;flex:none}
+      font-size:clamp(11px,2.9vw,13px);font-weight:670;color:#005C43;overflow-wrap:anywhere}
+    .pp15-tick{font-size:14px;color:#005C43;flex:none}
     .pp15-foot{display:flex;justify-content:space-between;align-items:center;
-      margin-top:12px;padding:11px 12px;border-radius:12px;background:#f3f8f6;color:#607a7b;font-size:13px}
-    .pp15-foot strong{font-size:17px;color:#224346}
+      margin-top:12px;padding:11px 12px;border-radius:12px;background:#f3f8f6;color:#005C43;font-size:13px}
+    .pp15-foot strong{font-size:17px;color:#005C43}
     .pp15-meta{font-size:12px;color:#768b8b;margin:9px 3px 13px}
-    .pp15-subtitle{font-size:15px;font-weight:800;color:#274348;margin:15px 0 5px}
+    .pp15-subtitle{font-size:15px;font-weight:800;color:#005C43;margin:15px 0 5px}
     .pp15-empty{color:#71888a;font-size:13px;margin:12px 0}
-    .pp15-alert{background:#eaf7f3;border:1px solid #d6eae4;border-radius:13px;padding:12px;color:#28564e}
+    .pp15-alert{background:#eaf7f3;border:1px solid #d6eae4;border-radius:13px;padding:12px;color:#005C43}
     /* Sidens widget-overflader; undgå legacy mørke og røde Streamlit-regler */
     .stApp [data-testid="stExpander"],.stApp [data-testid="stForm"],
     .stApp [data-testid="stVerticalBlockBorderWrapper"]{background:#fff!important;
-      border:1px solid #d7e8e3!important;border-radius:16px!important;color:#263e42!important}
-    .stApp [data-testid="stExpander"] summary,.stApp [data-testid="stExpander"] summary *{background:#fff!important;color:#244347!important;-webkit-text-fill-color:#244347!important}
-    .stApp [data-testid="stWidgetLabel"] *, .stApp label *, .stApp [data-testid="stForm"] label *{color:#32494c!important;-webkit-text-fill-color:#32494c!important;opacity:1!important}
+      border:1px solid #d7e8e3!important;border-radius:16px!important;color:#005C43!important}
+    .stApp [data-testid="stExpander"] summary,.stApp [data-testid="stExpander"] summary *{background:#fff!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important}
+    .stApp [data-testid="stWidgetLabel"] *, .stApp label *, .stApp [data-testid="stForm"] label *{color:#005C43!important;-webkit-text-fill-color:#005C43!important;opacity:1!important}
     .stApp [data-baseweb="input"],.stApp [data-baseweb="base-input"],
     .stApp [data-baseweb="select"]>div,.stApp [data-baseweb="textarea"],
     .stApp [data-testid="stTextInput"] input,.stApp [data-testid="stNumberInput"] input,
     .stApp [data-testid="stTextArea"] textarea{
-      background:#fff!important;color:#233d42!important;-webkit-text-fill-color:#233d42!important;
+      background:#fff!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important;
       border-color:#cbded9!important;color-scheme:light!important;border-radius:11px!important}
-    .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *{color:#233d42!important;-webkit-text-fill-color:#233d42!important}
-    .stApp [data-baseweb="select"] svg{fill:#39706b!important}
+    .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
+    .stApp [data-baseweb="select"] svg{fill:#005C43!important}
     [data-baseweb="popover"],[data-baseweb="menu"],[role="listbox"],[role="option"]{
-      background:#fff!important;color:#263d41!important;color-scheme:light!important}
-    .stApp [data-testid="stNumberInput"] button{background:#ebf5f2!important;color:#156e64!important}
+      background:#fff!important;color:#005C43!important;color-scheme:light!important}
+    .stApp [data-testid="stNumberInput"] button{background:#ebf5f2!important;color:#005C43!important}
     .stApp .stButton>button,.stApp .stFormSubmitButton>button{
       background:#edf7f4!important;border:1px solid #bcded5!important;
-      color:#176b62!important;-webkit-text-fill-color:#176b62!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
       border-radius:11px!important;min-height:44px!important;font-weight:650!important}
     .stApp .stButton>button[kind="primary"],.stApp .stFormSubmitButton>button[kind="primary"]{
-      background:#118578!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
-      border-color:#118578!important}
+      background:#005C43!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+      border-color:#005C43!important}
     .stApp [data-testid="stTextInput"] input::placeholder{color:#8ca2a1!important;-webkit-text-fill-color:#8ca2a1!important}
     .stApp [data-testid="stAlert"]{border-radius:13px!important}
     .stApp [data-testid="stRadio"]{background:transparent!important}
@@ -408,7 +408,7 @@ def signup_ui_css():
     .stApp [data-testid="stVerticalBlockBorderWrapper"],
     .stApp [data-testid="stPopoverBody"]{
       background:#ffffff!important;background-color:#ffffff!important;
-      color:#263e42!important;border-color:#d9e9e5!important;
+      color:#005C43!important;border-color:#d9e9e5!important;
       box-shadow:none!important;
     }
     .stApp [data-testid="stExpander"] summary,
@@ -418,7 +418,7 @@ def signup_ui_css():
     .stApp [data-testid="stForm"] [data-testid="stWidgetLabel"] *,
     .stApp [data-testid="stWidgetLabel"] *,
     .stApp [data-testid="stMarkdownContainer"] label{
-      color:#263f43!important;-webkit-text-fill-color:#263f43!important;opacity:1!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;opacity:1!important;
     }
     .stApp [data-testid="stTextInput"] input,
     .stApp [data-testid="stNumberInput"] input,
@@ -429,34 +429,34 @@ def signup_ui_css():
     .stApp [data-baseweb="input"],
     .stApp [data-baseweb="base-input"]{
       background:#ffffff!important;background-color:#ffffff!important;
-      color:#263f43!important;-webkit-text-fill-color:#263f43!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
       border-color:#cbdeda!important;color-scheme:light!important;
     }
     .stApp [data-baseweb="select"] input,
     .stApp [data-baseweb="select"] span,
     .stApp [data-baseweb="select"] div,
     .stApp input:not([type="checkbox"]),
-    .stApp textarea{color:#263f43!important;-webkit-text-fill-color:#263f43!important;caret-color:#148577!important}
-    .stApp [data-baseweb="select"] svg{fill:#47716c!important;color:#47716c!important}
+    .stApp textarea{color:#005C43!important;-webkit-text-fill-color:#005C43!important;caret-color:#005C43!important}
+    .stApp [data-baseweb="select"] svg{fill:#005C43!important;color:#005C43!important}
     .stApp [data-testid="stNumberInput"] button,
-    .stApp [data-testid="stNumberInput"] button *{background:#eaf6f2!important;color:#126e63!important;-webkit-text-fill-color:#126e63!important}
+    .stApp [data-testid="stNumberInput"] button *{background:#eaf6f2!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important}
     .stApp .stButton>button[kind="primary"],
     .stApp .stFormSubmitButton>button[kind="primary"],
     .stApp button[data-testid="stBaseButton-primary"]{
-      background:#138579!important;background-color:#138579!important;
-      color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;border:1px solid #138579!important;
+      background:#005C43!important;background-color:#005C43!important;
+      color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;border:1px solid #005C43!important;
     }
     .stApp .stButton>button[kind="primary"] *,
     .stApp .stFormSubmitButton>button[kind="primary"] *{color:#fff!important;-webkit-text-fill-color:#fff!important}
     .stApp .stButton>button:not([kind="primary"]),
     .stApp .stFormSubmitButton>button:not([kind="primary"]){
-      background:#eef8f5!important;color:#166e65!important;-webkit-text-fill-color:#166e65!important;
+      background:#eef8f5!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important;
       border:1px solid #b6ded5!important;
     }
     .stApp .stButton>button:not([kind="primary"]) *,
-    .stApp .stFormSubmitButton>button:not([kind="primary"]) *{color:#166e65!important;-webkit-text-fill-color:#166e65!important}
+    .stApp .stFormSubmitButton>button:not([kind="primary"]) *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
     [data-baseweb="popover"],[data-baseweb="popover"] *,[role="listbox"],[role="option"]{
-      background-color:#fff!important;color:#263f43!important;-webkit-text-fill-color:#263f43!important;
+      background-color:#fff!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important;
     }
     .stApp [data-testid="stPopover"] [data-testid="stPopoverBody"]{max-height:60vh;overflow-y:auto}
     .pp15-header{padding:15px 17px!important;margin-bottom:11px!important;border-radius:19px!important}
@@ -470,32 +470,32 @@ def signup_ui_css():
     .stApp [class*="st-key-pp15_open_"]{margin-top:0!important;margin-bottom:12px!important}
     .stApp [class*="st-key-pp15_open_"] button{min-height:42px!important;border-radius:12px!important}
     .pp151-choice{background:#eff8f5;border:1px solid #d8eae4;border-radius:13px;padding:10px 12px;
-      color:#244e49;font-size:14px;margin:5px 0 10px}
+      color:#005C43;font-size:14px;margin:5px 0 10px}
     @media(max-width:480px){
       .block-container{padding-top:.7rem!important}
       .pp15-day{padding:13px!important}
       .pp15-header{padding:14px!important}
       .stApp [data-testid="stVerticalBlock"]{gap:.45rem}
     }
-    .pp152-player-row{padding:9px 2px;color:#223f42!important;font-size:14px;font-weight:650;line-height:1.35}
+    .pp152-player-row{padding:9px 2px;color:#005C43!important;font-size:14px;font-weight:650;line-height:1.35}
     .pp152-player-status{font-size:11px;color:#788f8a;margin-left:4px;font-weight:500}
     .stApp [class*="st-key-pp15_rem_"] button,
     .stApp [class*="st-key-pp15_delwait_"] button{min-height:32px!important;padding:4px 9px!important;
       font-size:12px!important;border-radius:9px!important}
     /* 15.2 – ét lyst designsystem, helt adskilt fra turneringernes CSS */
     :root {color-scheme:light!important;}
-    html,body,.stApp,[data-testid="stAppViewContainer"]{background:#f8fbfa!important;color:#203b40!important;color-scheme:light!important}
+    html,body,.stApp,[data-testid="stAppViewContainer"]{background:#f8fbfa!important;color:#005C43!important;color-scheme:light!important}
     .stApp [data-testid="stExpander"],
     .stApp [data-testid="stExpanderDetails"],
     .stApp [data-testid="stForm"],
     .stApp [data-testid="stVerticalBlockBorderWrapper"]{
-      background:#fff!important;color:#203b40!important;border-color:#d7e9e3!important;
+      background:#fff!important;color:#005C43!important;border-color:#d7e9e3!important;
       box-shadow:none!important;
     }
     .stApp [data-testid="stExpander"] details,
     .stApp [data-testid="stExpander"] details>div,
     .stApp [data-testid="stExpander"] summary,
-    .stApp [data-testid="stExpander"] summary *{background:#fff!important;color:#203b40!important;-webkit-text-fill-color:#203b40!important}
+    .stApp [data-testid="stExpander"] summary *{background:#fff!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important}
     .stApp [data-testid="stExpander"] [data-testid="stMarkdownContainer"] *,
     .stApp [data-testid="stExpander"] p,
     .stApp [data-testid="stExpander"] label,
@@ -503,19 +503,19 @@ def signup_ui_css():
     .stApp [data-testid="stExpander"] h3,
     .stApp [data-testid="stExpander"] small,
     .stApp [data-testid="stExpander"] span:not([class*=icon]){
-      color:#254247!important;-webkit-text-fill-color:#254247!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
     }
     .stApp [data-testid="stRadio"] label,
     .stApp [data-testid="stRadio"] label *,
     [data-testid="stPopoverBody"] [data-testid="stRadio"] label,
     [data-testid="stPopoverBody"] [data-testid="stRadio"] label *{
-      color:#254247!important;-webkit-text-fill-color:#254247!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
     }
     [data-testid="stPopoverBody"],
     [data-testid="stPopoverBody"]>div,
     [data-testid="stPopoverBody"] [data-testid="stVerticalBlock"],
     [data-testid="stPopoverBody"] [data-testid="stRadio"]{
-      background-color:#fff!important;color:#254247!important;color-scheme:light!important;
+      background-color:#fff!important;color:#005C43!important;color-scheme:light!important;
     }
     [data-testid="stPopoverBody"]{max-height:min(62vh,500px)!important;overflow-y:auto!important;
       border:1px solid #d5e9e2!important;border-radius:14px!important;box-shadow:0 12px 36px #153f3530!important}
@@ -524,19 +524,19 @@ def signup_ui_css():
     .stApp input,.stApp textarea,
     .stApp [data-testid="stTextInput"] input,
     .stApp [data-testid="stNumberInput"] input{
-      background:#fff!important;color:#203b40!important;-webkit-text-fill-color:#203b40!important;
+      background:#fff!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important;
       border-color:#c9e0d9!important;color-scheme:light!important;
     }
     .stApp [data-baseweb="select"] input::placeholder{color:#738c89!important;-webkit-text-fill-color:#738c89!important}
     .stApp [data-testid="stPopover"]>button,
     .stApp [data-testid="stExpander"] button:not([kind="primary"]),
-    .stApp .stButton>button:not([kind="primary"]){background:#eef8f5!important;color:#166e65!important;
-      -webkit-text-fill-color:#166e65!important;border-color:#b6dbd1!important}
+    .stApp .stButton>button:not([kind="primary"]){background:#eef8f5!important;color:#005C43!important;
+      -webkit-text-fill-color:#005C43!important;border-color:#b6dbd1!important}
     .stApp .stButton>button[kind="primary"],
     .stApp .stFormSubmitButton>button[kind="primary"]{
-      background:#128276!important;color:white!important;-webkit-text-fill-color:#fff!important;
-      border-color:#128276!important}
-    .stApp [data-testid="stAlert"]{color:#254247!important}
+      background:#005C43!important;color:white!important;-webkit-text-fill-color:#fff!important;
+      border-color:#005C43!important}
+    .stApp [data-testid="stAlert"]{color:#005C43!important}
     .pp15-day{box-shadow:0 4px 16px rgba(30,76,68,.04)!important}
     @media(max-width:480px){
       .stApp .block-container{padding-left:13px!important;padding-right:13px!important}
@@ -966,48 +966,48 @@ def signup_wait_panel(item,registered,waiting):
 def signup_design_155():
     """Fælles lyst designsystem til alle tilmeldings- og administrationsvisninger."""
     st.markdown("""<style>
-    :root {color-scheme:light!important;--pp155-ink:#223d40;--pp155-green:#087c6c;--pp155-mint:#eaf7f3;--pp155-line:#cfe5de;--pp155-white:#fff}
+    :root {color-scheme:light!important;--pp155-ink:#005C43;--pp155-green:#005C43;--pp155-mint:#eaf7f3;--pp155-line:#cfe5de;--pp155-white:#fff}
     .stApp{background:#f8fbfa!important;color:var(--pp155-ink)!important;color-scheme:light!important}
     .stApp [data-testid="stMarkdownContainer"],.stApp [data-testid="stMarkdownContainer"] p,.stApp label{color:var(--pp155-ink)!important}
     .stApp [data-testid="stTextInput"] input,.stApp [data-testid="stNumberInput"] input,
     .stApp [data-testid="stDateInput"] input,.stApp [data-testid="stTimeInput"] input,
     .stApp [data-testid="stTextArea"] textarea,
     .stApp [data-baseweb="input"] input,.stApp [data-baseweb="select"] input,
-    .stApp [data-baseweb="select"] [role="combobox"]{background:#fff!important;color:#223d40!important;-webkit-text-fill-color:#223d40!important;caret-color:#087c6c!important}
+    .stApp [data-baseweb="select"] [role="combobox"]{background:#fff!important;color:#005C43!important;-webkit-text-fill-color:#005C43!important;caret-color:#005C43!important}
     .stApp [data-baseweb="input"],.stApp [data-baseweb="select"]>div,
     .stApp [data-baseweb="textarea"],.stApp [data-baseweb="base-input"],
     .stApp [data-testid="stDateInput"]>div>div,
     .stApp [data-testid="stNumberInput"]>div>div{
-      background:#fff!important;color:#223d40!important;border:1px solid #cfe3dd!important;
+      background:#fff!important;color:#005C43!important;border:1px solid #cfe3dd!important;
       border-radius:13px!important;box-shadow:none!important;min-height:45px!important}
     .stApp [data-baseweb="input"]:focus-within,.stApp [data-baseweb="select"]>div:focus-within,
-    .stApp [data-baseweb="textarea"]:focus-within{border-color:#158b79!important;box-shadow:0 0 0 2px rgba(21,139,121,.13)!important}
+    .stApp [data-baseweb="textarea"]:focus-within{border-color:#005C43!important;box-shadow:0 0 0 2px rgba(21,139,121,.13)!important}
     .stApp [data-baseweb="input"] button,.stApp [data-baseweb="select"] button,
-    .stApp [data-testid="stNumberInput"] button{background:#eaf7f3!important;color:#087c6c!important;border:none!important}
-    .stApp [data-baseweb="input"] svg,.stApp [data-baseweb="select"] svg{fill:#38615c!important;color:#38615c!important}
+    .stApp [data-testid="stNumberInput"] button{background:#eaf7f3!important;color:#005C43!important;border:none!important}
+    .stApp [data-baseweb="input"] svg,.stApp [data-baseweb="select"] svg{fill:#005C43!important;color:#005C43!important}
     .stApp input::placeholder,.stApp textarea::placeholder{color:#829a97!important;-webkit-text-fill-color:#829a97!important}
-    .stApp [data-baseweb="tag"]{background:#dcf4e9!important;color:#185f53!important;border-radius:9px!important}
-    .stApp [data-baseweb="tag"] span{color:#185f53!important}
+    .stApp [data-baseweb="tag"]{background:#dcf4e9!important;color:#005C43!important;border-radius:9px!important}
+    .stApp [data-baseweb="tag"] span{color:#005C43!important}
     .stApp [data-testid="stForm"],.stApp [data-testid="stExpander"],
     .stApp [data-testid="stPopoverBody"]{background:#fff!important;border:1px solid #d7e9e3!important;border-radius:19px!important;box-shadow:none!important}
-    .stApp [data-testid="stExpander"] summary,.stApp [data-testid="stExpander"] summary *{background:#fff!important;color:#223d40!important}
+    .stApp [data-testid="stExpander"] summary,.stApp [data-testid="stExpander"] summary *{background:#fff!important;color:#005C43!important}
     .stApp [data-testid="stExpander"] details{background:#fff!important;border-radius:19px!important}
-    .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"]{background:#fff!important;color:#223d40!important}
-    .stApp [data-testid="stPopoverBody"] *{color:#223d40}
-    .stApp [data-testid="stRadio"] label{color:#223d40!important}
+    .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"]{background:#fff!important;color:#005C43!important}
+    .stApp [data-testid="stPopoverBody"] *{color:#005C43}
+    .stApp [data-testid="stRadio"] label{color:#005C43!important}
     .stApp [data-testid="stRadio"] [role="radiogroup"]{background:#fff!important}
-    .stApp [data-testid="stRadio"] [role="radio"]{background:#fff!important;border-color:#8bbab0!important}
+    .stApp [data-testid="stRadio"] [role="radio"]{background:#fff!important;border-color:#005C43!important}
     .stApp button[kind="primary"],.stApp [data-testid="stFormSubmitButton"] button[kind="primary"]{
-      background:#087c6c!important;color:white!important;border:1px solid #087c6c!important}
+      background:#005C43!important;color:white!important;border:1px solid #005C43!important}
     .stApp button[kind="primary"] *{color:#fff!important}
     .stApp [data-testid="stButton"] button,.stApp [data-testid="stFormSubmitButton"] button,
     .stApp [data-testid="stPopover"] button{border-radius:13px!important;min-height:43px}
     .pp15-day{border-radius:19px!important;margin-top:11px!important;padding:17px!important}
-    .pp15-name{background:#edf8f4!important;border:1px solid #d9ebe4!important;color:#244443!important}
-    .pp15-track{background:#e3eeea!important}.pp15-track span{background:#0b8776!important}
-    .pp155-player{display:flex;align-items:center;gap:9px;padding:8px 0;font-weight:650;color:#284547;min-height:43px}
-    .pp155-check{display:inline-flex;align-items:center;justify-content:center;background:#dff3e9;color:#0c7b65;border-radius:50%;width:23px;height:23px;font-weight:800}
-    .pp152-player-row{color:#284547!important}
+    .pp15-name{background:#edf8f4!important;border:1px solid #d9ebe4!important;color:#005C43!important}
+    .pp15-track{background:#e3eeea!important}.pp15-track span{background:#005C43!important}
+    .pp155-player{display:flex;align-items:center;gap:9px;padding:8px 0;font-weight:650;color:#005C43;min-height:43px}
+    .pp155-check{display:inline-flex;align-items:center;justify-content:center;background:#dff3e9;color:#005C43;border-radius:50%;width:23px;height:23px;font-weight:800}
+    .pp152-player-row{color:#005C43!important}
     .stApp [class*="st-key-pp15_rem_"] button,.stApp [class*="st-key-pp15_delwait_"] button{
       min-height:35px!important;height:35px!important;width:42px!important;min-width:42px!important;
       background:#fff6f5!important;border:1px solid #f1d5d2!important;color:#a94a43!important;padding:0!important}
@@ -1110,21 +1110,21 @@ def require_admin():
 STYLE = '''
 <style>
 :root{color-scheme:dark}
-.stApp{background:radial-gradient(ellipse at top,#163b39 0,#0c191f 340px,#0a1318 100%);color:#edf5f6}
+.stApp{background:radial-gradient(ellipse at top,#005C43 0,#0c191f 340px,#0a1318 100%);color:#edf5f6}
 .block-container{padding-top:1.1rem;max-width:850px;padding-bottom:6rem}
 h1,h2,h3{color:#f0f8f7!important;letter-spacing:-.04em}
 [data-testid="stSidebar"]{background:#102328}
 .stTabs [data-baseweb="tab-list"]{gap:4px;background:#12252a;padding:5px;border-radius:16px}
 .stTabs [data-baseweb="tab"]{color:#b8cfca;background:transparent;border-radius:12px;padding:10px 16px;font-weight:650}
-.stTabs [aria-selected="true"]{background:#174f48!important;color:#ebfffa!important}
-.stButton button[kind="primary"]{background:#10a98e;border:1px solid #35c9ad;color:white;border-radius:12px}
+.stTabs [aria-selected="true"]{background:#005C43!important;color:#ebfffa!important}
+.stButton button[kind="primary"]{background:#005C43;border:1px solid #35c9ad;color:white;border-radius:12px}
 .stButton button{border-radius:12px;min-height:43px}
 [data-testid="stNumberInput"] input{font-size:20px;font-weight:750;text-align:center}
-[data-testid="stVerticalBlockBorderWrapper"]{border-color:#365656!important;border-radius:18px!important;background:#10242a!important}
-.court-card{border:1px solid #366f70;border-radius:20px;padding:14px 14px 17px;background:linear-gradient(160deg,#15383d,#10242b);margin:12px 0 8px;box-shadow:0 6px 25px #07171977}
+[data-testid="stVerticalBlockBorderWrapper"]{border-color:#005C43!important;border-radius:18px!important;background:#10242a!important}
+.court-card{border:1px solid #005C43;border-radius:20px;padding:14px 14px 17px;background:linear-gradient(160deg,#005C43,#10242b);margin:12px 0 8px;box-shadow:0 6px 25px #07171977}
 .court-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;color:#d5eeeb}
-.court-pill{border:1px solid #417b7b;background:#183d40;padding:6px 12px;border-radius:99px;font-size:13px}
-.court{display:grid;grid-template-columns:1fr 1fr;position:relative;min-height:190px;border:5px solid #607f84;border-radius:9px;overflow:hidden;box-shadow:inset 0 0 25px #09151c,0 5px 20px #0006}
+.court-pill{border:1px solid #005C43;background:#005C43;padding:6px 12px;border-radius:99px;font-size:13px}
+.court{display:grid;grid-template-columns:1fr 1fr;position:relative;min-height:190px;border:5px solid #005C43;border-radius:9px;overflow:hidden;box-shadow:inset 0 0 25px #09151c,0 5px 20px #0006}
 .court-side{position:relative;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;text-align:center;min-width:0;padding:16px 10px;color:white;font-weight:760;line-height:1.4;font-size:clamp(13px,3.5vw,18px);overflow-wrap:anywhere}
 .court-blue{background:linear-gradient(130deg,#1c6090,#113d70)}
 .court-red{background:linear-gradient(210deg,#8a3038,#51212b)}
@@ -1164,16 +1164,16 @@ h1,h2,h3{color:#f0f8f7!important;letter-spacing:-.04em}
 .brand{font-size:12px;letter-spacing:2px;font-weight:900;color:#3cddbd}
 .hero-title{font-size:clamp(28px,7vw,44px);font-weight:850;color:white;letter-spacing:-1.5px;line-height:1.15;margin:5px 0 7px}
 .subtitle{color:#9ebdbb;font-size:14px;margin-bottom:20px}
-.leader{background:#13292e;border:1px solid #365356;padding:12px 13px;border-radius:13px;display:grid;grid-template-columns:28px 1fr 55px 60px;gap:6px;align-items:center;margin:7px 0;font-size:15px}
-.leader.first{background:#18413d;border-color:#35ac9b}
+.leader{background:#13292e;border:1px solid #005C43;padding:12px 13px;border-radius:13px;display:grid;grid-template-columns:28px 1fr 55px 60px;gap:6px;align-items:center;margin:7px 0;font-size:15px}
+.leader.first{background:#005C43;border-color:#005C43}
 .leader-name{font-weight:760}.leader-stat{text-align:right;color:#b5cdc9;font-size:13px}.leader-pts{font-size:20px;text-align:right;font-weight:850;color:white}
 
 /* Stilling 4.2: tydelige V/U/T-kolonner på alle skærmstørrelser */
 .standing-heading,.standing-row {display:grid;grid-template-columns:24px minmax(66px,1fr) 26px 26px 26px 42px 43px;gap:5px;align-items:center;}
 .standing-heading{padding:8px 9px;color:#d2e9e7;font-size:11px;font-weight:750;text-align:center;}
 .standing-heading .standing-person{text-align:left}
-.standing-row{background:#13292e;border:1px solid #365356;padding:11px 9px;border-radius:12px;margin:6px 0;color:#f7ffff;font-size:13px;}
-.standing-row.top{background:#18413d;border-color:#35ac9b}
+.standing-row{background:#13292e;border:1px solid #005C43;padding:11px 9px;border-radius:12px;margin:6px 0;color:#f7ffff;font-size:13px;}
+.standing-row.top{background:#005C43;border-color:#005C43}
 .standing-row .standing-person{font-weight:750;overflow-wrap:anywhere;min-width:0}
 .standing-row .standing-value{text-align:center;font-variant-numeric:tabular-nums}
 .standing-row .standing-points{font-weight:850;color:#fff}
@@ -1181,8 +1181,8 @@ h1,h2,h3{color:#f0f8f7!important;letter-spacing:-.04em}
 @media(max-width:370px){.standing-heading,.standing-row{grid-template-columns:18px minmax(54px,1fr) 22px 22px 22px 33px 35px;gap:3px;font-size:11px;padding-left:5px;padding-right:5px}}
 
 .podium{display:grid;grid-template-columns:1fr 1.12fr 1fr;align-items:end;gap:8px;margin:14px 0 22px}
-.podium-card{padding:13px 5px;background:#183037;border:1px solid #35595c;border-radius:17px;text-align:center}
-.podium-card.winner{background:#174c43;border:1px solid #3ac8aa;padding:23px 5px}
+.podium-card{padding:13px 5px;background:#183037;border:1px solid #005C43;border-radius:17px;text-align:center}
+.podium-card.winner{background:#005C43;border:1px solid #3ac8aa;padding:23px 5px}
 .podium-rank{font-size:25px}.podium-name{font-weight:800;font-size:14px;overflow-wrap:anywhere}.podium-score{font-size:23px;font-weight:900;color:#fff}.podium-label{font-size:11px;color:#b6cfca}
 .small-note{font-size:12px;color:#9fbab8}
 @media(max-width:500px){.block-container{padding-left:13px;padding-right:13px}.court{min-height:170px}.court-card{padding:10px}.stTabs [data-baseweb="tab"]{padding:9px 6px;font-size:13px}}
@@ -1199,7 +1199,7 @@ h1,h2,h3{color:#f0f8f7!important;letter-spacing:-.04em}
   color:inherit!important;opacity:1!important;font-weight:inherit!important;
 }
 .stTabs button[data-baseweb="tab"][aria-selected="true"] {
-  background:#146C60!important;color:#FFFFFF!important;
+  background:#005C43!important;color:#FFFFFF!important;
   border-radius:10px 10px 0 0!important;
 }
 .stTabs button[data-baseweb="tab"][aria-selected="false"] {
@@ -1218,7 +1218,7 @@ section[data-testid="stSidebar"] .stMarkdown p {
 [data-testid="stCaptionContainer"],
 [data-testid="stCaptionContainer"] p {color:#C8DEDF!important;opacity:1!important;}
 [data-testid="stAlert"] p {color:#F3F9FA!important;opacity:1!important;}
-[data-testid="stAlert"] {border-color:#4C8E9A!important;}
+[data-testid="stAlert"] {border-color:#005C43!important;}
 @media(max-width:500px){
   .stTabs button[data-baseweb="tab"]{font-size:14px!important;padding:10px 8px!important;}
   .stTabs [data-baseweb="tab-list"]{gap:3px!important;}
@@ -1238,21 +1238,21 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .stApp [data-testid="stTabs"] button[data-baseweb="tab"] p,
 .stApp [data-testid="stTabs"] button[data-baseweb="tab"] div,
 .stApp [data-testid="stTabs"] button[data-baseweb="tab"] span {color:#f2f8f7!important;-webkit-text-fill-color:#f2f8f7!important;opacity:1!important;font-weight:750!important;}
-.stApp [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] {background:#096f63!important;color:#fff!important;}
+.stApp [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] {background:#005C43!important;color:#fff!important;}
 .stApp [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] * {color:#fff!important;-webkit-text-fill-color:#fff!important;}
 /* Secondary actions: dark surface rather than white cards; primary buttons remain teal. */
 .stApp [data-testid="stSidebar"] [data-testid="stButton"] button[kind="secondary"],
 .stApp [data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button[kind="secondary"],
 .stApp [data-testid="stSidebar"] [data-testid="stButton"] button:not([kind="primary"]),
 .stApp [data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:not([kind="primary"]) {
-  background:#213d44!important;border:1px solid #55787d!important;color:#f7fbfb!important;
+  background:#213d44!important;border:1px solid #005C43!important;color:#f7fbfb!important;
   box-shadow:none!important;border-radius:12px!important;
 }
 .stApp [data-testid="stSidebar"] [data-testid="stButton"] button:not([kind="primary"]) *,
 .stApp [data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:not([kind="primary"]) * {color:#f7fbfb!important;-webkit-text-fill-color:#f7fbfb!important;opacity:1!important;}
-.stApp [data-testid="stSidebar"] [data-testid="stButton"] button[kind="primary"] {background:#0ea891!important;color:#fff!important;border-color:#18bca2!important;}
+.stApp [data-testid="stSidebar"] [data-testid="stButton"] button[kind="primary"] {background:#005C43!important;color:#fff!important;border-color:#005C43!important;}
 .stApp [data-testid="stSidebar"] [data-testid="stButton"] button[kind="primary"] * {color:#fff!important;-webkit-text-fill-color:#fff!important;}
-.stApp [data-testid="stSidebar"] [data-testid="stButton"] button:hover {border-color:#68d7c5!important;background:#28565b!important;}
+.stApp [data-testid="stSidebar"] [data-testid="stButton"] button:hover {border-color:#68d7c5!important;background:#005C43!important;}
 .stApp [data-testid="stSidebar"] [data-testid="stTextInput"] input {background:#f7fafa!important;color:#14282c!important;-webkit-text-fill-color:#14282c!important;border-radius:10px!important;}
 .stApp [data-testid="stSidebar"] [data-testid="stTextInput"] input::placeholder {color:#60777c!important;opacity:1!important;}
 .stApp [data-testid="stSidebar"] [data-testid="stWidgetLabel"] *,
@@ -1283,7 +1283,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .stApp [data-testid="stTextArea"] [data-baseweb="base-input"],
 .stApp [data-baseweb="textarea"] > div {
   background-color:#F7FAFA!important;
-  border-color:#789397!important;
+  border-color:#005C43!important;
 }
 .stApp [data-testid="stTextArea"] textarea::placeholder,
 .stApp [data-baseweb="textarea"] textarea::placeholder {
@@ -1294,7 +1294,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .stApp [data-testid="stTextArea"] textarea:focus {
   color:#172C30!important;
   -webkit-text-fill-color:#172C30!important;
-  outline-color:#18B69E!important;
+  outline-color:#005C43!important;
 }
 
 
@@ -1304,7 +1304,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .stApp .stTabs [data-baseweb="tab"] {
   color:#F4FAFA!important;
   -webkit-text-fill-color:#F4FAFA!important;
-  background:#214248!important;
+  background:#005C43!important;
   opacity:1!important;
   filter:none!important;
   font-weight:750!important;
@@ -1321,7 +1321,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 }
 .stApp div[data-baseweb="tab-list"] [aria-selected="true"],
 .stApp .stTabs [aria-selected="true"] {
-  background:#0C7869!important;
+  background:#005C43!important;
   color:white!important;
   -webkit-text-fill-color:white!important;
 }
@@ -1336,7 +1336,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .stApp [data-testid="stPopoverButton"] button,
 .stApp button[kind="secondary"] {
   background:#24434A!important;
-  border:1px solid #62878E!important;
+  border:1px solid #005C43!important;
   color:#F8FCFD!important;
   -webkit-text-fill-color:#F8FCFD!important;
   opacity:1!important;
@@ -1349,7 +1349,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
   opacity:1!important;
 }
 .stApp [data-testid="stPopover"] button:hover,
-.stApp button[kind="secondary"]:hover {background:#31585F!important;border-color:#7DDACA!important;}
+.stApp button[kind="secondary"]:hover {background:#005C43!important;border-color:#7DDACA!important;}
 .stApp [data-testid="stPopover"] button:disabled,
 .stApp button[kind="secondary"]:disabled {opacity:.58!important;}
 @media (max-width:600px) {
@@ -1381,7 +1381,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 }
 .stApp [data-baseweb="tab-list"] button[role="tab"][aria-selected="true"],
 .stApp [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] {
-  background-color:#0C7869!important;
+  background-color:#005C43!important;
   border-color:#22C9AC!important;
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
@@ -1418,7 +1418,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 }
 .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button,
 .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button[kind="secondary"] {
- background:#204148!important;border:1px solid #6EB6B0!important;color:#FFFFFF!important;
+ background:#204148!important;border:1px solid #005C43!important;color:#FFFFFF!important;
  -webkit-text-fill-color:#FFFFFF!important;
 }
 .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button * {
@@ -1427,7 +1427,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 /* Legacy light inactive tabs removed in 6.2. */
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
 .stApp [data-baseweb="tab-list"] [role="tab"][aria-selected="true"] {
- background:#097D6D!important;color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
+ background:#005C43!important;color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
 }
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"] *,
 .stApp [data-baseweb="tab-list"] [role="tab"][aria-selected="true"] * {
@@ -1462,10 +1462,10 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 
 
 /* 4.7: Vandret padelbane, korrekte linjer og score på hver sin halvdel. */
-.padel-real-card{border:1px solid #427b7d;border-radius:18px;padding:10px;background:linear-gradient(145deg,#17363c,#0e252d);margin:12px 0 0}
+.padel-real-card{border:1px solid #005C43;border-radius:18px;padding:10px;background:linear-gradient(145deg,#005C43,#0e252d);margin:12px 0 0}
 .padel-real-top{display:flex;align-items:center;justify-content:space-between;color:#e8ffff;margin:0 2px 10px;gap:10px}
 .padel-real-top .court-pill{white-space:nowrap}
-.padel-real{width:100%;aspect-ratio:2/1;min-height:160px;max-height:245px;margin:0 auto;position:relative;border:5px solid #688e92;border-radius:9px;background:linear-gradient(to right,#14568b 0%,#174572 49.7%,#762b34 50.3%,#92303e 100%);box-shadow:inset 0 0 25px #09131c99,0 8px 22px #0005;overflow:hidden;isolation:isolate}
+.padel-real{width:100%;aspect-ratio:2/1;min-height:160px;max-height:245px;margin:0 auto;position:relative;border:5px solid #005C43;border-radius:9px;background:linear-gradient(to right,#14568b 0%,#174572 49.7%,#762b34 50.3%,#92303e 100%);box-shadow:inset 0 0 25px #09131c99,0 8px 22px #0005;overflow:hidden;isolation:isolate}
 /* Net x=50%. Servelinjerne er 6,95 m fra nettet: x=15,25% og 84,75% på en 20 m bane. */
 .padel-real:before{content:'';position:absolute;inset:6px;border:2px solid rgba(238,253,255,.7);z-index:1;pointer-events:none}
 .padel-real:after{content:'';position:absolute;top:0;bottom:0;left:50%;width:5px;transform:translateX(-50%);background:repeating-linear-gradient(to bottom,#e5f5f5 0 4px,#56727b 4px 7px);border-inline:1px solid #f9ffff;z-index:3;pointer-events:none;box-shadow:0 0 6px #0009}
@@ -1483,7 +1483,7 @@ html, body, [data-testid="stAppViewContainer"] {overflow-x:hidden!important;}
 .padel-score-strip-header{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;margin-bottom:1px}
 .padel-score-strip-header span{font-weight:800;font-size:13px;text-align:center;color:#fff;padding:8px 4px;border-radius:8px 8px 0 0}
 .padel-score-strip-header .blue{background:#14568b}.padel-score-strip-header .red{background:#842e3d}
-[class*="st-key-on_court_score_"]{position:relative!important;margin:0!important;padding:8px!important;background:#102a30!important;border:1px solid #487b7e;border-radius:0 0 13px 13px!important;box-sizing:border-box!important}
+[class*="st-key-on_court_score_"]{position:relative!important;margin:0!important;padding:8px!important;background:#102a30!important;border:1px solid #005C43;border-radius:0 0 13px 13px!important;box-sizing:border-box!important}
 [class*="st-key-on_court_score_"] [data-testid="stHorizontalBlock"]{gap:8px!important;align-items:center!important}
 [class*="st-key-on_court_score_"] [data-testid="stNumberInput"]{min-width:0!important}
 [class*="st-key-on_court_score_"] [data-testid="stNumberInput"] input{background:#f0f5f8!important;color:#15252c!important;-webkit-text-fill-color:#15252c!important;font-size:20px!important;font-weight:900!important;border-radius:8px!important;min-width:0!important;text-align:center!important;padding:4px!important}
@@ -1649,10 +1649,10 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"],
 .stApp [data-baseweb="tab-list"] [role="tab"],
 .stApp .stTabs [data-baseweb="tab"] {
-  background:#176458!important;
+  background:#005C43!important;
   color:#ffffff!important;
   -webkit-text-fill-color:#ffffff!important;
-  border:1px solid #2f9c8d!important;
+  border:1px solid #005C43!important;
   border-radius:11px!important;
   opacity:1!important;
   box-shadow:none!important;
@@ -1667,7 +1667,7 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
 .stApp [data-baseweb="tab-list"] [role="tab"][aria-selected="true"],
 .stApp .stTabs [data-baseweb="tab"][aria-selected="true"] {
-  background:#079b80!important;
+  background:#005C43!important;
   border-color:#67ead5!important;
   box-shadow:inset 0 -3px #f5df82!important;
 }
@@ -1681,8 +1681,8 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
 .stApp div[data-testid="stTabs"] div[data-baseweb="tab-list"] button[data-baseweb="tab"]:not([aria-selected="true"]),
 .stApp div[data-baseweb="tab-list"] button[role="tab"][aria-selected="false"],
 .stApp div[data-baseweb="tab-list"] button[data-baseweb="tab"][aria-selected="false"] {
-  background-color:#176458!important;background-image:none!important;
-  border:1px solid #38a899!important;color:#ffffff!important;
+  background-color:#005C43!important;background-image:none!important;
+  border:1px solid #005C43!important;color:#ffffff!important;
   -webkit-text-fill-color:#ffffff!important;opacity:1!important;
 }
 .stApp div[data-testid="stTabs"] div[role="tablist"] button[role="tab"]:not([aria-selected="true"]) *,
@@ -1693,7 +1693,7 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
 }
 .stApp div[data-testid="stTabs"] button[role="tab"][aria-selected="true"],
 .stApp div[data-baseweb="tab-list"] button[data-baseweb="tab"][aria-selected="true"] {
-  background-color:#0b9b83!important;color:#ffffff!important;
+  background-color:#005C43!important;color:#ffffff!important;
   border-color:#65e6ce!important;
 }
 
@@ -1703,7 +1703,7 @@ html, body, .stApp, [data-testid="stAppViewContainer"],
 html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
  background:#090d12!important;color:#eff7f7!important;
 }
-.stApp{background:radial-gradient(circle at 70% -150px,#173c3a 0,#090d12 520px)!important}
+.stApp{background:radial-gradient(circle at 70% -150px,#005C43 0,#090d12 520px)!important}
 [data-testid="stHeader"]{background:transparent!important}
 .block-container{max-width:860px!important;padding-top:1.6rem!important;padding-bottom:6rem!important}
 [data-testid="stSidebar"], [data-testid="stSidebarContent"]{background:#101a20!important}
@@ -1712,7 +1712,7 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
 .hero-title{font-weight:850!important;font-size:clamp(28px,6vw,43px)!important;margin-top:6px!important;letter-spacing:-.035em!important}
 .subtitle{color:#a3b6bd!important;font-size:14px!important}
 .p7-hero{padding:19px 20px 12px;background:linear-gradient(145deg,#13282c,#10171d 80%);border:1px solid #29454b;border-radius:20px;margin:2px 0 16px}
-.p7-id{display:inline-block;background:#142e2e;border:1px solid #326b60;border-radius:8px;padding:7px 10px;margin:6px 0 4px;font-size:12px;color:#bfefe6;overflow-wrap:anywhere}
+.p7-id{display:inline-block;background:#142e2e;border:1px solid #005C43;border-radius:8px;padding:7px 10px;margin:6px 0 4px;font-size:12px;color:#bfefe6;overflow-wrap:anywhere}
 .p7-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0 20px}
 .p7-stat{background:#141f27;border:1px solid #293c44;border-radius:14px;padding:12px 7px;text-align:center}
 .p7-stat strong{font-size:24px;line-height:1.2;color:#fff;display:block;font-weight:850;font-variant-numeric:tabular-nums}
@@ -1720,14 +1720,14 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
 /* Tab buttons: neither white default widgets nor green text on green. */
 .stApp [data-testid="stTabs"] div[role="tablist"], .stApp [data-baseweb="tab-list"]{background:transparent!important;gap:8px!important;padding:0!important;overflow-x:auto!important}
 .stApp [data-testid="stTabs"] button[role="tab"],.stApp [data-baseweb="tab-list"] button[data-baseweb="tab"]{
- flex:1 0 auto!important;background:#17282b!important;border:1px solid #2b655e!important;border-radius:12px!important;
+ flex:1 0 auto!important;background:#17282b!important;border:1px solid #005C43!important;border-radius:12px!important;
  color:#d6f2ed!important;-webkit-text-fill-color:#d6f2ed!important;padding:12px 10px!important;font-weight:750!important;opacity:1!important;
 }
 .stApp [data-testid="stTabs"] button[role="tab"] *, .stApp [data-baseweb="tab-list"] button[data-baseweb="tab"] *{
  color:inherit!important;-webkit-text-fill-color:inherit!important;font-weight:inherit!important;opacity:1!important;
 }
 .stApp [data-testid="stTabs"] button[role="tab"][aria-selected="true"],.stApp [data-baseweb="tab-list"] button[data-baseweb="tab"][aria-selected="true"]{
- background:#0da98f!important;border-color:#4df1cb!important;color:#fff!important;-webkit-text-fill-color:#fff!important;box-shadow:0 4px 17px #04b18c22!important;
+ background:#005C43!important;border-color:#4df1cb!important;color:#fff!important;-webkit-text-fill-color:#fff!important;box-shadow:0 4px 17px #04b18c22!important;
 }
 .stApp [data-testid="stTabs"] [data-baseweb="tab-highlight"],.stApp [data-testid="stTabs"] [data-baseweb="tab-border"]{display:none!important}
 /* Court card preserved: enhanced framing only, no changes to interactive component */
@@ -1738,16 +1738,16 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
 /* Modern leader board and podium */
 .podium{gap:10px!important;margin:18px 0 22px!important}
 .podium-card{background:#18232b!important;border:1px solid #364450!important;border-radius:18px!important;box-shadow:0 8px 24px #0003!important;padding:16px 5px!important}
-.podium-card.winner{background:linear-gradient(155deg,#164c44,#193029)!important;border-color:#42d4ac!important;padding:25px 5px!important}
+.podium-card.winner{background:linear-gradient(155deg,#005C43,#193029)!important;border-color:#42d4ac!important;padding:25px 5px!important}
 .podium-name{color:#f6fbfc!important;font-size:clamp(12px,3.3vw,15px)!important}
 .podium-score{font-size:clamp(22px,5.5vw,29px)!important}
 .standing-heading{color:#b6cbd0!important;padding:11px 9px!important}
 .standing-row{background:#141f26!important;border:1px solid #2d3e47!important;border-radius:13px!important;min-height:45px!important;box-shadow:0 2px 8px #0002}
-.standing-row.top{background:#16433b!important;border-color:#37bb9f!important}
+.standing-row.top{background:#005C43!important;border-color:#005C43!important}
 .standing-row .standing-person{color:#fff!important}
 /* Forms and actions */
 .stApp [data-testid="stButton"] button[kind="primary"],.stApp [data-testid="stFormSubmitButton"] button[kind="primary"]{
- background:#0dab90!important;color:#fff!important;border:1px solid #37dbc0!important;border-radius:12px!important;min-height:48px!important;font-weight:780!important;
+ background:#005C43!important;color:#fff!important;border:1px solid #37dbc0!important;border-radius:12px!important;min-height:48px!important;font-weight:780!important;
 }
 .stApp [data-testid="stButton"] button[kind="secondary"],.stApp [data-testid="stFormSubmitButton"] button[kind="secondary"]{
  background:#1d2a33!important;color:#f1f8f8!important;border:1px solid #42606c!important;border-radius:12px!important;
@@ -1833,7 +1833,7 @@ html,body,.stApp,[data-testid="stAppViewContainer"], [data-testid="stMain"]{
  box-shadow:inset 0 0 0 1px #31d7b61a!important;
 }
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"]:hover{
- border-color:#54a99a!important;
+ border-color:#005C43!important;
 }
 .stApp [data-testid="stTabs"] [data-baseweb="tab-highlight"],
 .stApp [data-testid="stTabs"] [data-baseweb="tab-border"]{display:none!important;}
@@ -1892,13 +1892,13 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 .stApp [data-testid="stMarkdownContainer"]{color:#26363D}
 .stApp h1,.stApp h2,.stApp h3,.stApp h4{color:#17242E!important}
 .stApp [data-testid="stCaptionContainer"],.stApp [data-testid="stCaptionContainer"] p{color:#64757E!important}
-.stApp a{color:#117A78!important}
+.stApp a{color:#005C43!important}
 .stApp [data-testid="stMarkdownContainer"] hr,.stApp hr{border-color:#E5ECF0!important}
 .p7-hero{background:linear-gradient(118deg,#FFFFFF 45%,#E6F7F5 100%)!important;border:1px solid #E0EBEE!important;border-radius:20px!important;box-shadow:0 7px 25px #1934440c!important}
 .p7-hero .hero-title,.hero-title{color:#162631!important}
 .p7-hero .subtitle,.subtitle{color:#6A7C85!important}
-.brand{color:#147E75!important}
-.p7-id{background:#E7F6F3!important;border:1px solid #B7DBD6!important;color:#17695E!important}
+.brand{color:#005C43!important}
+.p7-id{background:#E7F6F3!important;border:1px solid #B7DBD6!important;color:#005C43!important}
 .p7-stat,.p7-stats .p7-stat{background:#FFFFFF!important;border:1px solid #DEE9ED!important;border-radius:16px!important;box-shadow:0 4px 18px #213d4a0d!important}
 .p7-stat strong{color:#192B33!important}
 .p7-stat small{color:#697D85!important}
@@ -1912,7 +1912,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 }
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"][aria-selected="true"],
 .stApp [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"]{
- background:#137F75!important;border:2px solid #137F75!important;
+ background:#005C43!important;border:2px solid #005C43!important;
  color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;box-shadow:0 4px 14px #086f652b!important;
 }
 .stApp [data-testid="stTabs"] [role="tablist"] [role="tab"] *,
@@ -1933,12 +1933,12 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 [data-testid="stExpander"]{background:#FFFFFF!important;border:1px solid #DFE9ED!important;border-radius:15px!important}
 [data-testid="stExpander"] summary,[data-testid="stExpander"] summary *{color:#233840!important;-webkit-text-fill-color:#233840!important}
 .stApp [data-testid="stButton"] button[kind="primary"],.stApp [data-testid="stFormSubmitButton"] button[kind="primary"]{
- background:#138377!important;color:#FFFFFF!important;border:1px solid #0F786E!important;box-shadow:0 3px 12px #07695c22!important;
+ background:#005C43!important;color:#FFFFFF!important;border:1px solid #005C43!important;box-shadow:0 3px 12px #07695c22!important;
 }
 .stApp [data-testid="stButton"] button[kind="secondary"],.stApp [data-testid="stFormSubmitButton"] button[kind="secondary"]{
- background:#ECF8F6!important;color:#17665D!important;border:1px solid #92C9C2!important;box-shadow:none!important;
+ background:#ECF8F6!important;color:#005C43!important;border:1px solid #92C9C2!important;box-shadow:none!important;
 }
-.stApp [data-testid="stButton"] button[kind="secondary"] *,.stApp [data-testid="stFormSubmitButton"] button[kind="secondary"] *{color:#17665D!important;-webkit-text-fill-color:#17665D!important}
+.stApp [data-testid="stButton"] button[kind="secondary"] *,.stApp [data-testid="stFormSubmitButton"] button[kind="secondary"] *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
 .stApp [data-testid="stButton"] button[kind="primary"] *,.stApp [data-testid="stFormSubmitButton"] button[kind="primary"] *{color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important}
 .stApp [data-testid="stTextInput"] input,.stApp [data-testid="stNumberInput"] input,
 .stApp [data-testid="stTextArea"] textarea,.stApp [data-baseweb="select"]>div{
@@ -1988,12 +1988,12 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 }
 .stApp section[data-testid="stSidebar"] button[kind="secondary"],
 .stApp section[data-testid="stSidebar"] button:not([kind="primary"]){
-  background:#E7F4F2!important;color:#146A60!important;
-  -webkit-text-fill-color:#146A60!important;border-color:#9ACCC4!important;
+  background:#E7F4F2!important;color:#005C43!important;
+  -webkit-text-fill-color:#005C43!important;border-color:#9ACCC4!important;
 }
 .stApp section[data-testid="stSidebar"] button[kind="secondary"] *,
 .stApp section[data-testid="stSidebar"] button:not([kind="primary"]) *{
-  color:#146A60!important;-webkit-text-fill-color:#146A60!important;
+  color:#005C43!important;-webkit-text-fill-color:#005C43!important;
 }
 .stApp section[data-testid="stSidebar"] button[kind="primary"] *,
 .stApp section[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button[kind="primary"] *{
@@ -2021,15 +2021,15 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 /* Padel Pappas 9.0 - mobile light polish; appended last for reliable specificity */
 .pp9-progress{background:#fff;border:1px solid #d7e5e9;border-radius:17px;padding:14px;margin:12px 0 10px;box-shadow:0 3px 14px #263b4c0b}
 .pp9-progress-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px;color:#213842;font-size:14px}
-.pp9-progress-heading span{color:#138b7d;font-size:12px;font-weight:700}
+.pp9-progress-heading span{color:#005C43;font-size:12px;font-weight:700}
 .pp9-track{height:8px;background:#e1efed;border-radius:99px;overflow:hidden}
-.pp9-fill{height:100%;background:#10a58e;border-radius:99px;transition:width .25s}
+.pp9-fill{height:100%;background:#005C43;border-radius:99px;transition:width .25s}
 .pp9-history-mini{display:flex;align-items:start;gap:10px;margin:7px 0;padding:11px;background:white;border:1px solid #deeaec;border-radius:12px;color:#243940;font-size:13px}
 .pp9-history-mini b{min-width:58px}.pp9-history-mini span{overflow-wrap:anywhere}
-.pp9-history-mini strong{color:#0e8979}
-.pp9-saved{display:inline-block;font-size:12px;font-weight:800;color:#0b8874;background:#e2f7f0;border:1px solid #a9dfd1;border-radius:999px;padding:3px 10px;margin:0 0 1px 4px}
-.pp9-winners{text-align:center;background:linear-gradient(130deg,#edfaf5,#fff8df);border:2px solid #33b99d;border-radius:18px;padding:24px 14px;margin:12px 0;color:#144f48;box-shadow:0 10px 30px #236b5215}
-.pp9-winners>div{font-size:13px;letter-spacing:.08em;font-weight:850}.pp9-winners strong{display:block;color:#163d3d;font-size:clamp(22px,5vw,35px);margin:12px 0}.pp9-winners small{color:#5c7977}
+.pp9-history-mini strong{color:#005C43}
+.pp9-saved{display:inline-block;font-size:12px;font-weight:800;color:#005C43;background:#e2f7f0;border:1px solid #a9dfd1;border-radius:999px;padding:3px 10px;margin:0 0 1px 4px}
+.pp9-winners{text-align:center;background:linear-gradient(130deg,#edfaf5,#fff8df);border:2px solid #005C43;border-radius:18px;padding:24px 14px;margin:12px 0;color:#005C43;box-shadow:0 10px 30px #236b5215}
+.pp9-winners>div{font-size:13px;letter-spacing:.08em;font-weight:850}.pp9-winners strong{display:block;color:#005C43;font-size:clamp(22px,5vw,35px);margin:12px 0}.pp9-winners small{color:#005C43}
 /* More compact court surroundings and side-by-side round/points widgets */
 .stApp [data-testid="stPopover"]{margin:0!important}
 .stApp [data-testid="stPopover"] button{min-height:37px!important;border-radius:11px!important}
@@ -2079,7 +2079,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
   padding:2px 7px!important;font-size:12px!important;font-weight:600!important;
 }
 .stApp [class*="st-key-court_edit_actions_"] button *{color:#537780!important;-webkit-text-fill-color:#537780!important}
-.stApp [class*="st-key-court_edit_actions_"] button:hover{background:#edf7f5!important;color:#156f65!important}
+.stApp [class*="st-key-court_edit_actions_"] button:hover{background:#edf7f5!important;color:#005C43!important}
 
 /* 9.3: Rediger hold er en diskret del af kampkortets fod, ikke en bred handlingsknap. */
 .stApp [class*="st-key-court_edit_actions_"] {
@@ -2103,8 +2103,8 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
   border:1px solid transparent!important;
   border-radius:8px!important;
   background:#f4faf9!important;
-  color:#42777d!important;
-  -webkit-text-fill-color:#42777d!important;
+  color:#005C43!important;
+  -webkit-text-fill-color:#005C43!important;
   font-size:12px!important;
   font-weight:650!important;
   box-shadow:none!important;
@@ -2144,7 +2144,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 .stApp section[data-testid="stSidebar"] [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within,
 .stApp section[data-testid="stSidebar"] [data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
 .stApp section[data-testid="stSidebar"] [data-baseweb="select"] > div:focus-within {
- border-color:#63B8A9!important;
+ border-color:#005C43!important;
  box-shadow:0 0 0 3px rgba(32,155,134,.16)!important;
  outline:none!important;
 }
@@ -2218,15 +2218,15 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 .stApp [class*="st-key-pp95_history"] [data-testid="stFormSubmitButton"] button{
   background:#E7F5F2!important;
   border:1px solid #96CCC3!important;
-  color:#166B61!important;
-  -webkit-text-fill-color:#166B61!important;
+  color:#005C43!important;
+  -webkit-text-fill-color:#005C43!important;
   border-radius:11px!important;
 }
 .stApp [class*="st-key-pp95_history"] [data-testid="stFormSubmitButton"] button *{
-  color:#166B61!important;-webkit-text-fill-color:#166B61!important;
+  color:#005C43!important;-webkit-text-fill-color:#005C43!important;
 }
 .stApp [class*="st-key-pp95_history"] [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within{
-  border-color:#62B8A8!important;box-shadow:0 0 0 3px rgba(32,155,134,.13)!important;
+  border-color:#005C43!important;box-shadow:0 0 0 3px rgba(32,155,134,.13)!important;
 }
 
 
@@ -2265,7 +2265,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 .stApp [data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
 .stApp [data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
 .stApp [data-testid="stNumberInput"] [data-baseweb="input"]:focus-within {
- border-color:#55B6A3!important;
+ border-color:#005C43!important;
  box-shadow:0 0 0 3px rgba(40,160,139,.14)!important;
 }
 /* Sidepanel i nyere Streamlit kan bruge section, aside eller div. */
@@ -2278,8 +2278,8 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 /* 9.7 HISTORIK: Samme blå/røde bane, samme kort og navnerytme som Kampe */
 .pp97-card{background:#fff;border:1px solid #deeaed;border-radius:18px;padding:8px 9px 11px;margin:12px 0 3px;box-shadow:0 4px 18px #142e390b}
 .pp97-top{display:flex;justify-content:space-between;align-items:center;margin:2px 3px 9px;color:#26444c;font-size:14px}
-.pp97-pill{border:1px solid #aad8d0;background:#e9f7f4;color:#17655e;border-radius:30px;padding:6px 11px}
-.pp97-badge{font-size:12px;font-weight:700;border-radius:12px;padding:5px 8px;background:#e3f5ef;color:#157363}
+.pp97-pill{border:1px solid #aad8d0;background:#e9f7f4;color:#005C43;border-radius:30px;padding:6px 11px}
+.pp97-badge{font-size:12px;font-weight:700;border-radius:12px;padding:5px 8px;background:#e3f5ef;color:#005C43}
 .pp97-badge.pending{background:#f4f6f7;color:#687c83}
 .pp97-court{position:relative;aspect-ratio:2/1;min-height:138px;max-height:225px;width:100%;border:3px solid #a8bec3;border-radius:12px;overflow:hidden;background:linear-gradient(90deg,#165b91 0%,#194a7a 49.7%,#792c38 50.3%,#95323f 100%)}
 .pp97-court::before{content:'';position:absolute;inset:8px;border:2px solid #fff9;pointer-events:none}
@@ -2318,7 +2318,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
  box-shadow:none!important;outline:none!important;
 }
 .stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] > div:focus-within {
- border-color:#41B8A2!important;box-shadow:0 0 0 3px rgba(27,154,132,.15)!important;
+ border-color:#005C43!important;box-shadow:0 0 0 3px rgba(27,154,132,.15)!important;
  outline:none!important;
 }
 .stApp [class*="st-key-pp98_round_selector"] [data-baseweb="select"] input,
@@ -2349,7 +2349,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 }
 .stApp [data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div,
 .stApp [data-testid="stSelectbox"] [aria-haspopup="listbox"]:focus-visible{
- border-color:#41B8A2!important;box-shadow:0 0 0 3px rgba(27,154,132,.15)!important;
+ border-color:#005C43!important;box-shadow:0 0 0 3px rgba(27,154,132,.15)!important;
 }
 .stApp [data-testid="stSelectbox"] [data-baseweb="select"] *,
 .stApp [data-testid="stSelectbox"] div[role="combobox"] *,
@@ -2392,7 +2392,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
 }
 .stApp [data-testid="stSelectbox"] div[data-baseweb="select"]:focus-within > div:first-child,
 .stApp [data-testid="stSelectbox"] div[data-baseweb="select"] [role="combobox"]:focus-within{
- border-color:#51aa99!important;
+ border-color:#005C43!important;
  box-shadow:0 0 0 3px #bfe8df85!important;
 }
 .stApp [data-testid="stSelectbox"] div[data-baseweb="select"] span,
@@ -2426,7 +2426,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
   color:#203840!important;-webkit-text-fill-color:#203840!important;
 }
 .stApp [data-testid="stTabs"] [data-testid="stButton"] button[kind="primary"]{
-  background:#137F75!important;border:1px solid #137F75!important;color:#FFFFFF!important;
+  background:#005C43!important;border:1px solid #005C43!important;color:#FFFFFF!important;
 }
 .stApp [data-testid="stTabs"] [data-testid="stButton"] button[kind="primary"] *{
   color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;
@@ -2504,13 +2504,13 @@ html,body,[data-testid="stAppViewContainer"],.stApp,[data-testid="stMain"],[data
   min-height:33px!important; padding:5px 11px!important;
   border:1px solid #dcebe9!important; border-radius:9px!important;
   background:#f4faf9!important;
-  color:#42777d!important; -webkit-text-fill-color:#42777d!important;
+  color:#005C43!important; -webkit-text-fill-color:#005C43!important;
   font-size:13px!important; font-weight:650!important;
   box-shadow:none!important;
 }
 .stApp [class*="st-key-pp116_share_actions"] [data-testid="stPopover"] button *,
 .stApp [class*="st-key-pp116_history_edit_"] [data-testid="stPopover"] button * {
-  color:#42777d!important; -webkit-text-fill-color:#42777d!important;
+  color:#005C43!important; -webkit-text-fill-color:#005C43!important;
 }
 .stApp [class*="st-key-pp116_share_actions"] [data-testid="stPopover"] button:hover,
 .stApp [class*="st-key-pp116_history_edit_"] [data-testid="stPopover"] button:hover {
@@ -2781,16 +2781,16 @@ if not st.session_state.get('tid'):
     [data-testid="stMainBlockContainer"]{max-width:780px!important;padding-top:clamp(20px,4vw,45px)!important;padding-bottom:26px!important}
     .pp154-hero{isolation:isolate;position:relative;overflow:hidden;padding:clamp(24px,5.5vw,37px);border:1px solid #d3e8e3;border-radius:27px;background:linear-gradient(127deg,#fff 9%,#f3fcf9 61%,#e6f7f1 100%);box-shadow:0 7px 28px rgba(17,89,78,.045);margin:0 0 21px}
     .pp154-hero:before{content:"";position:absolute;z-index:-1;width:300px;height:300px;right:-135px;top:-157px;background:radial-gradient(circle,rgba(24,147,124,.11),transparent 70%);pointer-events:none}
-    .pp154-eyebrow{display:flex;align-items:center;gap:8px;color:#138276;font-size:11px;font-weight:850;letter-spacing:.17em;line-height:1.4}
-    .pp154-dot{display:inline-block;width:8px;height:8px;border-radius:100%;background:#16a08d;box-shadow:0 0 0 4px #daf3ea}
+    .pp154-eyebrow{display:flex;align-items:center;gap:8px;color:#005C43;font-size:11px;font-weight:850;letter-spacing:.17em;line-height:1.4}
+    .pp154-dot{display:inline-block;width:8px;height:8px;border-radius:100%;background:#005C43;box-shadow:0 0 0 4px #daf3ea}
     .pp154-hero-main{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:16px 0 13px}
     .pp154-copy{flex:1;min-width:0}
     .pp154-title{color:#20353d!important;font-size:clamp(32px,6.3vw,48px)!important;line-height:1.05!important;letter-spacing:-.055em!important;font-weight:830!important;margin:0!important}
-    .pp154-title span{color:#137f73}
+    .pp154-title span{color:#005C43}
     .pp154-logo{display:block;width:clamp(112px,32%,181px);max-width:181px;height:auto;object-fit:contain;mix-blend-mode:multiply;flex:0 0 auto;filter:contrast(1.035)}
     .pp154-subtitle{font-size:clamp(14px,2.8vw,17px);line-height:1.48;color:#607880;margin:14px 0 0}
     .pp154-pills{display:flex;gap:7px;flex-wrap:wrap;margin:20px 0 0}
-    .pp154-pills span{font-size:11px;line-height:1;border:1px solid #d6ebe5;background:rgba(255,255,255,.76);border-radius:30px;padding:9px 11px;color:#456b67;font-weight:650}
+    .pp154-pills span{font-size:11px;line-height:1;border:1px solid #d6ebe5;background:rgba(255,255,255,.76);border-radius:30px;padding:9px 11px;color:#005C43;font-weight:650}
     .pp154-section{font-size:11px;font-weight:800;letter-spacing:.13em;color:#77918e;margin:10px 2px 11px;text-transform:uppercase}
     .pp154-note{display:flex;align-items:center;justify-content:center;gap:7px;color:#829795;font-size:12px;line-height:1.45;margin:19px 0 5px;text-align:center}
     .pp154-note svg{flex:0 0 auto}
@@ -2798,14 +2798,14 @@ if not st.session_state.get('tid'):
     .stApp [class*="st-key-su_home_open"] button,
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{width:100%!important;min-height:62px!important;border-radius:17px!important;font-size:16px!important;font-weight:750!important;letter-spacing:-.013em!important;box-shadow:none!important;transition:transform .16s ease,background .16s ease,box-shadow .16s ease!important}
-    .stApp [class*="st-key-su_home_open"] button{background:#13877a!important;border:1px solid #13877a!important;color:#fff!important;box-shadow:0 5px 13px rgba(19,135,122,.15)!important}
+    .stApp [class*="st-key-su_home_open"] button{background:#005C43!important;border:1px solid #005C43!important;color:#fff!important;box-shadow:0 5px 13px rgba(19,135,122,.15)!important}
     .stApp [class*="st-key-su_home_open"] button *{color:#fff!important;-webkit-text-fill-color:#fff!important}
-    .stApp [class*="st-key-pp11_new_btn"] button{background:#eaf7f3!important;border:1px solid #a7d8cd!important;color:#106b62!important}
-    .stApp [class*="st-key-pp11_new_btn"] button *{color:#106b62!important;-webkit-text-fill-color:#106b62!important}
-    .stApp [class*="st-key-pp11_open_btn"] button{background:#fff!important;border:1px solid #d3e4e2!important;color:#385b5b!important}
-    .stApp [class*="st-key-pp11_open_btn"] button *{color:#385b5b!important;-webkit-text-fill-color:#385b5b!important}
-    .stApp [class*="st-key-su_home_open"] button:hover{background:#087469!important;box-shadow:0 6px 18px rgba(19,135,122,.19)!important}
-    .stApp [class*="st-key-pp11_new_btn"] button:hover{background:#dff3ed!important;border-color:#79c1b1!important}
+    .stApp [class*="st-key-pp11_new_btn"] button{background:#eaf7f3!important;border:1px solid #a7d8cd!important;color:#005C43!important}
+    .stApp [class*="st-key-pp11_new_btn"] button *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
+    .stApp [class*="st-key-pp11_open_btn"] button{background:#fff!important;border:1px solid #d3e4e2!important;color:#005C43!important}
+    .stApp [class*="st-key-pp11_open_btn"] button *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
+    .stApp [class*="st-key-su_home_open"] button:hover{background:#005C43!important;box-shadow:0 6px 18px rgba(19,135,122,.19)!important}
+    .stApp [class*="st-key-pp11_new_btn"] button:hover{background:#dff3ed!important;border-color:#005C43!important}
     .stApp [class*="st-key-pp11_open_btn"] button:hover{background:#f4faf8!important;border-color:#b2d8d0!important}
     .stApp [class*="st-key-su_home_open"] button:active,
     .stApp [class*="st-key-pp11_new_btn"] button:active,
@@ -2839,25 +2839,25 @@ if not st.session_state.get('tid'):
     .pp156-features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:0 auto 28px;max-width:610px}
     .pp156-features>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-height:103px;border-radius:19px;background:#fff;box-shadow:0 8px 25px rgba(25,62,53,.085);border:1px solid #edf3f0;color:#192e33;padding:12px 5px}
     .pp156-features strong{font-size:clamp(11px,3.2vw,15px);font-weight:780;white-space:nowrap}
-    .pp156-feature-icon{display:flex;align-items:center;justify-content:center;font-size:35px;line-height:1;color:#006d55;height:40px}
-    .pp154-section{color:#23393d!important;letter-spacing:.16em!important;font-size:12px!important;font-weight:850!important;margin:16px 3px 13px!important}
+    .pp156-feature-icon{display:flex;align-items:center;justify-content:center;font-size:35px;line-height:1;color:#005C43;height:40px}
+    .pp154-section{color:#005C43!important;letter-spacing:.16em!important;font-size:12px!important;font-weight:850!important;margin:16px 3px 13px!important}
     .stApp [class*="st-key-su_home_open"] button,
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{position:relative!important;text-align:left!important;justify-content:flex-start!important;padding-left:57px!important;padding-right:36px!important;min-height:66px!important;border-radius:17px!important;font-weight:750!important;font-size:clamp(14px,3.7vw,17px)!important;box-shadow:0 3px 10px rgba(14,80,67,.035)!important}
-    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(115deg,#00785c,#006c52)!important;color:white!important;box-shadow:0 7px 16px rgba(0,110,84,.17)!important}
+    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(115deg,#005C43,#005C43)!important;color:white!important;box-shadow:0 7px 16px rgba(0,110,84,.17)!important}
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{background:linear-gradient(100deg,#fff 8%,#e8f7f1 100%)!important;border:1px solid #cfe9df!important;color:#142d31!important}
     .stApp [class*="st-key-pp11_new_btn"] button *,
     .stApp [class*="st-key-pp11_open_btn"] button *{color:#142d31!important;-webkit-text-fill-color:#142d31!important}
     .stApp [class*="st-key-su_home_open"] button::before,
     .stApp [class*="st-key-pp11_new_btn"] button::before,
-    .stApp [class*="st-key-pp11_open_btn"] button::before{position:absolute;left:19px;top:50%;transform:translateY(-50%);font-size:29px;font-weight:450;color:#006b53;line-height:1}
+    .stApp [class*="st-key-pp11_open_btn"] button::before{position:absolute;left:19px;top:50%;transform:translateY(-50%);font-size:29px;font-weight:450;color:#005C43;line-height:1}
     .stApp [class*="st-key-su_home_open"] button::before{content:"▣";color:#fff}
     .stApp [class*="st-key-pp11_new_btn"] button::before{content:"+";font-size:34px}
     .stApp [class*="st-key-pp11_open_btn"] button::before{content:"◇";font-size:31px}
     .stApp [class*="st-key-su_home_open"] button::after,
     .stApp [class*="st-key-pp11_new_btn"] button::after,
-    .stApp [class*="st-key-pp11_open_btn"] button::after{content:"›";position:absolute;right:19px;top:50%;transform:translateY(-53%);font-size:34px;font-weight:400;color:#006c53}
+    .stApp [class*="st-key-pp11_open_btn"] button::after{content:"›";position:absolute;right:19px;top:50%;transform:translateY(-53%);font-size:34px;font-weight:400;color:#005C43}
     .stApp [class*="st-key-su_home_open"] button::after{color:white}
     .pp154-note{font-size:12px!important;margin-top:24px!important;color:#73878a!important}
     @media(max-width:520px){
@@ -2885,13 +2885,13 @@ if not st.session_state.get('tid'):
     .pp156-hero p{font-size:clamp(14px,3.4vw,17px)!important;margin:0 auto 17px!important;line-height:1.45!important}
     .pp156-features{gap:9px!important;margin:0 auto 7px!important}
     .pp156-features>div{min-height:83px!important;gap:7px!important;padding:10px 4px!important;border-radius:16px!important}
-    .pp156-feature-icon{height:32px!important;color:#006b53!important}
+    .pp156-feature-icon{height:32px!important;color:#005C43!important}
     .pp156-feature-icon svg{width:30px;height:30px;display:block}
     .pp154-section{margin:12px 3px 8px!important;font-size:11px!important}
     .stApp [class*="st-key-su_home_open"] button,
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{min-height:59px!important;padding:9px 39px 9px 53px!important;font-size:clamp(13px,3.45vw,16px)!important;line-height:1.3!important;justify-content:flex-start!important;text-align:left!important}
-    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(110deg,#006d54,#005f49)!important;color:#fff!important;border:1px solid #00664f!important}
+    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(110deg,#005C43,#005C43)!important;color:#fff!important;border:1px solid #005C43!important}
     .stApp [class*="st-key-su_home_open"] button *,
     .stApp [class*="st-key-su_home_open"] button p{color:#fff!important;-webkit-text-fill-color:#fff!important}
     .stApp [class*="st-key-pp11_new_btn"] button,
@@ -2900,7 +2900,7 @@ if not st.session_state.get('tid'):
     .stApp [class*="st-key-pp11_new_btn"] button::before,
     .stApp [class*="st-key-pp11_open_btn"] button::before{content:""!important;display:block!important;width:23px!important;height:23px!important;left:17px!important;background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important}
     .stApp [class*="st-key-su_home_open"] button::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22none%22%20stroke%3D%22%23006b53%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%225%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M7%203v4M17%203v4M3%2010h18%22%2F%3E%3C%2Fsvg%3E")!important;filter:brightness(0) invert(1)!important}
-    .stApp [class*="st-key-pp11_new_btn"] button::before{background-image:none!important;content:"+"!important;font-size:29px!important;line-height:22px!important;text-align:center!important;color:#006b53!important}
+    .stApp [class*="st-key-pp11_new_btn"] button::before{background-image:none!important;content:"+"!important;font-size:29px!important;line-height:22px!important;text-align:center!important;color:#005C43!important}
     .stApp [class*="st-key-pp11_open_btn"] button::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22none%22%20stroke%3D%22%23006b53%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20aria-hidden%3D%22true%22%3E%3Cpath%20d%3D%22m12%203%209%205-9%205-9-5%209-5ZM3%2012l9%205%209-5M3%2016l9%205%209-5%22%2F%3E%3C%2Fsvg%3E")!important}
     .stApp [class*="st-key-su_home_open"] button::after,
     .stApp [class*="st-key-pp11_new_btn"] button::after,
@@ -2925,17 +2925,17 @@ if not st.session_state.get('tid'):
     .stApp [class*="st-key-su_home_open"] button,
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{min-height:60px!important;border-radius:15px!important;padding-left:54px!important;padding-right:45px!important;box-shadow:0 3px 12px rgba(12,78,63,.045)!important;transition:transform .15s ease,box-shadow .15s ease!important}
-    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(105deg,#00765b,#00674f)!important;color:#fff!important;border:1px solid #00694f!important;box-shadow:0 7px 16px rgba(0,105,79,.16)!important}
+    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(105deg,#005C43,#005C43)!important;color:#fff!important;border:1px solid #005C43!important;box-shadow:0 7px 16px rgba(0,105,79,.16)!important}
     .stApp [class*="st-key-su_home_open"] button p,
     .stApp [class*="st-key-su_home_open"] button span{color:#fff!important;-webkit-text-fill-color:#fff!important}
     .stApp [class*="st-key-pp11_new_btn"] button,
-    .stApp [class*="st-key-pp11_open_btn"] button{background:linear-gradient(110deg,#ffffff,#eaf7f2)!important;color:#17383a!important;border:1px solid #b9dfd3!important}
+    .stApp [class*="st-key-pp11_open_btn"] button{background:linear-gradient(110deg,#ffffff,#eaf7f2)!important;color:#005C43!important;border:1px solid #b9dfd3!important}
     .stApp [class*="st-key-su_home_open"] button::before{filter:brightness(0) invert(1)!important}
     .stApp [class*="st-key-su_home_open"] button::after{color:#fff!important;-webkit-text-fill-color:#fff!important}
     .stApp [class*="st-key-pp11_new_btn"] button::before,
     .stApp [class*="st-key-pp11_open_btn"] button::after,
     .stApp [class*="st-key-pp11_open_btn"] button::before,
-    .stApp [class*="st-key-pp11_new_btn"] button::after{color:#006b53!important;-webkit-text-fill-color:#006b53!important}
+    .stApp [class*="st-key-pp11_new_btn"] button::after{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
     .stApp [class*="st-key-su_home_open"] button::before,
     .stApp [class*="st-key-pp11_new_btn"] button::before,
     .stApp [class*="st-key-pp11_open_btn"] button::before{left:18px!important}
@@ -2963,8 +2963,8 @@ if not st.session_state.get('tid'):
     .stApp div.st-key-su_home_open button,
     .stApp [class~="st-key-su_home_open"] button,
     .stApp [class*="st-key-su_home_open"] button{
-      background:#006e53!important;background-image:linear-gradient(105deg,#007a5c,#00634b)!important;
-      border:1px solid #006e53!important;color:#ffffff!important;
+      background:#005C43!important;background-image:linear-gradient(105deg,#005C43,#005C43)!important;
+      border:1px solid #005C43!important;color:#ffffff!important;
       -webkit-text-fill-color:#ffffff!important;
       box-shadow:0 7px 17px rgba(0,105,79,.16)!important;
     }
@@ -2975,17 +2975,17 @@ if not st.session_state.get('tid'):
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{
       background:#eef9f5!important;background-image:linear-gradient(105deg,#f6fcf9,#e9f7f1)!important;
-      border:1px solid #a9d8ca!important;color:#17383a!important;
-      -webkit-text-fill-color:#17383a!important;box-shadow:none!important;
+      border:1px solid #a9d8ca!important;color:#005C43!important;
+      -webkit-text-fill-color:#005C43!important;box-shadow:none!important;
     }
     .stApp [class*="st-key-pp11_new_btn"] button *,
-    .stApp [class*="st-key-pp11_open_btn"] button *{color:#17383a!important;-webkit-text-fill-color:#17383a!important}
+    .stApp [class*="st-key-pp11_open_btn"] button *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
     .stApp [class*="st-key-su_home_open"] button::before{filter:brightness(0) invert(1)!important}
     .stApp [class*="st-key-su_home_open"] button::after{color:#fff!important;-webkit-text-fill-color:#fff!important}
     .stApp [class*="st-key-pp11_new_btn"] button::before,
     .stApp [class*="st-key-pp11_new_btn"] button::after,
     .stApp [class*="st-key-pp11_open_btn"] button::before,
-    .stApp [class*="st-key-pp11_open_btn"] button::after{color:#006b53!important;-webkit-text-fill-color:#006b53!important}
+    .stApp [class*="st-key-pp11_open_btn"] button::after{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
     @media(max-width:520px){
       .pp156-features{margin-bottom:13px!important}
       .pp154-section{margin-top:15px!important;margin-bottom:10px!important}
@@ -3014,30 +3014,30 @@ if not st.session_state.get('tid'):
       text-align:center!important;letter-spacing:-.015em!important;
     }
     .stApp [class*="st-key-su_home_open"] button{
-      background:#005c43!important;background-image:none!important;
-      border:1px solid #006747!important;color:white!important;
+      background:#005C43!important;background-image:none!important;
+      border:1px solid #005C43!important;color:white!important;
       box-shadow:0 6px 15px rgba(0,70,48,.12)!important;
     }
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{
       background:#eef9f5!important;background-image:linear-gradient(105deg,#f5fcf9,#e8f7f1)!important;
-      border:1px solid #a9d8ca!important;color:#103c30!important;
+      border:1px solid #a9d8ca!important;color:#005C43!important;
       box-shadow:0 3px 12px rgba(12,78,63,.04)!important;
     }
     .stApp [class*="st-key-pp11_new_btn"] button *,
-    .stApp [class*="st-key-pp11_open_btn"] button *{color:#103c30!important;-webkit-text-fill-color:#103c30!important}
+    .stApp [class*="st-key-pp11_open_btn"] button *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
     .stApp [class*="st-key-su_home_open"] button *,
     .stApp [class*="st-key-su_home_open"] button p{color:white!important;-webkit-text-fill-color:white!important}
     .stApp [class*="st-key-su_home_open"] button::before,
     .stApp [class*="st-key-pp11_new_btn"] button::before,
     .stApp [class*="st-key-pp11_open_btn"] button::before{
       left:18px!important;width:25px!important;height:25px!important;
-      background-size:contain!important;color:#006747!important;
+      background-size:contain!important;color:#005C43!important;
     }
     .stApp [class*="st-key-su_home_open"] button::after,
     .stApp [class*="st-key-pp11_new_btn"] button::after,
     .stApp [class*="st-key-pp11_open_btn"] button::after{
-      right:18px!important;font-size:31px!important;font-weight:650!important;color:#006747!important;
+      right:18px!important;font-size:31px!important;font-weight:650!important;color:#005C43!important;
     }
     .stApp [class*="st-key-su_home_open"] button::after{color:white!important}
     .stApp [class*="st-key-su_home_open"] button::before{filter:brightness(0) invert(1)!important}
@@ -3094,6 +3094,43 @@ if not st.session_state.get('tid'):
     .pp156-logo{width:min(76%,350px)!important;max-width:350px!important;margin:0 auto 18px!important;filter:drop-shadow(0 2px 1px rgba(0,60,40,.04))!important}
     .pp156-hero p{font-size:clamp(18px,3.7vw,23px)!important;font-weight:600!important;line-height:1.45!important;margin:0 auto 23px!important}
     @media(max-width:520px){.pp156-logo{width:min(77%,300px)!important;margin-bottom:16px!important}.pp156-hero p{font-size:clamp(16px,4.35vw,19px)!important;margin-bottom:19px!important}}
+
+/* PP16.8: ÉN brandgrøn farve på alle grønne accenter.
+   Lyse mintflader bevares som baggrunde; kun grønne linjer/tekst/ikoner/knapper
+   bruger den samme mørkegrønne tone. */
+:root { --pp-brand-green: #005C43; }
+.stApp [class*="st-key-pp11_new_btn"] button,
+.stApp [class*="st-key-pp11_open_btn"] button {
+  border:1.5px solid var(--pp-brand-green)!important;
+  color:var(--pp-brand-green)!important;
+}
+.stApp [class*="st-key-pp11_new_btn"] button *,
+.stApp [class*="st-key-pp11_open_btn"] button * {
+  color:var(--pp-brand-green)!important;
+  -webkit-text-fill-color:var(--pp-brand-green)!important;
+}
+.stApp [class*="st-key-pp11_new_btn"] button::before,
+.stApp [class*="st-key-pp11_open_btn"] button::before { color:var(--pp-brand-green)!important; }
+.stApp [class*="st-key-pp11_new_btn"] button::after,
+.stApp [class*="st-key-pp11_open_btn"] button::after { color:var(--pp-brand-green)!important; }
+.stApp [class*="st-key-su_home_open"] button,
+.stApp [class*="st-key-pp164_open_submit"] button,
+.stApp [class*="st-key-pp166_create_submit"] button {
+  background:var(--pp-brand-green)!important;
+  background-image:none!important;
+  border-color:var(--pp-brand-green)!important;
+}
+.stApp [class*="st-key-pp11_open_back"] button,
+.stApp [class*="st-key-pp11_new_back"] button {
+  border-color:var(--pp-brand-green)!important;
+  color:var(--pp-brand-green)!important;
+}
+.stApp [class*="st-key-pp11_open_back"] button *,
+.stApp [class*="st-key-pp11_new_back"] button * {
+  color:var(--pp-brand-green)!important;
+  -webkit-text-fill-color:var(--pp-brand-green)!important;
+}
+
     </style>
     <div class="pp156-hero">
       <div class="pp156-wave"></div>
@@ -3122,8 +3159,8 @@ if not st.session_state.get('tid'):
         st.markdown("""<style>
         .stApp [class*="st-key-pp164_open_submit"] button,
         .stApp [class*="st-key-pp164_open_submit"] button[kind="primaryFormSubmit"]{
-            background:#005c43!important;background-image:none!important;
-            border:1px solid #005c43!important;
+            background:#005C43!important;background-image:none!important;
+            border:1px solid #005C43!important;
             border-radius:16px!important;
             height:62px!important;min-height:62px!important;
             box-sizing:border-box!important;
@@ -3147,18 +3184,18 @@ if not st.session_state.get('tid'):
           }
         }
         .stApp [class*="st-key-pp164_open_submit"] button:hover{
-            background:#004b38!important;background-image:none!important;border-color:#004b38!important;
+            background:#005C43!important;background-image:none!important;border-color:#005C43!important;
         }
         .stApp [class*="st-key-pp164_open_submit"] button:focus-visible{
             outline:3px solid rgba(0,103,71,.28)!important;outline-offset:3px!important;
         }
         .stApp [class*="st-key-pp11_open_back"] button{
-            background:#eef9f5!important;color:#006b53!important;
+            background:#eef9f5!important;color:#005C43!important;
             border:1px solid #9dd4c6!important;border-radius:14px!important;
             min-height:48px!important;font-weight:650!important;
         }
         .stApp [class*="st-key-pp11_open_back"] button *{
-            color:#006b53!important;-webkit-text-fill-color:#006b53!important;
+            color:#005C43!important;-webkit-text-fill-color:#005C43!important;
         }
         </style>""", unsafe_allow_html=True)
         st.subheader('Åbn eksisterende turnering')
@@ -3184,16 +3221,16 @@ if not st.session_state.get('tid'):
         # PP 16.6: Formularen følger forsiden – isoleret til oprettelsesvisningen.
         st.markdown("""<style>
         /* Oprettelse: grønne valg og gennemgående lette felter. */
-        .stApp [data-testid="stRadio"] input[type="radio"]{accent-color:#006747!important}
+        .stApp [data-testid="stRadio"] input[type="radio"]{accent-color:#005C43!important}
         .stApp [data-testid="stRadio"] [data-baseweb="radio"] > div:first-child,
         .stApp [data-testid="stRadio"] [role="radio"][aria-checked="true"]{
-            border-color:#006747!important;color:#006747!important;
+            border-color:#005C43!important;color:#005C43!important;
         }
         .stApp [data-testid="stRadio"] [data-baseweb="radio"] input:checked + div,
         .stApp [data-testid="stRadio"] [data-baseweb="radio"] input:checked ~ div{
-            border-color:#006747!important;background-color:#006747!important;
+            border-color:#005C43!important;background-color:#005C43!important;
         }
-        .stApp [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"]{color:#006747!important;font-weight:700!important}
+        .stApp [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"]{color:#005C43!important;font-weight:700!important}
         .stApp [data-testid="stForm"]{
             background:#fff!important;border:1px solid #d7e9e3!important;
             border-radius:20px!important;padding:22px 20px 24px!important;
@@ -3212,15 +3249,15 @@ if not st.session_state.get('tid'):
             background:#fff!important;color:#20343a!important;font-weight:750!important;
         }
         .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button{
-            background:#eaf7f2!important;color:#006747!important;
+            background:#eaf7f2!important;color:#005C43!important;
             border-color:#c9dfd8!important;
         }
         .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button svg{
-            fill:#006747!important;stroke:#006747!important;color:#006747!important;
+            fill:#005C43!important;stroke:#005C43!important;color:#005C43!important;
         }
         .stApp [class*="st-key-pp166_create_submit"] button{
-            background:#005c43!important;background-image:none!important;
-            color:white!important;border:1px solid #005c43!important;
+            background:#005C43!important;background-image:none!important;
+            color:white!important;border:1px solid #005C43!important;
             border-radius:16px!important;height:62px!important;min-height:62px!important;
             font-weight:800!important;font-size:17px!important;
             box-shadow:0 6px 15px rgba(0,70,48,.12)!important;
@@ -3228,15 +3265,15 @@ if not st.session_state.get('tid'):
         .stApp [class*="st-key-pp166_create_submit"] button *{
             color:white!important;-webkit-text-fill-color:white!important;font-weight:800!important;
         }
-        .stApp [class*="st-key-pp166_create_submit"] button:hover{background:#004b38!important;background-image:none!important}
+        .stApp [class*="st-key-pp166_create_submit"] button:hover{background:#005C43!important;background-image:none!important}
         .stApp [class*="st-key-pp11_new_back"] button{
-            background:#eef9f5!important;color:#006b53!important;
+            background:#eef9f5!important;color:#005C43!important;
             border:1px solid #9dd4c6!important;border-radius:14px!important;
             min-height:48px!important;font-weight:650!important;
         }
-        .stApp [class*="st-key-pp11_new_back"] button *{color:#006b53!important;-webkit-text-fill-color:#006b53!important}
+        .stApp [class*="st-key-pp11_new_back"] button *{color:#005C43!important;-webkit-text-fill-color:#005C43!important}
         .pp166-section{font-size:13px;font-weight:850;letter-spacing:.12em;
-            text-transform:uppercase;color:#006747;margin:22px 0 7px;
+            text-transform:uppercase;color:#005C43;margin:22px 0 7px;
             padding-bottom:9px;border-bottom:1px solid #e0eee9}
         .pp166-section:first-child{margin-top:0}
         @media(max-width:520px){
@@ -3246,13 +3283,13 @@ if not st.session_state.get('tid'):
         /* PP16.7 – ensartet mørkegrøn og samme knapmål som Åbn turnering. */
         .stApp [class*="st-key-pp166_create_submit"] button,
         .stApp [class*="st-key-pp166_create_submit"] button[kind="primaryFormSubmit"]{
-            background:#005c43!important;background-image:none!important;
-            border:1px solid #005c43!important;border-radius:16px!important;
+            background:#005C43!important;background-image:none!important;
+            border:1px solid #005C43!important;border-radius:16px!important;
             height:62px!important;min-height:62px!important;width:100%!important;
             color:#fff!important;font-size:17px!important;font-weight:800!important;
             padding:10px 24px!important;box-shadow:0 6px 15px rgba(0,70,48,.12)!important;
         }
-        .stApp [class*="st-key-pp166_create_submit"] button:hover{background:#004b38!important;border-color:#004b38!important}
+        .stApp [class*="st-key-pp166_create_submit"] button:hover{background:#005C43!important;border-color:#005C43!important}
         /* Ens kantfarve på tekstfelter, tekstområder og talvælgere. */
         .stApp [data-testid="stForm"] [data-baseweb="input"],
         .stApp [data-testid="stForm"] [data-baseweb="textarea"],
@@ -3263,26 +3300,26 @@ if not st.session_state.get('tid'):
         }
         .stApp [data-testid="stForm"] [data-baseweb="input"]:focus-within,
         .stApp [data-testid="stForm"] [data-baseweb="textarea"]:focus-within{
-            border-color:#005c43!important;box-shadow:0 0 0 2px rgba(0,92,67,.10)!important;
+            border-color:#005C43!important;box-shadow:0 0 0 2px rgba(0,92,67,.10)!important;
         }
         .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button{
             background:#e9f6f1!important;border-color:#b9d9cd!important;
-            color:#005c43!important;
+            color:#005C43!important;
         }
         .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button svg,
         .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button svg path{
-            stroke:#005c43!important;fill:#005c43!important;color:#005c43!important;
+            stroke:#005C43!important;fill:#005C43!important;color:#005C43!important;
         }
         /* Radio: både Streamlits indbyggede og BaseWebs markering. */
-        .stApp [data-testid="stRadio"] input[type="radio"]{accent-color:#005c43!important}
+        .stApp [data-testid="stRadio"] input[type="radio"]{accent-color:#005C43!important}
         .stApp [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"]{
-            color:#005c43!important;font-weight:700!important;
+            color:#005C43!important;font-weight:700!important;
         }
         .stApp [data-testid="stRadio"] [aria-checked="true"] > div,
         .stApp [data-testid="stRadio"] [data-baseweb="radio"]:has(input:checked) > div{
-            border-color:#005c43!important;
+            border-color:#005C43!important;
         }
-        .pp166-section{color:#005c43!important;border-bottom-color:#dcece5!important}
+        .pp166-section{color:#005C43!important;border-bottom-color:#dcece5!important}
         @media(max-width:520px){
             .stApp [class*="st-key-pp166_create_submit"] button{height:62px!important;min-height:62px!important}
         }
@@ -6331,7 +6368,7 @@ def pp125_standing_png(data, standings_rows):
     # Clean compact header, not a big poster block
     title = data.get('title') or 'Turnering'
     subtitle = 'SLUTSTILLING' if finals_complete(data) else 'STILLING'
-    dr.text((margin, 24), subtitle, font=font(30, True), fill='#138777')
+    dr.text((margin, 24), subtitle, font=font(30, True), fill='#005C43')
     title_txt, title_font = fit(title, 700, 58, 34, True)
     dr.text((margin, 58), title_txt, font=title_font, fill='#1B3136')
     meta = f"{data.get('format', 'Padel')} · {len(standings_rows)} spillere"
@@ -6348,9 +6385,9 @@ def pp125_standing_png(data, standings_rows):
     cols = [margin + 16, margin + 82, 665, 740, 815, 900, 1000]
     for x, txt in zip(cols, ['#', 'Spiller', 'V', 'U', 'T', '+/-', 'Point']):
         if x >= 660:
-            center(x, top - 36, txt, font(22, True), '#536B6F')
+            center(x, top - 36, txt, font(22, True), '#005C43')
         else:
-            dr.text((x, top - 36), txt, font=font(22, True), fill='#536B6F')
+            dr.text((x, top - 36), txt, font=font(22, True), fill='#005C43')
 
     for idx, row in enumerate(standings_rows):
         y = top + idx * row_h
@@ -6363,14 +6400,14 @@ def pp125_standing_png(data, standings_rows):
             dr.ellipse((margin + 14, y + 34, margin + 72, y + 92), fill=medal_color)
             center(margin + 43, y + 45, str(idx + 1), font(28, True), '#FFFFFF')
         else:
-            dr.text((cols[0], y + 42), str(idx + 1) + '.', font=font(32, True), fill='#23393C')
+            dr.text((cols[0], y + 42), str(idx + 1) + '.', font=font(32, True), fill='#005C43')
 
         name, name_f = fit(row['name'], 430, 33, 22, True)
-        dr.text((cols[1], y + 40), name, font=name_f, fill='#20383B')
+        dr.text((cols[1], y + 40), name, font=name_f, fill='#005C43')
         diff = int(row['diff'])
         values = [row['wins'], row['draws'], row['losses'], f'{diff:+d}', row['points']]
         for x, v in zip(cols[2:], values):
-            center(x, y + 42, str(v), font(31, x == cols[-1]), '#18363A')
+            center(x, y + 42, str(v), font(31, x == cols[-1]), '#005C43')
 
     end = top + len(standings_rows) * row_h
     dr.text((margin + 2, end + 18), 'V = Vundne · U = Uafgjorte · T = Tabte · +/- = Pointforskel', font=font(22), fill='#64787B')
@@ -6419,9 +6456,9 @@ with tab_table:
             share_html = r"""<!doctype html><html lang="da"><head><meta name="viewport" content="width=device-width,initial-scale=1" />
             <style>
             html,body{margin:0;padding:0;background:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-            button{display:block;width:100%;min-height:52px;border:0;border-radius:15px;background:#148479;color:white;font-size:17px;font-weight:650;cursor:pointer}
+            button{display:block;width:100%;min-height:52px;border:0;border-radius:15px;background:#005C43;color:white;font-size:17px;font-weight:650;cursor:pointer}
             button:disabled{opacity:.55}
-            #msg{font-size:13px;color:#526e70;min-height:18px;margin:5px 3px}
+            #msg{font-size:13px;color:#005C43;min-height:18px;margin:5px 3px}
             </style></head><body>
             <button id="share" type="button" disabled>↗ Klargør stilling …</button><div id="msg" role="status"></div>
             <script>
@@ -6443,7 +6480,7 @@ with tab_table:
             function ellipse(x,y,r,color){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
             function draw(logoImg){
               ctx.fillStyle='#F7FAF9';ctx.fillRect(0,0,W,H);
-              text(title,40,53,43,true,'#233B3E');text(subtitle,40,105,26,false,'#688084');
+              text(title,40,53,43,true,'#005C43');text(subtitle,40,105,26,false,'#005C43');
               if(logoImg)ctx.drawImage(logoImg,878,12,160,135);
               const xs=[58,145,670,743,816,914,1010];
               ['#','Spiller','V','U','T','+/-','Point'].forEach((v,i)=>text(v,xs[i],171,26,true,'#26383D',i>1?'center':'left'));
