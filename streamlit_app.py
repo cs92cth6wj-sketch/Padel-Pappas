@@ -2874,6 +2874,47 @@ if not st.session_state.get('tid'):
       .stApp [class*="st-key-pp11_new_btn"] button::before,
       .stApp [class*="st-key-pp11_open_btn"] button::before{left:15px}
     }
+
+    /* PP 15.7: Stram mobilforside og ensartede, rigtige SVG-ikoner. */
+    .pp156-hero{margin:0 -3px 5px!important;padding:3px 6px 0!important}
+    .pp156-wave{top:55px!important;height:120px!important;opacity:.7}
+    .pp156-logo{width:min(44%,185px)!important;margin:0 auto 9px!important}
+    .pp156-hero h1{font-size:clamp(30px,7.5vw,43px)!important;margin:0 0 9px!important;line-height:1.08!important}
+    .pp156-hero p{font-size:clamp(14px,3.4vw,17px)!important;margin:0 auto 17px!important;line-height:1.45!important}
+    .pp156-features{gap:9px!important;margin:0 auto 7px!important}
+    .pp156-features>div{min-height:83px!important;gap:7px!important;padding:10px 4px!important;border-radius:16px!important}
+    .pp156-feature-icon{height:32px!important;color:#006b53!important}
+    .pp156-feature-icon svg{width:30px;height:30px;display:block}
+    .pp154-section{margin:12px 3px 8px!important;font-size:11px!important}
+    .stApp [class*="st-key-su_home_open"] button,
+    .stApp [class*="st-key-pp11_new_btn"] button,
+    .stApp [class*="st-key-pp11_open_btn"] button{min-height:59px!important;padding:9px 39px 9px 53px!important;font-size:clamp(13px,3.45vw,16px)!important;line-height:1.3!important;justify-content:flex-start!important;text-align:left!important}
+    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(110deg,#006d54,#005f49)!important;color:#fff!important;border:1px solid #00664f!important}
+    .stApp [class*="st-key-su_home_open"] button *,
+    .stApp [class*="st-key-su_home_open"] button p{color:#fff!important;-webkit-text-fill-color:#fff!important}
+    .stApp [class*="st-key-pp11_new_btn"] button,
+    .stApp [class*="st-key-pp11_open_btn"] button{background:linear-gradient(105deg,#fff,#e9f7f2)!important;color:#193238!important;border:1px solid #cce7dd!important}
+    .stApp [class*="st-key-su_home_open"] button::before,
+    .stApp [class*="st-key-pp11_new_btn"] button::before,
+    .stApp [class*="st-key-pp11_open_btn"] button::before{content:""!important;display:block!important;width:23px!important;height:23px!important;left:17px!important;background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important}
+    .stApp [class*="st-key-su_home_open"] button::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22none%22%20stroke%3D%22%23006b53%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20aria-hidden%3D%22true%22%3E%3Crect%20x%3D%223%22%20y%3D%225%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M7%203v4M17%203v4M3%2010h18%22%2F%3E%3C%2Fsvg%3E")!important;filter:brightness(0) invert(1)!important}
+    .stApp [class*="st-key-pp11_new_btn"] button::before{background-image:none!important;content:"+"!important;font-size:29px!important;line-height:22px!important;text-align:center!important;color:#006b53!important}
+    .stApp [class*="st-key-pp11_open_btn"] button::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22none%22%20stroke%3D%22%23006b53%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20aria-hidden%3D%22true%22%3E%3Cpath%20d%3D%22m12%203%209%205-9%205-9-5%209-5ZM3%2012l9%205%209-5M3%2016l9%205%209-5%22%2F%3E%3C%2Fsvg%3E")!important}
+    .stApp [class*="st-key-su_home_open"] button::after,
+    .stApp [class*="st-key-pp11_new_btn"] button::after,
+    .stApp [class*="st-key-pp11_open_btn"] button::after{content:"›"!important;font-family:Arial,sans-serif!important;font-size:29px!important;right:16px!important;line-height:1!important}
+    .pp154-note{margin-top:15px!important;font-size:11px!important}
+    @media(max-width:520px){
+      .pp156-logo{width:min(46%,178px)!important}
+      .pp156-features>div{min-height:79px!important}
+      .pp156-feature-icon svg{width:27px;height:27px}
+      .stApp [class*="st-key-su_home_open"] button,
+      .stApp [class*="st-key-pp11_new_btn"] button,
+      .stApp [class*="st-key-pp11_open_btn"] button{min-height:57px!important;padding-left:48px!important}
+      .stApp [class*="st-key-su_home_open"] button::before,
+      .stApp [class*="st-key-pp11_new_btn"] button::before,
+      .stApp [class*="st-key-pp11_open_btn"] button::before{left:13px!important}
+    }
     </style>
     <div class="pp156-hero">
       <div class="pp156-wave"></div>
@@ -2881,9 +2922,9 @@ if not st.session_state.get('tid'):
       <h1>Padel Pappas</h1>
       <p>Spilledage, turneringer og resultater.<br>Alt samlet ét sted.</p>
       <div class="pp156-features">
-        <div><span class="pp156-feature-icon">▣</span><strong>Spilledage</strong></div>
-        <div><span class="pp156-feature-icon">♜</span><strong>Americano</strong></div>
-        <div><span class="pp156-feature-icon">♧</span><strong>Mexicano</strong></div>
+        <div><span class="pp156-feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg></span><strong>Spilledage</strong></div>
+        <div><span class="pp156-feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v8a5 5 0 0 1-10 0V4ZM7 6H4v3a4 4 0 0 0 4 4M17 6h3v3a4 4 0 0 1-4 4M12 17v4M8 21h8"/></svg></span><strong>Americano</strong></div>
+        <div><span class="pp156-feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 20v-2a6 6 0 0 1 12 0v2H6ZM5 7a3 3 0 0 0-1 6M19 7a3 3 0 0 1 1 6M2 20v-2a5 5 0 0 1 3-4M22 20v-2a5 5 0 0 0-3-4"/></svg></span><strong>Mexicano</strong></div>
       </div>
     </div>
     """, unsafe_allow_html=True)
