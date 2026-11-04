@@ -3118,10 +3118,43 @@ if not st.session_state.get('tid'):
         if st.button('Åbn eksisterende turnering',use_container_width=True,key='pp11_open_btn'):
             st.session_state.pp11_landing_mode='open';st.rerun()
     elif st.session_state.pp11_landing_mode == 'open':
+        # Scoped styling: only the open-tournament form, never other actions.
+        st.markdown("""<style>
+        .stApp [class*="st-key-pp164_open_submit"] button,
+        .stApp [class*="st-key-pp164_open_submit"] button[kind="primaryFormSubmit"]{
+            background:linear-gradient(105deg,#006b53 0%,#087b61 100%)!important;
+            border:1px solid #006b53!important;
+            border-radius:15px!important;
+            min-height:62px!important;
+            width:100%!important;
+            color:#ffffff!important;
+            font-weight:750!important;
+            font-size:clamp(16px,4vw,19px)!important;
+            box-shadow:0 5px 14px rgba(0,92,69,.12)!important;
+        }
+        .stApp [class*="st-key-pp164_open_submit"] button *{
+            color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;
+            font-weight:750!important;
+        }
+        .stApp [class*="st-key-pp164_open_submit"] button:hover{
+            background:#005840!important;border-color:#005840!important;
+        }
+        .stApp [class*="st-key-pp164_open_submit"] button:focus-visible{
+            outline:3px solid rgba(0,107,83,.28)!important;outline-offset:3px!important;
+        }
+        .stApp [class*="st-key-pp11_open_back"] button{
+            background:#eef9f5!important;color:#006b53!important;
+            border:1px solid #9dd4c6!important;border-radius:14px!important;
+            min-height:48px!important;font-weight:650!important;
+        }
+        .stApp [class*="st-key-pp11_open_back"] button *{
+            color:#006b53!important;-webkit-text-fill-color:#006b53!important;
+        }
+        </style>""", unsafe_allow_html=True)
         st.subheader('Åbn eksisterende turnering')
         with st.form('pp11_open_form'):
             welcome_open_id = st.text_input('Turnerings-ID', placeholder='F.eks. PADEL1/11', key='pp111_open_id')
-            welcome_open_clicked = st.form_submit_button('Åbn turnering', type='primary', use_container_width=True)
+            welcome_open_clicked = st.form_submit_button('Åbn turnering  ›', type='primary', use_container_width=True, key='pp164_open_submit')
         if welcome_open_clicked:
             welcome_tid = normalize_id(welcome_open_id)
             if not ID_PATTERN.fullmatch(welcome_tid):
