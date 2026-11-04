@@ -687,21 +687,28 @@ def signup_admin_edit(item):
 
 def signup_admin_players(item,registered,waiting):
     day=item['date']
-    st.markdown('#### Deltagere')
+    st.markdown(f'#### Tilmeldte ({len(registered)} af {int(item.get("capacity",16))})')
     if not registered: st.caption('Ingen tilmeldte')
     for r in registered:
         a,b=st.columns([4.2,1],vertical_alignment='center',gap='small')
-        a.markdown('<div class="pp152-player-row">'+html.escape(r['name'])+'</div>',unsafe_allow_html=True)
-        if b.button('Fjern',key='pp15_rem_'+r['id'],use_container_width=True):
-            try: signup_db_delete(r['id']);st.rerun()
-            except requests.RequestException as exc: st.error(str(exc))
+        a.markdown('<div class="pp155-player"><span class="pp155-check">✓</span>'+html.escape(r['name'])+'</div>',unsafe_allow_html=True)
+        if b.button('✕',key='pp15_rem_'+r['id'],help='Fjern '+r['name'],use_container_width=True):
+            st.session_state['pp155_confirm_remove']=r['id']
+        if st.session_state.get('pp155_confirm_remove')==r['id']:
+            st.warning('Fjern '+r['name']+' fra spilledagen?')
+            c1,c2=st.columns(2)
+            if c1.button('Ja, fjern',key='pp155_yes_'+r['id']):
+                try: signup_db_delete(r['id']);st.session_state.pop('pp155_confirm_remove',None);st.rerun()
+                except requests.RequestException as exc: st.error(str(exc))
+            if c2.button('Fortryd',key='pp155_no_'+r['id']):
+                st.session_state.pop('pp155_confirm_remove',None);st.rerun()
     if waiting:
         st.markdown('#### Venteliste')
         for row in waiting:
             if row.get('status') in ('waiting','offered'):
                 a,b=st.columns([4.2,1],vertical_alignment='center',gap='small')
-                a.markdown('<div class="pp152-player-row">'+html.escape(row.get('name',''))+' <span class="pp152-player-status">'+('Plads tilbudt' if row.get('status')=='offered' else 'Venter')+'</span></div>',unsafe_allow_html=True)
-                if b.button('Fjern',key='pp15_delwait_'+row['id'],use_container_width=True):
+                a.markdown('<div class="pp155-player">'+html.escape(row.get('name',''))+' <span class="pp152-player-status">'+('Plads tilbudt' if row.get('status')=='offered' else 'Venter')+'</span></div>',unsafe_allow_html=True)
+                if b.button('✕',key='pp15_delwait_'+row['id'],help='Fjern fra ventelisten',use_container_width=True):
                     try: signup_db_delete(row['id']);st.rerun()
                     except requests.RequestException as exc: st.error(str(exc))
     taken={r.get('name','').casefold() for r in registered+waiting if r.get('status')!='expired'}
@@ -956,8 +963,67 @@ def signup_wait_panel(item,registered,waiting):
             except (requests.RequestException,ValueError) as exc:st.error('Kunne ikke gemme tilmeldingen: '+str(exc))
 
 
+def signup_design_155():
+    """Fælles lyst designsystem til alle tilmeldings- og administrationsvisninger."""
+    st.markdown("""<style>
+    :root {color-scheme:light!important;--pp155-ink:#223d40;--pp155-green:#087c6c;--pp155-mint:#eaf7f3;--pp155-line:#cfe5de;--pp155-white:#fff}
+    .stApp{background:#f8fbfa!important;color:var(--pp155-ink)!important;color-scheme:light!important}
+    .stApp [data-testid="stMarkdownContainer"],.stApp [data-testid="stMarkdownContainer"] p,.stApp label{color:var(--pp155-ink)!important}
+    .stApp [data-testid="stTextInput"] input,.stApp [data-testid="stNumberInput"] input,
+    .stApp [data-testid="stDateInput"] input,.stApp [data-testid="stTimeInput"] input,
+    .stApp [data-testid="stTextArea"] textarea,
+    .stApp [data-baseweb="input"] input,.stApp [data-baseweb="select"] input,
+    .stApp [data-baseweb="select"] [role="combobox"]{background:#fff!important;color:#223d40!important;-webkit-text-fill-color:#223d40!important;caret-color:#087c6c!important}
+    .stApp [data-baseweb="input"],.stApp [data-baseweb="select"]>div,
+    .stApp [data-baseweb="textarea"],.stApp [data-baseweb="base-input"],
+    .stApp [data-testid="stDateInput"]>div>div,
+    .stApp [data-testid="stNumberInput"]>div>div{
+      background:#fff!important;color:#223d40!important;border:1px solid #cfe3dd!important;
+      border-radius:13px!important;box-shadow:none!important;min-height:45px!important}
+    .stApp [data-baseweb="input"]:focus-within,.stApp [data-baseweb="select"]>div:focus-within,
+    .stApp [data-baseweb="textarea"]:focus-within{border-color:#158b79!important;box-shadow:0 0 0 2px rgba(21,139,121,.13)!important}
+    .stApp [data-baseweb="input"] button,.stApp [data-baseweb="select"] button,
+    .stApp [data-testid="stNumberInput"] button{background:#eaf7f3!important;color:#087c6c!important;border:none!important}
+    .stApp [data-baseweb="input"] svg,.stApp [data-baseweb="select"] svg{fill:#38615c!important;color:#38615c!important}
+    .stApp input::placeholder,.stApp textarea::placeholder{color:#829a97!important;-webkit-text-fill-color:#829a97!important}
+    .stApp [data-baseweb="tag"]{background:#dcf4e9!important;color:#185f53!important;border-radius:9px!important}
+    .stApp [data-baseweb="tag"] span{color:#185f53!important}
+    .stApp [data-testid="stForm"],.stApp [data-testid="stExpander"],
+    .stApp [data-testid="stPopoverBody"]{background:#fff!important;border:1px solid #d7e9e3!important;border-radius:19px!important;box-shadow:none!important}
+    .stApp [data-testid="stExpander"] summary,.stApp [data-testid="stExpander"] summary *{background:#fff!important;color:#223d40!important}
+    .stApp [data-testid="stExpander"] details{background:#fff!important;border-radius:19px!important}
+    .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"]{background:#fff!important;color:#223d40!important}
+    .stApp [data-testid="stPopoverBody"] *{color:#223d40}
+    .stApp [data-testid="stRadio"] label{color:#223d40!important}
+    .stApp [data-testid="stRadio"] [role="radiogroup"]{background:#fff!important}
+    .stApp [data-testid="stRadio"] [role="radio"]{background:#fff!important;border-color:#8bbab0!important}
+    .stApp button[kind="primary"],.stApp [data-testid="stFormSubmitButton"] button[kind="primary"]{
+      background:#087c6c!important;color:white!important;border:1px solid #087c6c!important}
+    .stApp button[kind="primary"] *{color:#fff!important}
+    .stApp [data-testid="stButton"] button,.stApp [data-testid="stFormSubmitButton"] button,
+    .stApp [data-testid="stPopover"] button{border-radius:13px!important;min-height:43px}
+    .pp15-day{border-radius:19px!important;margin-top:11px!important;padding:17px!important}
+    .pp15-name{background:#edf8f4!important;border:1px solid #d9ebe4!important;color:#244443!important}
+    .pp15-track{background:#e3eeea!important}.pp15-track span{background:#0b8776!important}
+    .pp155-player{display:flex;align-items:center;gap:9px;padding:8px 0;font-weight:650;color:#284547;min-height:43px}
+    .pp155-check{display:inline-flex;align-items:center;justify-content:center;background:#dff3e9;color:#0c7b65;border-radius:50%;width:23px;height:23px;font-weight:800}
+    .pp152-player-row{color:#284547!important}
+    .stApp [class*="st-key-pp15_rem_"] button,.stApp [class*="st-key-pp15_delwait_"] button{
+      min-height:35px!important;height:35px!important;width:42px!important;min-width:42px!important;
+      background:#fff6f5!important;border:1px solid #f1d5d2!important;color:#a94a43!important;padding:0!important}
+    .stApp [data-testid="stVerticalBlock"]{row-gap:.7rem}
+    @media(max-width:650px){
+      .block-container{padding-left:14px!important;padding-right:14px!important;padding-top:14px!important}
+      .pp15-header{padding:17px!important}.pp15-day{padding:15px!important}
+      .stApp [data-testid="stForm"]{padding:15px!important}
+      .stApp [data-testid="stExpander"]{margin:8px 0!important}
+      .stApp [data-testid="stButton"] button{font-size:14px!important}
+    }
+    </style>""",unsafe_allow_html=True)
+
+
 def signup_screen():
-    signup_ui_css();signup_header()
+    signup_ui_css();signup_design_155();signup_header()
     pending=st.session_state.pop('signup_navigation_pending',None)
     if st.query_params.get('player'):
         candidate=str(st.query_params.get('player'))
