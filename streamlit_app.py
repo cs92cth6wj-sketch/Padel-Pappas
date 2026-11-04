@@ -2988,6 +2988,72 @@ if not st.session_state.get('tid'):
       .pp156-features{margin-bottom:13px!important}
       .pp154-section{margin-top:15px!important;margin-bottom:10px!important}
     }
+    /* PP 16.0: Identiske handlingsknapper, federe læsbar tekst og logo-grøn. */
+    .stApp [class*="st-key-su_home_open"],
+    .stApp [class*="st-key-pp11_new_btn"],
+    .stApp [class*="st-key-pp11_open_btn"]{width:100%!important;max-width:100%!important}
+    .stApp [class*="st-key-su_home_open"] button,
+    .stApp [class*="st-key-pp11_new_btn"] button,
+    .stApp [class*="st-key-pp11_open_btn"] button{
+      width:100%!important;min-height:64px!important;height:64px!important;
+      box-sizing:border-box!important;border-radius:16px!important;
+      padding:10px 45px 10px 54px!important;
+      font-size:17px!important;font-weight:800!important;line-height:1.25!important;
+      letter-spacing:-.015em!important;display:flex!important;align-items:center!important;
+      justify-content:center!important;text-align:center!important;
+    }
+    .stApp [class*="st-key-su_home_open"] button p,
+    .stApp [class*="st-key-pp11_new_btn"] button p,
+    .stApp [class*="st-key-pp11_open_btn"] button p,
+    .stApp [class*="st-key-su_home_open"] button span,
+    .stApp [class*="st-key-pp11_new_btn"] button span,
+    .stApp [class*="st-key-pp11_open_btn"] button span{
+      font-size:inherit!important;font-weight:800!important;line-height:1.25!important;
+      text-align:center!important;letter-spacing:-.015em!important;
+    }
+    .stApp [class*="st-key-su_home_open"] button{
+      background:#006747!important;background-image:linear-gradient(110deg,#006747,#00583e)!important;
+      border:1px solid #006747!important;color:white!important;
+      box-shadow:0 7px 17px rgba(0,88,62,.16)!important;
+    }
+    .stApp [class*="st-key-pp11_new_btn"] button,
+    .stApp [class*="st-key-pp11_open_btn"] button{
+      background:#eef9f5!important;background-image:linear-gradient(105deg,#f5fcf9,#e8f7f1)!important;
+      border:1px solid #a9d8ca!important;color:#103c30!important;
+      box-shadow:0 3px 12px rgba(12,78,63,.04)!important;
+    }
+    .stApp [class*="st-key-pp11_new_btn"] button *,
+    .stApp [class*="st-key-pp11_open_btn"] button *{color:#103c30!important;-webkit-text-fill-color:#103c30!important}
+    .stApp [class*="st-key-su_home_open"] button *,
+    .stApp [class*="st-key-su_home_open"] button p{color:white!important;-webkit-text-fill-color:white!important}
+    .stApp [class*="st-key-su_home_open"] button::before,
+    .stApp [class*="st-key-pp11_new_btn"] button::before,
+    .stApp [class*="st-key-pp11_open_btn"] button::before{
+      left:18px!important;width:25px!important;height:25px!important;
+      background-size:contain!important;color:#006747!important;
+    }
+    .stApp [class*="st-key-su_home_open"] button::after,
+    .stApp [class*="st-key-pp11_new_btn"] button::after,
+    .stApp [class*="st-key-pp11_open_btn"] button::after{
+      right:18px!important;font-size:31px!important;font-weight:650!important;color:#006747!important;
+    }
+    .stApp [class*="st-key-su_home_open"] button::after{color:white!important}
+    .stApp [class*="st-key-su_home_open"] button::before{filter:brightness(0) invert(1)!important}
+    .pp154-section{margin-top:19px!important;margin-bottom:12px!important}
+    @media(max-width:520px){
+      .stApp [class*="st-key-su_home_open"] button,
+      .stApp [class*="st-key-pp11_new_btn"] button,
+      .stApp [class*="st-key-pp11_open_btn"] button{
+        height:62px!important;min-height:62px!important;font-size:clamp(15px,4.1vw,17px)!important;
+        padding-left:45px!important;padding-right:37px!important;
+      }
+      .stApp [class*="st-key-su_home_open"] button::before,
+      .stApp [class*="st-key-pp11_new_btn"] button::before,
+      .stApp [class*="st-key-pp11_open_btn"] button::before{left:13px!important}
+      .stApp [class*="st-key-su_home_open"] button::after,
+      .stApp [class*="st-key-pp11_new_btn"] button::after,
+      .stApp [class*="st-key-pp11_open_btn"] button::after{right:13px!important}
+    }
     </style>
     <div class="pp156-hero">
       <div class="pp156-wave"></div>
