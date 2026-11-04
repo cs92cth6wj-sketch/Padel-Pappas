@@ -3014,9 +3014,9 @@ if not st.session_state.get('tid'):
       text-align:center!important;letter-spacing:-.015em!important;
     }
     .stApp [class*="st-key-su_home_open"] button{
-      background:#006747!important;background-image:linear-gradient(110deg,#006747,#00583e)!important;
+      background:#005c43!important;background-image:none!important;
       border:1px solid #006747!important;color:white!important;
-      box-shadow:0 7px 17px rgba(0,88,62,.16)!important;
+      box-shadow:0 6px 15px rgba(0,70,48,.12)!important;
     }
     .stApp [class*="st-key-pp11_new_btn"] button,
     .stApp [class*="st-key-pp11_open_btn"] button{
@@ -3122,10 +3122,10 @@ if not st.session_state.get('tid'):
         st.markdown("""<style>
         .stApp [class*="st-key-pp164_open_submit"] button,
         .stApp [class*="st-key-pp164_open_submit"] button[kind="primaryFormSubmit"]{
-            background:#006747!important;background-image:linear-gradient(110deg,#006747,#00583e)!important;
-            border:1px solid #006747!important;
+            background:#005c43!important;background-image:none!important;
+            border:1px solid #005c43!important;
             border-radius:16px!important;
-            height:64px!important;min-height:64px!important;
+            height:62px!important;min-height:62px!important;
             box-sizing:border-box!important;
             padding:10px 45px 10px 54px!important;
             width:100%!important;
@@ -3133,7 +3133,7 @@ if not st.session_state.get('tid'):
             font-weight:800!important;
             font-size:17px!important;line-height:1.25!important;
             letter-spacing:-.015em!important;
-            box-shadow:0 7px 17px rgba(0,88,62,.16)!important;
+            box-shadow:0 6px 15px rgba(0,70,48,.12)!important;
         }
         .stApp [class*="st-key-pp164_open_submit"] button *{
             color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;
@@ -3147,7 +3147,7 @@ if not st.session_state.get('tid'):
           }
         }
         .stApp [class*="st-key-pp164_open_submit"] button:hover{
-            background:#00583e!important;background-image:none!important;border-color:#00583e!important;
+            background:#004b38!important;background-image:none!important;border-color:#004b38!important;
         }
         .stApp [class*="st-key-pp164_open_submit"] button:focus-visible{
             outline:3px solid rgba(0,103,71,.28)!important;outline-offset:3px!important;
@@ -3219,16 +3219,16 @@ if not st.session_state.get('tid'):
             fill:#006747!important;stroke:#006747!important;color:#006747!important;
         }
         .stApp [class*="st-key-pp166_create_submit"] button{
-            background:#006747!important;background-image:linear-gradient(110deg,#006747,#00583e)!important;
-            color:white!important;border:1px solid #006747!important;
-            border-radius:16px!important;height:64px!important;min-height:64px!important;
+            background:#005c43!important;background-image:none!important;
+            color:white!important;border:1px solid #005c43!important;
+            border-radius:16px!important;height:62px!important;min-height:62px!important;
             font-weight:800!important;font-size:17px!important;
-            box-shadow:0 7px 17px rgba(0,88,62,.16)!important;
+            box-shadow:0 6px 15px rgba(0,70,48,.12)!important;
         }
         .stApp [class*="st-key-pp166_create_submit"] button *{
             color:white!important;-webkit-text-fill-color:white!important;font-weight:800!important;
         }
-        .stApp [class*="st-key-pp166_create_submit"] button:hover{background:#00583e!important;background-image:none!important}
+        .stApp [class*="st-key-pp166_create_submit"] button:hover{background:#004b38!important;background-image:none!important}
         .stApp [class*="st-key-pp11_new_back"] button{
             background:#eef9f5!important;color:#006b53!important;
             border:1px solid #9dd4c6!important;border-radius:14px!important;
@@ -3242,6 +3242,49 @@ if not st.session_state.get('tid'):
         @media(max-width:520px){
             .stApp [data-testid="stForm"]{padding:17px 13px 20px!important;border-radius:17px!important}
             .stApp [class*="st-key-pp166_create_submit"] button{min-height:62px!important;height:62px!important}
+        }
+        /* PP16.7 – ensartet mørkegrøn og samme knapmål som Åbn turnering. */
+        .stApp [class*="st-key-pp166_create_submit"] button,
+        .stApp [class*="st-key-pp166_create_submit"] button[kind="primaryFormSubmit"]{
+            background:#005c43!important;background-image:none!important;
+            border:1px solid #005c43!important;border-radius:16px!important;
+            height:62px!important;min-height:62px!important;width:100%!important;
+            color:#fff!important;font-size:17px!important;font-weight:800!important;
+            padding:10px 24px!important;box-shadow:0 6px 15px rgba(0,70,48,.12)!important;
+        }
+        .stApp [class*="st-key-pp166_create_submit"] button:hover{background:#004b38!important;border-color:#004b38!important}
+        /* Ens kantfarve på tekstfelter, tekstområder og talvælgere. */
+        .stApp [data-testid="stForm"] [data-baseweb="input"],
+        .stApp [data-testid="stForm"] [data-baseweb="textarea"],
+        .stApp [data-testid="stForm"] [data-testid="stTextArea"] textarea,
+        .stApp [data-testid="stForm"] [data-testid="stNumberInput"] [data-baseweb="input"]{
+            border:1px solid #b9d9cd!important;box-shadow:none!important;
+            background:#fff!important;border-radius:12px!important;
+        }
+        .stApp [data-testid="stForm"] [data-baseweb="input"]:focus-within,
+        .stApp [data-testid="stForm"] [data-baseweb="textarea"]:focus-within{
+            border-color:#005c43!important;box-shadow:0 0 0 2px rgba(0,92,67,.10)!important;
+        }
+        .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button{
+            background:#e9f6f1!important;border-color:#b9d9cd!important;
+            color:#005c43!important;
+        }
+        .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button svg,
+        .stApp [data-testid="stForm"] [data-testid="stNumberInput"] button svg path{
+            stroke:#005c43!important;fill:#005c43!important;color:#005c43!important;
+        }
+        /* Radio: både Streamlits indbyggede og BaseWebs markering. */
+        .stApp [data-testid="stRadio"] input[type="radio"]{accent-color:#005c43!important}
+        .stApp [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"]{
+            color:#005c43!important;font-weight:700!important;
+        }
+        .stApp [data-testid="stRadio"] [aria-checked="true"] > div,
+        .stApp [data-testid="stRadio"] [data-baseweb="radio"]:has(input:checked) > div{
+            border-color:#005c43!important;
+        }
+        .pp166-section{color:#005c43!important;border-bottom-color:#dcece5!important}
+        @media(max-width:520px){
+            .stApp [class*="st-key-pp166_create_submit"] button{height:62px!important;min-height:62px!important}
         }
         </style>""",unsafe_allow_html=True)
         st.subheader('Opret ny turnering')
