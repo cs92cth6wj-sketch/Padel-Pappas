@@ -321,6 +321,91 @@ def signup_screen():
         .signup-heading h2{font-size:24px}
         .stApp [data-testid="stHorizontalBlock"]{gap:9px!important}
       }
+      /* 13.3: Fix legacy dark theme rules with enough specificity.
+         These rules are injected exclusively for the signup screen. */
+      .stApp [data-testid="stExpander"] details,
+      .stApp [data-testid="stExpander"] details > summary,
+      .stApp [data-testid="stExpander"] summary,
+      .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"],
+      .stApp [data-testid="stExpander"] [data-testid="stVerticalBlock"],
+      .stApp [data-testid="stExpander"] [data-testid="stForm"],
+      .stApp [data-testid="stForm"] {
+        background-color:#FFFFFF!important;
+        color:#20383C!important;
+        -webkit-text-fill-color:#20383C!important;
+        border-color:#DAE8E5!important;
+        box-shadow:none!important;
+      }
+      .stApp [data-testid="stExpander"] summary,
+      .stApp [data-testid="stExpander"] summary *,
+      .stApp [data-testid="stExpander"] [data-testid="stExpanderToggleIcon"],
+      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"],
+      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"] *,
+      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"] label,
+      .stApp [data-testid="stExpander"] [data-testid="stWidgetLabel"] label * ,
+      .stApp [data-testid="stForm"] [data-testid="stWidgetLabel"] *,
+      .stApp [data-testid="stForm"] label *{
+        color:#213C40!important;
+        -webkit-text-fill-color:#213C40!important;
+        fill:#213C40!important;
+        opacity:1!important;
+      }
+      .stApp [data-testid="stExpander"] [data-testid="stTimeInput"] input,
+      .stApp [data-testid="stExpander"] [data-testid="stTextInput"] input,
+      .stApp [data-testid="stExpander"] [data-testid="stNumberInput"] input,
+      .stApp [data-testid="stForm"] [data-testid="stTimeInput"] input,
+      .stApp [data-testid="stForm"] [data-testid="stTextInput"] input,
+      .stApp [data-testid="stForm"] [data-testid="stNumberInput"] input,
+      .stApp [data-testid="stExpander"] [data-baseweb="input"],
+      .stApp [data-testid="stExpander"] [data-baseweb="base-input"],
+      .stApp [data-testid="stForm"] [data-baseweb="input"],
+      .stApp [data-testid="stForm"] [data-baseweb="base-input"],
+      .stApp [data-testid="stTimeInput"] div[data-baseweb="input"],
+      .stApp [data-testid="stTimeInput"] div[data-baseweb="base-input"],
+      .stApp [data-testid="stTimeInput"] input {
+        background:#FFFFFF!important;
+        background-color:#FFFFFF!important;
+        color:#20383C!important;
+        -webkit-text-fill-color:#20383C!important;
+        border-color:#C8DDDA!important;
+        color-scheme:light!important;
+        opacity:1!important;
+      }
+      .stApp [data-testid="stExpander"] [data-baseweb="select"],
+      .stApp [data-testid="stExpander"] [data-baseweb="select"] > div,
+      .stApp [data-testid="stForm"] [data-baseweb="select"],
+      .stApp [data-testid="stForm"] [data-baseweb="select"] > div,
+      .stApp [data-testid="stSelectbox"] [data-baseweb="select"],
+      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] div[role="combobox"] {
+        background:#FFFFFF!important;
+        background-color:#FFFFFF!important;
+        color:#20383C!important;
+        -webkit-text-fill-color:#20383C!important;
+        border-color:#C8DDDA!important;
+        color-scheme:light!important;
+      }
+      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] span,
+      .stApp [data-testid="stSelectbox"] [data-baseweb="select"] svg {
+        color:#20383C!important;
+        -webkit-text-fill-color:#20383C!important;
+        fill:#456B68!important;
+      }
+      .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button,
+      .stApp [data-testid="stForm"] [data-testid="stFormSubmitButton"] button {
+        background:#147F75!important;
+        color:#FFFFFF!important;
+        -webkit-text-fill-color:#FFFFFF!important;
+        border-color:#147F75!important;
+      }
+      .stApp [data-testid="stExpander"] [data-testid="stFormSubmitButton"] button *,
+      .stApp [data-testid="stForm"] [data-testid="stFormSubmitButton"] button * {
+        color:#FFFFFF!important;
+        -webkit-text-fill-color:#FFFFFF!important;
+      }
+      .stApp [data-testid="stExpander"] {border:1px solid #D8E8E5!important;border-radius:17px!important;overflow:hidden!important}
+      .stApp [data-testid="stExpander"] summary{padding:12px 15px!important}
+      .stApp [data-testid="stExpander"] summary:hover{background:#EFF8F6!important}
     </style>''', unsafe_allow_html=True)
     st.markdown('<div class="signup-heading"><h2>🎾 Søndagspadel · Tilmelding</h2><p>Se kommende spilledage og hvem der er tilmeldt.</p></div>', unsafe_allow_html=True)
     day = str(st.query_params.get('signup', 'all'))
@@ -332,17 +417,12 @@ def signup_screen():
         except (requests.RequestException, ValueError) as exc:
             st.error(f'Kunne ikke hente spilledage: {exc}'); st.stop()
         st.caption('Del denne faste tilmeldingsoversigt i Messenger:')
-        st.code('https://padel-pappas.streamlit.app/?signup=all', language=None)
-        if st.button('📋 Kopiér tilmeldingslink', key='su_copy_signup_link', use_container_width=True):
-            st.components.v1.html("""<script>
-              const link='https://padel-pappas.streamlit.app/?signup=all';
-              const tryCopy=async()=>{
-                try { await navigator.clipboard.writeText(link); }
-                catch(e) { const t=document.createElement('textarea');t.value=link;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove(); }
-              };
-              tryCopy();
-            </script>""", height=0)
-            st.info('Hvis iPhone blokerer kopiering, brug kopieringsikonet i linkfeltet ovenfor.')
+        st.text_input('Tilmeldingslink – hold fingeren på teksten for at kopiere',
+                      value='https://padel-pappas.streamlit.app/?signup=all',
+                      key='su_signup_link_display')
+        st.link_button('↗ Åbn tilmeldingslink',
+                       'https://padel-pappas.streamlit.app/?signup=all',
+                       use_container_width=True)
         if not upcoming:
             st.info('Der er endnu ingen kommende spilledage. Kig forbi igen senere.')
         for entry in upcoming:
