@@ -221,6 +221,73 @@ def signup_roster(day):
                   key=lambda item: (item.get('created_at', ''), item.get('name', '').casefold()))
 
 
+def signup_players():
+    """Shared named roster, persisted using the existing Supabase table."""
+    rows = signup_db_list('PLAYER-')
+    return sorted([{'id': r['id'], **(r.get('data') or {})} for r in rows
+                   if (r.get('data') or {}).get('kind') == 'padel_player'],
+                  key=lambda p: p.get('name', '').casefold())
+
+
+def signup_player_id(name):
+    canonical = ' '.join(str(name).casefold().split())
+    return 'PLAYER-' + hashlib.sha256(canonical.encode('utf-8')).hexdigest()[:20].upper()
+
+
+def signup_player_admin():
+    st.markdown('#### Fælles spillerliste')
+    st.caption('Opret de 36 spillere én gang. Spillerne vælger derefter deres eget navn ved tilmelding.')
+    try:
+        players = signup_players()
+    except requests.RequestException as exc:
+        st.error(f'Kunne ikke hente spillerlisten: {exc}')
+        return
+    st.caption(f'{len(players)} spillere i listen')
+    with st.form('su_add_players_form'):
+        raw = st.text_area('Tilføj spillere – ét fuldt navn pr. linje',
+                           placeholder='Jan Henriksen\nSimon Jakobsen\nMorten Aslak', height=125)
+        submit = st.form_submit_button('Gem spillere', use_container_width=True)
+    if submit:
+        names = [' '.join(x.split()) for x in raw.splitlines() if x.strip()]
+        unique = {signup_player_id(x): x for x in names if len(x) >= 3}
+        already = {p['id'] for p in players}
+        added = 0
+        for player_id, name in unique.items():
+            if player_id in already:
+                continue
+            try:
+                db_save(player_id, {'kind':'padel_player','name':name}, create=True)
+                added += 1
+            except requests.HTTPError as exc:
+                if exc.response is None or exc.response.status_code != 409:
+                    st.error(f'Kunne ikke gemme {name}: {exc}')
+                    break
+            except (requests.RequestException, ValueError) as exc:
+                st.error(f'Kunne ikke gemme {name}: {exc}')
+                break
+        if added:
+            st.success(f'{added} nye spillere er tilføjet.')
+            st.rerun()
+    if players:
+        with st.expander(f'Administrér de {len(players)} spillere', expanded=False):
+            for player in players:
+                a,b=st.columns([5,1])
+                a.write(player['name'])
+                if b.button('Fjern', key='su_rm_player_'+player['id']):
+                    try:
+                        signup_db_delete(player['id'])
+                        st.rerun()
+                    except requests.RequestException as exc:
+                        st.error(f'Kunne ikke fjerne spilleren: {exc}')
+
+
+def signup_delete_day(day):
+    """Delete registrations first, then the day; do not touch tournament records."""
+    for record in signup_roster(day):
+        signup_db_delete(record['id'])
+    signup_db_delete(signup_day_id(day))
+
+
 def signup_admin_ok():
     pin = str(st.secrets.get('PADEL_ADMIN_PIN', '')).strip()
     if not pin:
@@ -450,6 +517,25 @@ def signup_screen():
       .stApp [data-testid="stExpander"] summary{padding:12px 15px!important}
       .stApp [data-testid="stExpander"] summary:hover{background:#EFF8F6!important}
     </style>''', unsafe_allow_html=True)
+    st.markdown("""<style>
+       /* v13.6: visual hierarchy aligned to the light landing page */
+       .signup-heading{background:linear-gradient(115deg,#ffffff,#e8f7f3)!important;
+          padding:24px 22px!important;border:1px solid #d4e6e3!important;border-radius:26px!important}
+       .signup-heading h2{color:#22363a!important;font-weight:800!important;font-size:clamp(24px,5vw,35px)!important}
+       .signup-heading p{font-size:15px!important;line-height:1.45!important}
+       .su136-card{border:1px solid #d8e8e5;border-radius:20px;background:#fff;
+          padding:16px 18px;margin:12px 0;box-shadow:0 2px 8px #0d55440a}
+       .su136-card-title{font-weight:750;font-size:19px;color:#203e40;margin-bottom:7px}
+       .su136-meta{color:#61787b;font-size:14px;margin-bottom:9px}
+       .su136-pill{display:inline-block;color:#176f61;background:#e6f6f1;border:1px solid #b9dbd4;
+          padding:5px 12px;border-radius:99px;font-size:13px;margin:4px 6px 4px 0}
+       .su136-progress{height:9px;background:#e6eeeb;border-radius:20px;overflow:hidden;margin:12px 0}
+       .su136-progress div{height:100%;background:#16877c;border-radius:20px}
+       .signup-roster{background:#f5fbf9!important;padding:14px 16px!important;border-radius:15px!important}
+       .stApp [data-testid="stTextInput"] input,.stApp [data-testid="stTextArea"] textarea{
+          background:#fff!important;color:#243c40!important;-webkit-text-fill-color:#243c40!important}
+       .stApp [data-testid="stAlert"]{background:#edf8f5!important;color:#274a4a!important}
+       </style>""", unsafe_allow_html=True)
     st.markdown('<div class="signup-heading"><h2>🎾 Søndagspadel · Tilmelding</h2><p>Se kommende spilledage og hvem der er tilmeldt.</p></div>', unsafe_allow_html=True)
     raw_day = st.query_params.get('signup', 'all')
     # Immediately following creation, favour the date saved by the app over a
@@ -486,16 +572,25 @@ def signup_screen():
                 registered = []
             count = len(registered)
             capacity = int(entry.get('capacity', 16))
-            with st.container(border=True):
-                st.markdown(f'**{html.escape(entry.get("title", "Søndagspadel"))} · {date.fromisoformat(date_str).strftime("%d.%m.%Y")}**')
-                st.caption(f'{entry.get("start", "20:00")}–{entry.get("end", "22:00")} · {count}/{capacity} tilmeldte' + (' · Fuldt' if count >= capacity else ''))
-                if registered:
-                    st.markdown(', '.join(html.escape(x.get('name','')) for x in registered))
-                if st.button('Se og tilmeld', key=f'su_open_{date_str}', use_container_width=True):
-                    signup_open(date_str)
-        with st.expander('🔒 Administration – opret spilledag', expanded=False):
+            cancelled = bool(entry.get('cancelled'))
+            label_date = date.fromisoformat(date_str).strftime('%d.%m.%Y')
+            title = html.escape(entry.get('title', 'Søndagspadel'))
+            status = 'Aflyst' if cancelled else ('Fuldt' if count >= capacity else f'{max(0,capacity-count)} ledige pladser')
+            chips = ''.join('<span class="su136-pill">'+html.escape(x.get('name',''))+'</span>' for x in registered)
+            st.markdown(
+                f'<div class="su136-card"><div class="su136-card-title">{title} · {label_date}</div>'
+                f'<div class="su136-meta">{html.escape(entry.get("start","20:00"))}–{html.escape(entry.get("end","22:00"))} · '
+                f'{count} / {capacity} tilmeldte · {status}</div>'
+                f'<div class="su136-progress"><div style="width:{min(100, 100*count/max(1,capacity)):.1f}%"></div></div>'
+                f'{chips if chips else "<span class=\"su136-meta\">Ingen tilmeldte endnu</span>"}'
+                '</div>', unsafe_allow_html=True)
+            if st.button('Se spilledag og deltagere', key=f'su_open_{date_str}', use_container_width=True):
+                signup_open(date_str)
+        with st.expander('🔒 Administration · spilledage og spillere', expanded=False):
             if signup_admin_login():
                 signup_create_form()
+                st.divider()
+                signup_player_admin()
     else:
         if st.button('← Alle kommende spilledage', key='su_back_list'):
             signup_open('all')
@@ -518,6 +613,8 @@ def signup_screen():
         st.subheader(f'{item.get("title", "Søndagspadel")} · {date.fromisoformat(day).strftime("%d.%m.%Y")}')
         st.caption(f'{item.get("start", "20:00")}–{item.get("end", "22:00")} · {len(registered)} af {capacity} pladser')
         st.progress(min(1.0, len(registered)/max(1,capacity)))
+        if item.get('cancelled'):
+            st.error('SPILLEDAGEN ER AFLYST – tilmelding er lukket.')
         if registered:
             st.markdown('**Tilmeldte spillere**')
             st.markdown('<div class="signup-roster">' + '<br>'.join(f'{i}. {html.escape(x.get("name", ""))}' for i,x in enumerate(registered,1)) + '</div>', unsafe_allow_html=True)
@@ -528,15 +625,34 @@ def signup_screen():
         cancel_deadline = signup_cancel_deadline(item)
         st.caption('Tilmeldingsfrist: ' + deadline.strftime('%d.%m. kl. %H:%M') +
                    ' · Afbudsfrist: ' + cancel_deadline.strftime('%d.%m. kl. %H:%M'))
-        if item.get('closed') or deadline_passed:
+        if item.get('cancelled'):
+            st.error('Denne spilledag er aflyst af arrangøren.')
+        elif item.get('closed') or deadline_passed:
             st.warning('Tilmeldingen er lukket.')
         elif len(registered) >= capacity:
             st.warning('Alle pladser er optaget.')
         else:
-            with st.form('signup_register'):
-                name = st.text_input('Dit fulde navn', placeholder='Fornavn Efternavn', max_chars=80)
-                submitted = st.form_submit_button('Tilmeld mig', type='primary', use_container_width=True)
-            if submitted:
+            try:
+                all_players = signup_players()
+            except requests.RequestException as exc:
+                st.error(f'Kunne ikke hente spillerlisten: {exc}')
+                all_players = []
+            current_ids = {r['id'] for r in registered}
+            available_players = [player['name'] for player in all_players
+                                 if signup_name_id(day, player['name']) not in current_ids]
+            if not all_players:
+                st.info('Spillerlisten er endnu tom. Arrangøren skal først oprette gruppens spillere under Administration.')
+            elif not available_players:
+                st.info('Alle spillere fra listen er allerede tilmeldt.')
+            else:
+                with st.form('signup_register'):
+                    name = st.selectbox('Vælg dit navn', available_players,
+                                        index=None, placeholder='Find dit navn på listen')
+                    submitted = st.form_submit_button('Tilmeld mig', type='primary', use_container_width=True)
+                if submitted and not name:
+                    st.warning('Vælg dit navn på listen først.')
+                    submitted = False
+            if 'submitted' in locals() and submitted:
                 clean = ' '.join(name.split())
                 if len(clean) < 3:
                     st.error('Indtast dit navn (mindst 3 tegn).')
@@ -563,6 +679,7 @@ def signup_screen():
                             st.error(f'Tilmelding mislykkedes: {exc}')
                     except (requests.RequestException, ValueError) as exc:
                         st.error(f'Tilmelding mislykkedes: {exc}')
+        # Name selection is not authentication. Cancellation still requires the private token.
         # A private cancellation link is issued once at signup. The secret
         # appears neither in the roster nor in the public database record.
         recent = st.session_state.get(f'su_link_{day}')
@@ -659,6 +776,46 @@ def signup_screen():
                             st.rerun()
                         except requests.RequestException as exc:
                             st.error(f'Kunne ikke fjerne: {exc}')
+                st.markdown('#### Aflys eller slet spilledag')
+                st.caption('Aflysning beholder deltagere og historik, men lukker tilmelding. Sletning fjerner også tilmeldingerne permanent.')
+                if item.get('cancelled'):
+                    st.warning('Spilledagen er aflyst, men stadig synlig i oversigten.')
+                    if st.button('Genåbn spilledag', key='su_restore_'+day):
+                        item['cancelled'] = False
+                        item['closed'] = False
+                        db_save(signup_day_id(day), item)
+                        st.rerun()
+                else:
+                    if st.button('Aflys spilledag', key='su_cancel_day_'+day):
+                        st.session_state['su_confirm_cancel_day_'+day] = True
+                    if st.session_state.get('su_confirm_cancel_day_'+day):
+                        st.warning('Bekræft aflysningen. Tilmeldte bliver ikke automatisk kontaktet – giv også besked i Messenger.')
+                        if st.button('Ja, aflys spilledagen', type='primary', key='su_cancel_confirm_'+day):
+                            try:
+                                item['cancelled'] = True
+                                item['closed'] = True
+                                db_save(signup_day_id(day), item)
+                                st.session_state.pop('su_confirm_cancel_day_'+day, None)
+                                st.rerun()
+                            except (requests.RequestException, ValueError) as exc:
+                                st.error(f'Kunne ikke aflyse: {exc}')
+                if st.button('Slet spilledag permanent', key='su_delete_day_'+day):
+                    st.session_state['su_confirm_delete_day_'+day] = True
+                if st.session_state.get('su_confirm_delete_day_'+day):
+                    st.error('Dette sletter spilledagen og alle dens tilmeldinger permanent. En allerede startet turnering ændres ikke.')
+                    with st.form('su_delete_confirm_form_'+day):
+                        confirmation = st.text_input('Skriv SLET for at bekræfte')
+                        do_delete = st.form_submit_button('Slet dato og tilmeldinger')
+                    if do_delete:
+                        if confirmation.strip().upper() != 'SLET':
+                            st.error('Skriv SLET præcist for at bekræfte.')
+                        else:
+                            try:
+                                signup_delete_day(day)
+                                st.session_state.pop('su_confirm_delete_day_'+day,None)
+                                signup_open('all')
+                            except (requests.RequestException, ValueError) as exc:
+                                st.error(f'Kunne ikke slette alt: {exc}')
                 if st.button('Luk tilmelding', key='su_close'):
                     item['closed'] = True
                     try:
