@@ -1176,8 +1176,75 @@ def signup_design_180():
     </style>""",unsafe_allow_html=True)
 
 
+def signup_design_181():
+    """Ensartet mørkegrøn primær handling og rolige, tydelige fold-ud-paneler."""
+    st.markdown("""<style>
+    /* Tilmeld mig / venteliste: samme mørkegrønne farve som logo og Åbn turnering. */
+    .stApp [data-testid="stFormSubmitButton"] button[kind="primary"],
+    .stApp [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primary"],
+    .stApp [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primaryFormSubmit"]{
+      background:#005C43!important;background-color:#005C43!important;
+      border:1px solid #005C43!important;color:#fff!important;
+      -webkit-text-fill-color:#fff!important;border-radius:14px!important;
+      min-height:53px!important;font-size:16px!important;font-weight:750!important;
+      box-shadow:none!important;width:100%!important;
+    }
+    .stApp [data-testid="stFormSubmitButton"] button[kind="primary"] *,
+    .stApp [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primary"] *,
+    .stApp [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primaryFormSubmit"] *{
+      color:#fff!important;-webkit-text-fill-color:#fff!important;
+    }
+    .stApp [data-testid="stFormSubmitButton"] button[kind="primary"]:hover,
+    .stApp [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primaryFormSubmit"]:hover{
+      background:#004b37!important;background-color:#004b37!important;
+    }
+    /* Oversigten over spilledage: Forsiden-knappen må ikke ligge under mobilens topbjælke. */
+    .stApp [class*="st-key-pp15_home"]{
+      margin-top:30px!important;
+      margin-bottom:0!important;
+    }
+    .stApp [class*="st-key-pp15_home"] button{
+      min-height:46px!important;
+    }
+    .pp18-list-heading{margin-top:0!important;}
+    @media(min-width:701px){
+      .stApp [class*="st-key-pp15_home"]{margin-top:18px!important;}
+    }
+    /* Afbud og administration: to ens, diskrete kort med tydelig grøn pil. */
+    .stApp [data-testid="stExpander"]{
+      background:#fff!important;border:1px solid #cfe4dc!important;
+      border-radius:17px!important;box-shadow:none!important;
+      overflow:hidden!important;margin:7px 0!important;
+    }
+    .stApp [data-testid="stExpander"] details,
+    .stApp [data-testid="stExpander"] summary,
+    .stApp [data-testid="stExpander"] summary *{
+      background:#fff!important;color:#005C43!important;
+    }
+    .stApp [data-testid="stExpander"] summary{
+      padding:15px 17px!important;min-height:55px!important;
+      font-size:15px!important;font-weight:650!important;
+      border:0!important;
+    }
+    .stApp [data-testid="stExpander"] summary svg{
+      color:#005C43!important;stroke:#005C43!important;fill:none!important;
+    }
+    .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"]{
+      background:#fff!important;border-top:1px solid #e2eee9!important;
+      padding:13px 17px 16px!important;color:#20383d!important;
+    }
+    .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"] *{
+      -webkit-text-fill-color:initial;
+    }
+    @media(max-width:600px){
+      .stApp [data-testid="stExpander"] summary{padding:13px 15px!important}
+      .stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"]{padding:12px 15px 15px!important}
+    }
+    </style>""",unsafe_allow_html=True)
+
+
 def signup_screen():
-    signup_ui_css();signup_design_155();signup_design_170();signup_design_180()
+    signup_ui_css();signup_design_155();signup_design_170();signup_design_180();signup_design_181()
     pending=st.session_state.pop('signup_navigation_pending',None)
     if st.query_params.get('player'):
         candidate=str(st.query_params.get('player'))
