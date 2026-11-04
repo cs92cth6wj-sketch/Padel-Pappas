@@ -2827,15 +2827,64 @@ if not st.session_state.get('tid'):
       .stApp [class*="st-key-pp11_open_btn"] button{min-height:58px!important;font-size:15px!important}
     }
     @media(prefers-reduced-motion:reduce){.stApp [class*="st-key-su_home_open"] button,.stApp [class*="st-key-pp11_new_btn"] button,.stApp [class*="st-key-pp11_open_btn"] button{transition:none!important}}
+
+    /* PP 15.6: Mobile-first velkomstside inspireret af det godkendte design. */
+    .pp156-hero{position:relative;text-align:center;isolation:isolate;margin:-8px -3px 25px;padding:16px 6px 10px;background:transparent;overflow:visible}
+    .pp156-wave{position:absolute;z-index:-1;pointer-events:none;top:80px;left:-8vw;right:-8vw;height:175px;background:linear-gradient(160deg,rgba(219,243,234,.65),rgba(244,252,249,.7) 55%,transparent);clip-path:polygon(0 18%,22% 37%,47% 68%,71% 70%,100% 23%,100% 100%,0 100%)}
+    .pp156-logo{display:block;width:min(58%,245px);height:auto;object-fit:contain;margin:0 auto 20px;mix-blend-mode:multiply}
+    .pp156-hero h1{font-size:clamp(34px,8.8vw,52px)!important;font-weight:850!important;letter-spacing:-.055em!important;line-height:1.08!important;color:#162c31!important;margin:0 0 17px!important}
+    .pp156-hero p{font-size:clamp(15px,3.9vw,19px);line-height:1.52;color:#1f3036;margin:0 auto 25px;max-width:550px}
+    .pp156-features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:0 auto 28px;max-width:610px}
+    .pp156-features>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-height:103px;border-radius:19px;background:#fff;box-shadow:0 8px 25px rgba(25,62,53,.085);border:1px solid #edf3f0;color:#192e33;padding:12px 5px}
+    .pp156-features strong{font-size:clamp(11px,3.2vw,15px);font-weight:780;white-space:nowrap}
+    .pp156-feature-icon{display:flex;align-items:center;justify-content:center;font-size:35px;line-height:1;color:#006d55;height:40px}
+    .pp154-section{color:#23393d!important;letter-spacing:.16em!important;font-size:12px!important;font-weight:850!important;margin:16px 3px 13px!important}
+    .stApp [class*="st-key-su_home_open"] button,
+    .stApp [class*="st-key-pp11_new_btn"] button,
+    .stApp [class*="st-key-pp11_open_btn"] button{position:relative!important;text-align:left!important;justify-content:flex-start!important;padding-left:57px!important;padding-right:36px!important;min-height:66px!important;border-radius:17px!important;font-weight:750!important;font-size:clamp(14px,3.7vw,17px)!important;box-shadow:0 3px 10px rgba(14,80,67,.035)!important}
+    .stApp [class*="st-key-su_home_open"] button{background:linear-gradient(115deg,#00785c,#006c52)!important;color:white!important;box-shadow:0 7px 16px rgba(0,110,84,.17)!important}
+    .stApp [class*="st-key-pp11_new_btn"] button,
+    .stApp [class*="st-key-pp11_open_btn"] button{background:linear-gradient(100deg,#fff 8%,#e8f7f1 100%)!important;border:1px solid #cfe9df!important;color:#142d31!important}
+    .stApp [class*="st-key-pp11_new_btn"] button *,
+    .stApp [class*="st-key-pp11_open_btn"] button *{color:#142d31!important;-webkit-text-fill-color:#142d31!important}
+    .stApp [class*="st-key-su_home_open"] button::before,
+    .stApp [class*="st-key-pp11_new_btn"] button::before,
+    .stApp [class*="st-key-pp11_open_btn"] button::before{position:absolute;left:19px;top:50%;transform:translateY(-50%);font-size:29px;font-weight:450;color:#006b53;line-height:1}
+    .stApp [class*="st-key-su_home_open"] button::before{content:"▣";color:#fff}
+    .stApp [class*="st-key-pp11_new_btn"] button::before{content:"+";font-size:34px}
+    .stApp [class*="st-key-pp11_open_btn"] button::before{content:"◇";font-size:31px}
+    .stApp [class*="st-key-su_home_open"] button::after,
+    .stApp [class*="st-key-pp11_new_btn"] button::after,
+    .stApp [class*="st-key-pp11_open_btn"] button::after{content:"›";position:absolute;right:19px;top:50%;transform:translateY(-53%);font-size:34px;font-weight:400;color:#006c53}
+    .stApp [class*="st-key-su_home_open"] button::after{color:white}
+    .pp154-note{font-size:12px!important;margin-top:24px!important;color:#73878a!important}
+    @media(max-width:520px){
+      [data-testid="stMainBlockContainer"]{padding-top:12px!important;padding-left:16px!important;padding-right:16px!important}
+      .pp156-hero{padding-top:4px;margin-bottom:12px}
+      .pp156-logo{width:min(59%,215px);margin-bottom:16px}
+      .pp156-hero h1{font-size:clamp(32px,9vw,43px)!important}
+      .pp156-hero p{margin-bottom:22px}
+      .pp156-features{gap:9px;margin-bottom:22px}
+      .pp156-features>div{min-height:92px;border-radius:17px}
+      .pp156-feature-icon{font-size:30px;height:34px}
+      .stApp [class*="st-key-su_home_open"] button,
+      .stApp [class*="st-key-pp11_new_btn"] button,
+      .stApp [class*="st-key-pp11_open_btn"] button{min-height:62px!important;padding-left:51px!important;font-size:14px!important}
+      .stApp [class*="st-key-su_home_open"] button::before,
+      .stApp [class*="st-key-pp11_new_btn"] button::before,
+      .stApp [class*="st-key-pp11_open_btn"] button::before{left:15px}
+    }
     </style>
-    <div class="pp154-hero">
-      <div class="pp154-eyebrow"><span class="pp154-dot"></span> PADEL PAPPAS 8362</div>
-      <div class="pp154-hero-main">
-        <div class="pp154-copy"><h1 class="pp154-title">Padel<br><span>Pappas.</span></h1></div>
-        <img class="pp154-logo" src="data:image/png;base64,""" + _PP126_HERO_LOGO + """" alt="Padel Pappas 8362-logo">
+    <div class="pp156-hero">
+      <div class="pp156-wave"></div>
+      <img class="pp156-logo" src="data:image/png;base64,""" + _PP126_HERO_LOGO + """" alt="Padel Pappas 8362-logo">
+      <h1>Padel Pappas</h1>
+      <p>Spilledage, turneringer og resultater.<br>Alt samlet ét sted.</p>
+      <div class="pp156-features">
+        <div><span class="pp156-feature-icon">▣</span><strong>Spilledage</strong></div>
+        <div><span class="pp156-feature-icon">♜</span><strong>Americano</strong></div>
+        <div><span class="pp156-feature-icon">♧</span><strong>Mexicano</strong></div>
       </div>
-      <p class="pp154-subtitle">Spilledage, turneringer og resultater.<br>Alt samlet ét sted.</p>
-      <div class="pp154-pills"><span>Tilmelding</span><span>Americano</span><span>Mexicano</span></div>
     </div>
     """, unsafe_allow_html=True)
     if 'pp11_landing_mode' not in st.session_state:
@@ -2845,7 +2894,7 @@ if not st.session_state.get('tid'):
         if st.button('Spilledage og tilmelding', use_container_width=True, key='su_home_open'):
             signup_open('all')
         st.markdown('<div class="pp154-section">Spil en turnering</div>', unsafe_allow_html=True)
-        if st.button('＋ Opret ny turnering',type='primary',use_container_width=True,key='pp11_new_btn'):
+        if st.button('Opret ny turnering',type='primary',use_container_width=True,key='pp11_new_btn'):
             st.session_state.pp11_landing_mode='new';st.rerun()
         if st.button('Åbn eksisterende turnering',use_container_width=True,key='pp11_open_btn'):
             st.session_state.pp11_landing_mode='open';st.rerun()
