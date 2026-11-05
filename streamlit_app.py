@@ -3862,50 +3862,94 @@ if not st.session_state.get('tid'):
     st.markdown('<div class="pp154-note">Ingen konto nødvendig · Del nemt med din padelgruppe</div>', unsafe_allow_html=True)
     st.stop()
 
-# Den oprindelige sidepanel-menu vises kun i en åben turnering.
-with st.sidebar:
-    st.header('Åbn turnering')
-    st.caption('Åben redigering: Alle med turnerings-ID kan ændre resultater og opsætning.')
-
-    entered = st.text_input('Turnerings-ID',value='',placeholder='F.eks. PADEL1/11 eller P-AB12CD34')
-    if st.button('Åbn eksisterende turnering',use_container_width=True):
-        tid=normalize_id(entered)
-        try:
-            data=db_load(tid)
-            st.session_state.tid=tid
-            st.session_state.tourney=data
-            st.query_params['id']=tid
+# PP20: Enkel navigation i hovedindholdet, ingen dobbeltmenu i sidebaren.
+# Forside forlader kun turneringen lokalt. Gemte data i Supabase bevares.
+st.markdown("""<style>
+[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"]{display:none!important}
+.stApp [class*="st-key-pp20_nav_"] button {min-height:52px!important;border-radius:13px!important;font-weight:700!important}
+.stApp [class*="st-key-pp20_nav_"] button[kind="primary"] {background:#005C43!important;color:white!important;border-color:#005C43!important}
+.stApp [class*="st-key-pp20_nav_"] button[kind="primary"] * {color:white!important;-webkit-text-fill-color:white!important}
+.stApp [class*="st-key-pp20_nav_"] button[kind="secondary"] {background:#edf8f4!important;color:#005C43!important;border:1px solid #acd9cc!important}
+.stApp [class*="st-key-pp20_nav_"] button[kind="secondary"] * {color:#005C43!important;-webkit-text-fill-color:#005C43!important}
+</style>""", unsafe_allow_html=True)
+if 'pp20_view' not in st.session_state:
+    st.session_state.pp20_view='turnering'
+with st.container(key='pp20_navigation'):
+    nav_cols=st.columns(3,gap='small')
+    with nav_cols[0]:
+        if st.button('⌂ Forside',key='pp20_nav_home',use_container_width=True):
+            st.session_state.pop('tid',None)
+            st.session_state.tourney=fresh()
+            st.session_state.pp20_view='turnering'
+            st.session_state.pp11_landing_mode=None
+            st.session_state.confirm_reset=False
+            st.query_params.clear()
             st.rerun()
-        except (requests.RequestException,ValueError,RuntimeError) as exc:
-            st.error(f'Kunne ikke åbne turneringen: {exc}')
-    st.divider()
-    st.subheader('Opret ny turnering')
-    id_choice = st.radio('Turnerings-ID', ['Vælg selv', 'Generér automatisk'], horizontal=True,
-                         help='Du kan f.eks. bruge Padel1/11. ID må indeholde bogstaver, tal, /, - og _.')
-    custom_id = ''
-    if id_choice == 'Vælg selv':
-        custom_id = st.text_input('Dit nye turnerings-ID', placeholder='F.eks. Padel1/11',
-                                  help='3-32 tegn. Gem ID-et, så du kan åbne turneringen igen.')
-    if st.button('Opret ny turnering',type='primary',use_container_width=True):
-        tid = normalize_id(custom_id) if id_choice == 'Vælg selv' else 'P-'+secrets.token_hex(5).upper()
-        if not ID_PATTERN.fullmatch(tid):
-            st.error('Indtast et gyldigt turnerings-ID på 3-32 tegn. Brug bogstaver, tal, /, - eller _.')
-        else:
-            try:
-                data=fresh()
-                db_save(tid,data,create=True)
-                st.session_state.tid=tid
-                st.session_state.tourney=data
-                st.query_params['id']=tid
-                st.rerun()
-            except requests.HTTPError as exc:
-                if exc.response is not None and exc.response.status_code == 409:
-                    st.error('Dette turnerings-ID er allerede i brug. Vælg et andet, eller åbn den eksisterende turnering.')
-                else:
-                    st.error(f'Kunne ikke oprette turneringen: {exc}')
-            except (requests.RequestException,ValueError,RuntimeError) as exc:
-                st.error(f'Kunne ikke oprette turneringen: {exc}')
+    with nav_cols[1]:
+        if st.button('🎾 Turnering',key='pp20_nav_tournament',type='primary' if st.session_state.pp20_view=='turnering' else 'secondary',use_container_width=True):
+            st.session_state.pp20_view='turnering';st.rerun()
+    with nav_cols[2]:
+        if st.button('⚙ Indstillinger',key='pp20_nav_settings',type='primary' if st.session_state.pp20_view=='indstillinger' else 'secondary',use_container_width=True):
+            st.session_state.pp20_view='indstillinger';st.rerun()
 
+if st.session_state.pp20_view=='indstillinger':
+    st.title('Turneringsindstillinger')
+    st.caption(f'Turnerings-ID: {st.session_state.tid} · Ændringer gemmes i den eksisterende turnering.')
+    st.markdown('### Spillere og opsætning')
+    # Valgknapper som på oprettelsessiden. Gem først ved klik på Gem opsætning.
+    def pp20_choice(label,options,state_key,current):
+        st.markdown(f'**{label}**')
+        if state_key not in st.session_state or st.session_state.get('pp20_settings_tid')!=st.session_state.tid:
+            st.session_state[state_key]=current
+        cols=st.columns(len(options),gap='small')
+        for i,opt in enumerate(options):
+            with cols[i]:
+                if st.button(('✓ ' if st.session_state[state_key]==opt else '')+opt,
+                             key=f'pp20_{state_key}_{i}',use_container_width=True,
+                             type='primary' if st.session_state[state_key]==opt else 'secondary'):
+                    st.session_state[state_key]=opt;st.rerun()
+        return st.session_state[state_key]
+    if st.session_state.get('pp20_settings_tid')!=st.session_state.tid:
+        for k in ('pp20_fmt','pp20_partner','pp20_rank'):
+            st.session_state.pop(k,None)
+        st.session_state.pp20_settings_tid=st.session_state.tid
+    fmt=pp20_choice('Turneringsform',['Mexicano','Americano'],'pp20_fmt',d['format'])
+    partner_mode=pp20_choice('Makkertype',['Skiftende makker','Fast makker'],'pp20_partner',d.get('partner_mode','Skiftende makker'))
+    if partner_mode=='Fast makker':
+        st.caption('Skriv faste makkere to og to i spillerlisten (1+2, 3+4 osv.).')
+    ranking_priority=pp20_choice('Hvad afgør placeringen?',['Point først','Sejre først'],'pp20_rank',d.get('ranking_priority','Point først'))
+    with st.form('pp20_setup_form'):
+        title=st.text_input('Turneringens navn',value=d['title'])
+        raw=st.text_area('Spillere – én pr. linje',value='\n'.join(d['players']),height=175)
+        rounds=st.number_input('Maksimalt antal runder',min_value=1,max_value=40,value=int(d['round_limit']))
+        target=st.number_input('Point pr. kamp (0 = frit)',min_value=0,max_value=100,value=int(d['target']))
+        submitted=st.form_submit_button('Gem opsætning',type='primary',use_container_width=True)
+    if submitted:
+        players=[p.strip() for p in raw.splitlines() if p.strip()]
+        if len(players)<4 or len(players)!=len(set(players)):
+            st.error('Skriv mindst fire forskellige spillernavne.')
+        elif partner_mode=='Fast makker' and len(players)%2:
+            st.error('Faste makkere kræver et lige antal spillere.')
+        elif d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode','Skiftende makker')):
+            st.error('En startet turnering kan ikke ændre spillere eller turneringsform. Nulstil først.')
+        elif d['round'] and int(rounds)!=int(d['round_limit']) and d['format']=='Americano':
+            st.error('Antal runder kan ikke ændres efter Americano er startet.')
+        else:
+            if not d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode') or int(rounds)!=int(d['round_limit'])):
+                d['americano_schedule']=[]
+            d.update(title=title,players=players,format=fmt,partner_mode=partner_mode,ranking_priority=ranking_priority,round_limit=int(rounds),target=int(target))
+            save();st.success('Opsætning gemt.')
+    st.divider()
+    with st.expander('Nulstil turnering – slet runder og resultater'):
+        st.warning('Nulstilling sletter turneringens runder og resultater. Dette kan ikke fortrydes.')
+        confirm=st.checkbox('Jeg forstår, at alle runder og resultater bliver slettet',key='pp20_reset_confirm')
+        if st.button('Nulstil turnering',disabled=not confirm,key='pp20_reset_button'):
+            # Behold navn, spillere og indstillinger; nulstil kun spilledata.
+            d.update(round=0,matches=[],history=[],byes=[],finale=None,finales=None,americano_schedule=[])
+            save();st.session_state.pp20_view='turnering';st.rerun()
+    if st.button('← Tilbage til turneringen',key='pp20_settings_back'):
+        st.session_state.pp20_view='turnering';st.rerun()
+    st.stop()
 
 st.markdown("""<style>
 .pp126-hero{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:165px}
@@ -3940,50 +3984,6 @@ st.markdown(
     f'<div class="p7-stat"><strong>{len(d.get("matches", []))}</strong><small>Baner i runden</small></div>'
     f'<div class="p7-stat"><strong>{d.get("target", 0) or "Fri"}</strong><small>Point pr. kamp</small></div>'
     '</div>', unsafe_allow_html=True)
-
-if st.session_state.get('tid'):
-    with st.sidebar:
-        st.divider()
-        st.header('Turneringsopsætning')
-        with st.form('setup'):
-            title=st.text_input('Turneringens navn',value=d['title'])
-            raw=st.text_area('Spillere – én pr. linje',value='\n'.join(d['players']),height=170,placeholder='Jan\nTue\nMick\nJanus')
-            fmt=st.radio('Turneringsform', ['Mexicano', 'Americano'],
-                         index=['Mexicano', 'Americano'].index(d['format']))
-            partner_mode=st.radio('Makkertype', ['Skiftende makker', 'Fast makker'],
-                                  index=1 if d.get('partner_mode')=='Fast makker' else 0,
-                                  help='Fast makker: Skriv partnerne to og to i spillerlisten (linje 1+2, 3+4 osv.).')
-            if partner_mode == 'Fast makker':
-                st.caption('Faste par: 1. og 2. navn er et par; 3. og 4. navn er næste par osv. Parrene bliver sammen i alle runder.')
-            ranking_priority=st.radio('Hvad afgør placeringen?', ['Point først', 'Sejre først'],
-                                      index=1 if d.get('ranking_priority')=='Sejre først' else 0,
-                                      help='Point først: flest scorede point, derefter flest sejre og pointforskel. Sejre først: flest vundne kampe, derefter scorede point og pointforskel.')
-            rounds=st.number_input('Maksimalt antal runder',min_value=1,max_value=40,value=int(d['round_limit']))
-            target=st.number_input('Point pr. kamp (0 = frit)',min_value=0,max_value=100,value=int(d['target']))
-            submitted=st.form_submit_button('Gem opsætning',type='primary',use_container_width=True)
-        if submitted:
-            players=[p.strip() for p in raw.splitlines() if p.strip()]
-            if len(players)<4 or len(players)!=len(set(players)):
-                st.error('Skriv mindst fire forskellige spillernavne.')
-            elif partner_mode == 'Fast makker' and len(players)%2:
-                st.error('Faste makkere kræver et lige antal spillere. Skriv hvert par lige efter hinanden.')
-            elif d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode','Skiftende makker')):
-                st.error('En startet turnering kan ikke ændre spillere eller turneringsform. Nulstil først.')
-            else:
-                if not d['round'] and (players != d['players'] or fmt != d['format'] or partner_mode != d.get('partner_mode') or int(rounds) != int(d['round_limit'])):
-                    d['americano_schedule'] = []
-                if d['round'] and int(rounds) != int(d['round_limit']) and d['format'] == 'Americano':
-                    st.error('Antal runder kan ikke ændres efter Americano er startet, fordi programmet er fastlagt.')
-                    st.stop()
-                d.update(title=title,players=players,format=fmt,partner_mode=partner_mode,ranking_priority=ranking_priority,round_limit=int(rounds),target=int(target))
-                save();st.success('Opsætning gemt')
-        st.divider()
-        if st.button('Nulstil turnering',use_container_width=True):
-            st.session_state.confirm_reset=True
-        if st.session_state.get('confirm_reset'):
-            st.warning('Alle runder og resultater slettes i denne turnering.')
-            if st.button('Bekræft nulstilling',type='primary'):
-                st.session_state.tourney=fresh();d=st.session_state.tourney;save();st.session_state.confirm_reset=False;st.rerun()
 
 # Tour progress is visual only, based on completed and persisted round scores.
 completed_rounds = min(int(d.get('round_limit', 7)), played_rounds)
