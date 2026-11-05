@@ -1243,8 +1243,54 @@ def signup_design_181():
     </style>""",unsafe_allow_html=True)
 
 
+
+
+def signup_design_184():
+    """Farver til valg af flere søndage og delingsknappen – uden funktionsændringer."""
+    st.markdown("""<style>
+    /* Multiselect: fjern mørk baggrund, ramme og røde valgte datoer. */
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"] > div,
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"] > div > div {
+      background-color:#fff!important;color:#005C43!important;
+      border-color:#bfd9d0!important;box-shadow:none!important;
+    }
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+      border:1px solid #bfd9d0!important;border-radius:13px!important;min-height:49px!important;
+    }
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="tag"],
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="tag"] > span,
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="tag"] > div {
+      background:#e5f4ee!important;background-color:#e5f4ee!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
+      border-radius:8px!important;
+    }
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="tag"] svg,
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"] svg {
+      color:#005C43!important;fill:#005C43!important;
+    }
+    .stApp [data-testid="stMultiSelect"] input {
+      background:transparent!important;color:#005C43!important;
+      -webkit-text-fill-color:#005C43!important;
+    }
+    /* Del tilmeldingsoversigten: grøn handlingsknap med hvid tekst. */
+    .stApp [data-testid="stLinkButton"] a,
+    .stApp [data-testid="stLinkButton"] a[kind],
+    .stApp [data-testid="stLinkButton"] a[data-testid] {
+      background:#005C43!important;background-color:#005C43!important;
+      color:#fff!important;-webkit-text-fill-color:#fff!important;
+      border:1px solid #005C43!important;border-radius:14px!important;
+      min-height:51px!important;font-weight:750!important;box-shadow:none!important;
+    }
+    .stApp [data-testid="stLinkButton"] a *,
+    .stApp [data-testid="stLinkButton"] a svg {
+      color:#fff!important;-webkit-text-fill-color:#fff!important;stroke:#fff!important;
+    }
+    .stApp [data-testid="stLinkButton"] a:hover {background:#004b37!important;}
+    </style>""",unsafe_allow_html=True)
+
+
 def signup_screen():
-    signup_ui_css();signup_design_155();signup_design_170();signup_design_180();signup_design_181()
+    signup_ui_css();signup_design_155();signup_design_170();signup_design_180();signup_design_181();signup_design_184()
     pending=st.session_state.pop('signup_navigation_pending',None)
     if st.query_params.get('player'):
         candidate=str(st.query_params.get('player'))
