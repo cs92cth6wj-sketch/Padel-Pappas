@@ -756,7 +756,16 @@ def signup_bulk_create():
     with st.form('pp15_bulk'):
         start_sunday=signup_default_sunday()
         options=[start_sunday+timedelta(days=7*i) for i in range(16)]
-        selected=st.multiselect('Vælg søndage',options,default=options[:4],format_func=signup_date_label)
+        st.markdown('**Vælg søndage**')
+        st.caption('De første fire søndage er valgt på forhånd. Du kan vælge op til 12.')
+        selected=[]
+        for offset in range(0,len(options),4):
+            date_cols=st.columns(4)
+            for j,day_option in enumerate(options[offset:offset+4]):
+                with date_cols[j]:
+                    if st.checkbox(signup_date_label(day_option),value=(offset+j<4),
+                                   key='pp186_sunday_'+day_option.isoformat()):
+                        selected.append(day_option)
         a,b=st.columns(2)
         start=a.text_input('Starttid',value='20:00',key='pp15_bulkstart')
         end=b.text_input('Sluttid',value='22:00',key='pp15_bulkend')
@@ -1286,6 +1295,40 @@ def signup_design_184():
       color:#fff!important;-webkit-text-fill-color:#fff!important;stroke:#fff!important;
     }
     .stApp [data-testid="stLinkButton"] a:hover {background:#004b37!important;}
+    /* 18.6: konsekvent farve på valgte søndage, uanset BaseWeb-version. */
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"],
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"] > div,
+    .stApp [data-testid="stMultiSelect"] [role="combobox"]{
+      background:#fff!important;background-color:#fff!important;
+      border-color:#bfd9d0!important;color:#005C43!important;
+      box-shadow:none!important;
+    }
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="tag"],
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="tag"] *,
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"] [data-baseweb="tag"],
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="select"] [data-baseweb="tag"] *{
+      background:#e5f4ee!important;background-color:#e5f4ee!important;
+      color:#005C43!important;-webkit-text-fill-color:#005C43!important;
+      border-color:#bfd9d0!important;box-shadow:none!important;
+    }
+    .stApp [data-testid="stMultiSelect"] [data-baseweb="tag"] svg{
+      fill:#005C43!important;stroke:#005C43!important;
+    }
+    .stApp a.pp186-share-link,
+    .stApp a.pp186-share-link:link,
+    .stApp a.pp186-share-link:visited{
+      display:flex!important;align-items:center!important;justify-content:center!important;
+      width:100%!important;min-height:52px!important;padding:12px 18px!important;
+      border-radius:14px!important;background:#005C43!important;
+      color:#fff!important;-webkit-text-fill-color:#fff!important;
+      font-weight:750!important;text-decoration:none!important;text-align:center!important;
+      border:1px solid #005C43!important;box-sizing:border-box!important;
+    }
+    .stApp a.pp186-share-link:hover{background:#004b37!important;color:#fff!important}
+    .stApp [class*="st-key-pp186_sunday_"] label{background:#edf8f4!important;border:1px solid #bfd9d0!important;border-radius:10px!important;padding:10px 8px!important;min-height:48px!important;cursor:pointer!important}
+    .stApp [class*="st-key-pp186_sunday_"] label p{color:#005C43!important;-webkit-text-fill-color:#005C43!important;font-size:13px!important;font-weight:600!important}
+    .stApp [class*="st-key-pp186_sunday_"] [data-testid="stCheckbox"] input:checked + div,
+    .stApp [class*="st-key-pp186_sunday_"] [data-baseweb="checkbox"] [aria-checked="true"]{background:#005C43!important;border-color:#005C43!important}
     </style>""",unsafe_allow_html=True)
 
 
@@ -1318,8 +1361,12 @@ def signup_screen():
             st.text_input('Link til tilmeldingsoversigten', value=signup_share_link,
                           key='pp183_signup_share_link', label_visibility='collapsed',
                           help='Tryk i feltet, markér adressen, og kopiér den.')
-            st.link_button('Åbn tilmeldingsoversigten ↗', signup_share_link,
-                           use_container_width=True)
+            # Eget link-element: Streamlits globale knap-CSS skjulte teksten i st.link_button.
+            st.markdown(
+                '<a class="pp186-share-link" href="'+html.escape(signup_share_link,quote=True)+'" '
+                'target="_blank" rel="noopener noreferrer">Åbn tilmeldingsoversigten ↗</a>',
+                unsafe_allow_html=True,
+            )
         signup_admin()
         st.caption('Padel Pappas 8362 · Ingen betaling ved tilmelding')
         st.stop()
@@ -3598,63 +3645,72 @@ if not st.session_state.get('tid'):
         </style>""",unsafe_allow_html=True)
         st.subheader('Opret ny turnering')
         st.markdown('<div class="pp166-section">1 · Spillere</div>',unsafe_allow_html=True)
-        # Version 18.5: alle radio-valg fremstår som store, tilgængelige valgknapper.
-        # Kun CSS: Streamlits indbyggede radiologik, formularer og gemte værdier bevares.
+        # Version 18.7: to ens, vandrette valgknapper uden synlige radioprikker.
+        # De oprindelige st.radio widgets og deres værdier er uændrede.
         st.markdown("""
         <style>
-        .stApp [data-testid="stRadio"] [role="radiogroup"] {
-            display:flex!important;
-            flex-wrap:wrap!important;
-            align-items:stretch!important;
-            gap:10px!important;
+        /* Ensartet 2-kolonne-layout i oprettelsesformularen. */
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"]{
+          display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+          gap:10px!important;width:100%!important;align-items:stretch!important;
         }
-        .stApp [data-testid="stRadio"] [role="radiogroup"] > label,
-        .stApp [data-testid="stRadio"] [role="radiogroup"] > div:has(input[type="radio"]) {
-            flex:1 1 175px!important;
-            min-width:0!important;
-            margin:0!important;
-            padding:0!important;
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] > *{
+          min-width:0!important;width:100%!important;max-width:none!important;
+          margin:0!important;flex:unset!important;align-self:stretch!important;
         }
-        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) {
-            display:flex!important;
-            align-items:center!important;
-            justify-content:center!important;
-            box-sizing:border-box!important;
-            width:100%!important;
-            min-height:54px!important;
-            padding:12px 15px!important;
-            border:1.5px solid #A8D4C5!important;
-            border-radius:14px!important;
-            background:#EDF8F3!important;
-            color:#005C43!important;
-            cursor:pointer!important;
-            transition:background .12s ease,border-color .12s ease!important;
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label{
+          position:relative!important;display:flex!important;align-items:center!important;
+          justify-content:center!important;min-width:0!important;width:100%!important;
+          min-height:54px!important;box-sizing:border-box!important;padding:11px 8px!important;
+          border:1.5px solid #a8d4c5!important;border-radius:14px!important;
+          background:#edf8f3!important;color:#005c43!important;
+          cursor:pointer!important;text-align:center!important;gap:0!important;
+          box-shadow:none!important;
         }
-        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]:checked) {
-            background:#005C43!important;
-            border-color:#005C43!important;
-            color:#FFFFFF!important;
-            box-shadow:0 5px 14px rgba(0,92,67,.10)!important;
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked),
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label:has([aria-checked="true"]){
+          background:#005c43!important;border-color:#005c43!important;
+          color:#fff!important;box-shadow:0 5px 14px rgba(0,92,67,.10)!important;
         }
-        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) [data-testid="stMarkdownContainer"],
-        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) p {
-            color:inherit!important;
-            font-weight:650!important;
-            text-align:center!important;
-            margin:0!important;
+        /* Gem hele den grafiske radiomarkør – men bevar input til tastatur og skærmlæser. */
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label input[type="radio"]{
+          position:absolute!important;opacity:0!important;width:1px!important;height:1px!important;
         }
-        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) > div:first-child,
-        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) [data-baseweb="radio"] > div:first-child {
-            display:none!important;
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label [data-baseweb="radio"]{
+          display:none!important;
         }
-        .stApp [data-testid="stRadio"] [role="radiogroup"] label:focus-within {
-            outline:3px solid #8BC5B3!important;
-            outline-offset:2px!important;
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label > div:first-child:not([data-testid="stMarkdownContainer"]){
+          display:none!important;
         }
-        @media(max-width:420px){
-            .stApp [data-testid="stRadio"] [role="radiogroup"] {gap:8px!important;}
-            .stApp [data-testid="stRadio"] [role="radiogroup"] > label {flex-basis:140px!important;}
-            .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) {padding:11px 8px!important;font-size:14px!important;}
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"],
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"] p,
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label p{
+          color:inherit!important;-webkit-text-fill-color:currentColor!important;
+          font-size:14px!important;font-weight:700!important;line-height:1.3!important;
+          text-align:center!important;margin:0!important;white-space:normal!important;
+        }
+        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label:focus-within{
+          outline:2px solid #005c43!important;outline-offset:3px!important;
+        }
+        /* Spilledagsvælger: fjern gamle sorte baggrunde og brug samme lyse design. */
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"],
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] > div,
+        .stApp [class*="st-key-su_selected_day"] [role="combobox"],
+        .stApp [class*="st-key-su_selected_day"] [aria-haspopup="listbox"]{
+          background:#fff!important;background-color:#fff!important;
+          color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+          border-color:#bfd9d0!important;box-shadow:none!important;
+        }
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] *,
+        .stApp [class*="st-key-su_selected_day"] [role="combobox"] *,
+        .stApp [class*="st-key-su_selected_day"] [aria-haspopup="listbox"] *{
+          color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+        }
+        .stApp [class*="st-key-su_selected_day"] svg{fill:#005c43!important;color:#005c43!important;}
+        @media(max-width:380px){
+          .stApp section.main [data-testid="stRadio"] [role="radiogroup"]{gap:7px!important;}
+          .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label{min-height:58px!important;padding:9px 5px!important;}
+          .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label p{font-size:12px!important;}
         }
         </style>
         """,unsafe_allow_html=True)
