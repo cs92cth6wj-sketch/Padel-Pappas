@@ -3598,6 +3598,66 @@ if not st.session_state.get('tid'):
         </style>""",unsafe_allow_html=True)
         st.subheader('Opret ny turnering')
         st.markdown('<div class="pp166-section">1 · Spillere</div>',unsafe_allow_html=True)
+        # Version 18.5: alle radio-valg fremstår som store, tilgængelige valgknapper.
+        # Kun CSS: Streamlits indbyggede radiologik, formularer og gemte værdier bevares.
+        st.markdown("""
+        <style>
+        .stApp [data-testid="stRadio"] [role="radiogroup"] {
+            display:flex!important;
+            flex-wrap:wrap!important;
+            align-items:stretch!important;
+            gap:10px!important;
+        }
+        .stApp [data-testid="stRadio"] [role="radiogroup"] > label,
+        .stApp [data-testid="stRadio"] [role="radiogroup"] > div:has(input[type="radio"]) {
+            flex:1 1 175px!important;
+            min-width:0!important;
+            margin:0!important;
+            padding:0!important;
+        }
+        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) {
+            display:flex!important;
+            align-items:center!important;
+            justify-content:center!important;
+            box-sizing:border-box!important;
+            width:100%!important;
+            min-height:54px!important;
+            padding:12px 15px!important;
+            border:1.5px solid #A8D4C5!important;
+            border-radius:14px!important;
+            background:#EDF8F3!important;
+            color:#005C43!important;
+            cursor:pointer!important;
+            transition:background .12s ease,border-color .12s ease!important;
+        }
+        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]:checked) {
+            background:#005C43!important;
+            border-color:#005C43!important;
+            color:#FFFFFF!important;
+            box-shadow:0 5px 14px rgba(0,92,67,.10)!important;
+        }
+        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) [data-testid="stMarkdownContainer"],
+        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) p {
+            color:inherit!important;
+            font-weight:650!important;
+            text-align:center!important;
+            margin:0!important;
+        }
+        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) > div:first-child,
+        .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) [data-baseweb="radio"] > div:first-child {
+            display:none!important;
+        }
+        .stApp [data-testid="stRadio"] [role="radiogroup"] label:focus-within {
+            outline:3px solid #8BC5B3!important;
+            outline-offset:2px!important;
+        }
+        @media(max-width:420px){
+            .stApp [data-testid="stRadio"] [role="radiogroup"] {gap:8px!important;}
+            .stApp [data-testid="stRadio"] [role="radiogroup"] > label {flex-basis:140px!important;}
+            .stApp [data-testid="stRadio"] [role="radiogroup"] label:has(input[type="radio"]) {padding:11px 8px!important;font-size:14px!important;}
+        }
+        </style>
+        """,unsafe_allow_html=True)
         signup_source = st.radio('Hvor kommer spillerne fra?', ['Skriv spillere manuelt', 'Hent fra spilledag'], horizontal=True, key='su_player_source')
         selected_day = None
         imported_players = []
