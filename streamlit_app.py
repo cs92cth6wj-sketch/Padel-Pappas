@@ -3656,13 +3656,13 @@ if not st.session_state.get('tid'):
             for col, option in zip(cols, options):
                 with col:
                     chosen = st.session_state[key] == option
-                    if st.button(option, key=f"{key}_{options.index(option)}", type="primary" if chosen else "secondary", use_container_width=True):
+                    if st.button(("✓  " if chosen else "") + option, key=f"{key}_{options.index(option)}", type="primary" if chosen else "secondary", use_container_width=True):
                         st.session_state[key] = option
                         st.rerun()
             return st.session_state[key]
 
         st.markdown("""<style>
-        .pp-choice-label{font-weight:600;color:#005c43;margin:15px 0 7px}
+        .pp-choice-label{font-weight:600;color:#005c43;margin:9px 0 5px}
         .stApp [class*="st-key-pp_choice_"] button[kind="primary"],
         .stApp [class*="st-key-pp_choice_"] button[data-testid="stBaseButton-primary"]{
             background:#005c43!important;color:white!important;border:1px solid #005c43!important;
@@ -3676,6 +3676,46 @@ if not st.session_state.get('tid'):
         .stApp [class*="st-key-pp_choice_"] button p{color:inherit!important;font-weight:700!important;
             white-space:normal!important;overflow-wrap:anywhere!important}
         .stApp [class*="st-key-pp_choice_"] button:hover{border-color:#005c43!important}
+        </style>""", unsafe_allow_html=True)
+        # Afsluttende, lokalt afgrænset styling af valgene og de to talfelter.
+        # CSS placeres efter de tidligere tema-regler for at undgå mørke +/- felter.
+        st.markdown("""<style>
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] [data-baseweb="input"],
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] [data-baseweb="base-input"]{
+            background:#fff!important;background-color:#fff!important;
+            border:1px solid #b8d8cc!important;border-radius:12px!important;
+            box-shadow:none!important;overflow:hidden!important;
+        }
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] input{
+            background:#fff!important;background-color:#fff!important;
+            color:#203a38!important;-webkit-text-fill-color:#203a38!important;
+            border:0!important;box-shadow:none!important;font-weight:750!important;
+        }
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] button,
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] button:hover,
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] button:focus{
+            background:#eaf6f1!important;background-color:#eaf6f1!important;
+            border:0!important;border-left:1px solid #c7e0d6!important;
+            box-shadow:none!important;color:#005c43!important;
+        }
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] button svg,
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] button svg *{
+            color:#005c43!important;stroke:#005c43!important;
+        }
+        .stApp [class*="st-key-pp19_new_form"] [data-testid="stNumberInput"] button:disabled{
+            opacity:.5!important;background:#eaf6f1!important;
+        }
+        .stApp [class*="st-key-pp_choice_"] button{
+            min-height:52px!important;
+        }
+        .stApp [class*="st-key-pp_choice_"] button[kind="primary"] *,
+        .stApp [class*="st-key-pp_choice_"] button[data-testid="stBaseButton-primary"] *{
+            color:#fff!important;-webkit-text-fill-color:#fff!important;
+        }
+        .stApp [class*="st-key-pp_choice_"] button[kind="secondary"] *,
+        .stApp [class*="st-key-pp_choice_"] button[data-testid="stBaseButton-secondary"] *{
+            color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+        }
         </style>""", unsafe_allow_html=True)
         signup_source = pp_choice('Hvor kommer spillerne fra?', ['Skriv spillere manuelt', 'Hent fra spilledag'], 'pp_choice_source')
         selected_day = None
