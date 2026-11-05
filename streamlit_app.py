@@ -3896,40 +3896,40 @@ with st.container(key='pp20_navigation'):
 # This block deliberately comes after the accumulated legacy CSS.
 st.markdown("""<style>
 /* Settings form: white inputs, restrained green borders and consistent text. */
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stTextInput"] input,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stTextArea"] textarea,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] input {
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stTextInput"] input,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stTextArea"] textarea,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] input {
   background:#fff!important;color:#203b36!important;-webkit-text-fill-color:#203b36!important;
   border-color:#c7ded6!important;box-shadow:none!important;
 }
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stTextArea"] textarea {
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stTextArea"] textarea {
   border:1px solid #c7ded6!important;border-radius:12px!important;
   min-height:155px!important;line-height:1.6!important;padding:12px 14px!important;
 }
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] > div,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] [data-baseweb="input"] {
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] > div,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] [data-baseweb="input"] {
   background:#fff!important;border:1px solid #c7ded6!important;border-radius:12px!important;
   overflow:hidden!important;box-shadow:none!important;
 }
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] button,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] button:hover,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] button:focus {
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] button,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] button:hover,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] button:focus {
   background:#eaf7f1!important;border-color:#c7ded6!important;color:#005c43!important;
   -webkit-text-fill-color:#005c43!important;opacity:1!important;
 }
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] button svg,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stNumberInput"] button svg * {
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] button svg,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stNumberInput"] button svg * {
   color:#005c43!important;stroke:#005c43!important;fill:none!important;opacity:1!important;
 }
 /* Strong selector for submit: old rules had overridden primary buttons with red. */
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stFormSubmitButton"] button,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stFormSubmitButton"] button[kind="primary"],
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primary"] {
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stFormSubmitButton"] button,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stFormSubmitButton"] button[kind="primary"],
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stFormSubmitButton"] button[data-testid="stBaseButton-primary"] {
   background:#005c43!important;border:1px solid #005c43!important;color:#fff!important;
   -webkit-text-fill-color:#fff!important;border-radius:13px!important;min-height:52px!important;
 }
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stFormSubmitButton"] button *,
-.stApp [class*="st-key-pp20_setup_form"] [data-testid="stFormSubmitButton"] button p {
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stFormSubmitButton"] button *,
+.stApp [class*="st-key-pp21_settings_scope"] [data-testid="stFormSubmitButton"] button p {
   color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;
 }
 /* Reset remains subdued, but its label must always be readable. */
@@ -3944,65 +3944,108 @@ st.markdown("""<style>
 .stApp [class*="st-key-pp20_reset_button"] button:disabled {opacity:.6!important}
 </style>""",unsafe_allow_html=True)
 
+# PP20.2: All rules scoped to a real keyed Streamlit container, not a form.
+st.markdown("""<style>
+.stApp .st-key-pp21_settings_scope [data-testid="stFormSubmitButton"] button,
+.stApp .st-key-pp21_settings_scope [data-testid="stFormSubmitButton"] button[kind],
+.stApp .st-key-pp21_settings_scope [data-testid="stFormSubmitButton"] button[data-testid] {
+ background:#005c43!important;background-color:#005c43!important;border:1px solid #005c43!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;box-shadow:0 5px 14px rgba(0,92,67,.13)!important;
+}
+.stApp .st-key-pp21_settings_scope [data-testid="stFormSubmitButton"] button :is(p,span,div),
+.stApp .st-key-pp21_settings_scope [data-testid="stFormSubmitButton"] button * {
+ color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;
+}
+.stApp .st-key-pp21_settings_scope [data-testid="stNumberInput"] [data-baseweb="input"],
+.stApp .st-key-pp21_settings_scope [data-testid="stNumberInput"] [data-baseweb="input"] > div {
+ background:#fff!important;background-color:#fff!important;border-color:#c7ded6!important;
+}
+.stApp .st-key-pp21_settings_scope [data-testid="stNumberInput"] button,
+.stApp .st-key-pp21_settings_scope [data-testid="stNumberInput"] button[kind] {
+ background:#eaf7f1!important;background-color:#eaf7f1!important;
+ color:#005c43!important;-webkit-text-fill-color:#005c43!important;border-color:#c7ded6!important;
+}
+.stApp .st-key-pp21_settings_scope [data-testid="stNumberInput"] button svg,
+.stApp .st-key-pp21_settings_scope [data-testid="stNumberInput"] button svg * {
+ color:#005c43!important;stroke:#005c43!important;fill:none!important;opacity:1!important;
+}
+.stApp .st-key-pp21_settings_scope [data-testid="stNumberInput"] input,
+.stApp .st-key-pp21_settings_scope [data-testid="stTextInput"] input,
+.stApp .st-key-pp21_settings_scope [data-testid="stTextArea"] textarea {
+ background:#fff!important;background-color:#fff!important;color:#203b36!important;
+ -webkit-text-fill-color:#203b36!important;border:1px solid #c7ded6!important;border-radius:10px!important;
+}
+.stApp .st-key-pp21_settings_scope [data-testid="stTextArea"] textarea {line-height:1.65!important;padding:12px 14px!important;}
+.stApp .st-key-pp21_settings_scope [class*="st-key-pp20_reset_button"] button,
+.stApp .st-key-pp21_settings_scope [class*="st-key-pp20_reset_button"] button * {
+ background:#edf8f4!important;color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+}
+.stApp .st-key-pp21_settings_scope [data-testid="stExpander"] summary,
+.stApp .st-key-pp21_settings_scope [data-testid="stExpander"] summary * {
+ color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+}
+</style>""",unsafe_allow_html=True)
+
 if st.session_state.pp20_view=='indstillinger':
-    st.title('Turneringsindstillinger')
-    st.caption(f'Turnerings-ID: {st.session_state.tid} · Ændringer gemmes i den eksisterende turnering.')
-    st.markdown('### Spillere og opsætning')
-    # Valgknapper som på oprettelsessiden. Gem først ved klik på Gem opsætning.
-    def pp20_choice(label,options,state_key,current):
-        st.markdown(f'**{label}**')
-        if state_key not in st.session_state or st.session_state.get('pp20_settings_tid')!=st.session_state.tid:
-            st.session_state[state_key]=current
-        cols=st.columns(len(options),gap='small')
-        for i,opt in enumerate(options):
-            with cols[i]:
-                if st.button(('✓ ' if st.session_state[state_key]==opt else '')+opt,
-                             key=f'pp20_{state_key}_{i}',use_container_width=True,
-                             type='primary' if st.session_state[state_key]==opt else 'secondary'):
-                    st.session_state[state_key]=opt;st.rerun()
-        return st.session_state[state_key]
-    if st.session_state.get('pp20_settings_tid')!=st.session_state.tid:
-        for k in ('pp20_fmt','pp20_partner','pp20_rank'):
-            st.session_state.pop(k,None)
-        st.session_state.pp20_settings_tid=st.session_state.tid
-    fmt=pp20_choice('Turneringsform',['Mexicano','Americano'],'pp20_fmt',d['format'])
-    partner_mode=pp20_choice('Makkertype',['Skiftende makker','Fast makker'],'pp20_partner',d.get('partner_mode','Skiftende makker'))
-    if partner_mode=='Fast makker':
-        st.caption('Skriv faste makkere to og to i spillerlisten (1+2, 3+4 osv.).')
-    ranking_priority=pp20_choice('Hvad afgør placeringen?',['Point først','Sejre først'],'pp20_rank',d.get('ranking_priority','Point først'))
-    with st.form('pp20_setup_form', border=True):
-        # Scoped marker is provided by the form's own key/class in Streamlit.
-        title=st.text_input('Turneringens navn',value=d['title'])
-        raw=st.text_area('Spillere – én pr. linje',value='\n'.join(d['players']),height=175)
-        rounds=st.number_input('Maksimalt antal runder',min_value=1,max_value=40,value=int(d['round_limit']))
-        target=st.number_input('Point pr. kamp (0 = frit)',min_value=0,max_value=100,value=int(d['target']))
-        submitted=st.form_submit_button('Gem opsætning',type='primary',use_container_width=True)
-    if submitted:
-        players=[p.strip() for p in raw.splitlines() if p.strip()]
-        if len(players)<4 or len(players)!=len(set(players)):
-            st.error('Skriv mindst fire forskellige spillernavne.')
-        elif partner_mode=='Fast makker' and len(players)%2:
-            st.error('Faste makkere kræver et lige antal spillere.')
-        elif d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode','Skiftende makker')):
-            st.error('En startet turnering kan ikke ændre spillere eller turneringsform. Nulstil først.')
-        elif d['round'] and int(rounds)!=int(d['round_limit']) and d['format']=='Americano':
-            st.error('Antal runder kan ikke ændres efter Americano er startet.')
-        else:
-            if not d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode') or int(rounds)!=int(d['round_limit'])):
-                d['americano_schedule']=[]
-            d.update(title=title,players=players,format=fmt,partner_mode=partner_mode,ranking_priority=ranking_priority,round_limit=int(rounds),target=int(target))
-            save();st.success('Opsætning gemt.')
-    st.divider()
-    with st.expander('Nulstil turnering – slet runder og resultater'):
-        st.warning('Nulstilling sletter turneringens runder og resultater. Dette kan ikke fortrydes.')
-        confirm=st.checkbox('Jeg forstår, at alle runder og resultater bliver slettet',key='pp20_reset_confirm')
-        if st.button('Nulstil turnering',disabled=not confirm,key='pp20_reset_button',use_container_width=True):
-            # Behold navn, spillere og indstillinger; nulstil kun spilledata.
-            d.update(round=0,matches=[],history=[],byes=[],finale=None,finales=None,americano_schedule=[])
-            save();st.session_state.pp20_view='turnering';st.rerun()
-    if st.button('← Tilbage til turneringen',key='pp20_settings_back'):
-        st.session_state.pp20_view='turnering';st.rerun()
-    st.stop()
+    with st.container(key='pp21_settings_scope'):
+        st.title('Turneringsindstillinger')
+        st.caption(f'Turnerings-ID: {st.session_state.tid} · Ændringer gemmes i den eksisterende turnering.')
+        st.markdown('### Spillere og opsætning')
+        # Valgknapper som på oprettelsessiden. Gem først ved klik på Gem opsætning.
+        def pp20_choice(label,options,state_key,current):
+            st.markdown(f'**{label}**')
+            if state_key not in st.session_state or st.session_state.get('pp20_settings_tid')!=st.session_state.tid:
+                st.session_state[state_key]=current
+            cols=st.columns(len(options),gap='small')
+            for i,opt in enumerate(options):
+                with cols[i]:
+                    if st.button(('✓ ' if st.session_state[state_key]==opt else '')+opt,
+                                 key=f'pp20_{state_key}_{i}',use_container_width=True,
+                                 type='primary' if st.session_state[state_key]==opt else 'secondary'):
+                        st.session_state[state_key]=opt;st.rerun()
+            return st.session_state[state_key]
+        if st.session_state.get('pp20_settings_tid')!=st.session_state.tid:
+            for k in ('pp20_fmt','pp20_partner','pp20_rank'):
+                st.session_state.pop(k,None)
+            st.session_state.pp20_settings_tid=st.session_state.tid
+        fmt=pp20_choice('Turneringsform',['Mexicano','Americano'],'pp20_fmt',d['format'])
+        partner_mode=pp20_choice('Makkertype',['Skiftende makker','Fast makker'],'pp20_partner',d.get('partner_mode','Skiftende makker'))
+        if partner_mode=='Fast makker':
+            st.caption('Skriv faste makkere to og to i spillerlisten (1+2, 3+4 osv.).')
+        ranking_priority=pp20_choice('Hvad afgør placeringen?',['Point først','Sejre først'],'pp20_rank',d.get('ranking_priority','Point først'))
+        with st.form('pp20_setup_form', border=True):
+            # Scoped marker is provided by the form's own key/class in Streamlit.
+            title=st.text_input('Turneringens navn',value=d['title'])
+            raw=st.text_area('Spillere – én pr. linje',value='\n'.join(d['players']),height=175)
+            rounds=st.number_input('Maksimalt antal runder',min_value=1,max_value=40,value=int(d['round_limit']))
+            target=st.number_input('Point pr. kamp (0 = frit)',min_value=0,max_value=100,value=int(d['target']))
+            submitted=st.form_submit_button('Gem opsætning',type='primary',use_container_width=True)
+        if submitted:
+            players=[p.strip() for p in raw.splitlines() if p.strip()]
+            if len(players)<4 or len(players)!=len(set(players)):
+                st.error('Skriv mindst fire forskellige spillernavne.')
+            elif partner_mode=='Fast makker' and len(players)%2:
+                st.error('Faste makkere kræver et lige antal spillere.')
+            elif d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode','Skiftende makker')):
+                st.error('En startet turnering kan ikke ændre spillere eller turneringsform. Nulstil først.')
+            elif d['round'] and int(rounds)!=int(d['round_limit']) and d['format']=='Americano':
+                st.error('Antal runder kan ikke ændres efter Americano er startet.')
+            else:
+                if not d['round'] and (players!=d['players'] or fmt!=d['format'] or partner_mode!=d.get('partner_mode') or int(rounds)!=int(d['round_limit'])):
+                    d['americano_schedule']=[]
+                d.update(title=title,players=players,format=fmt,partner_mode=partner_mode,ranking_priority=ranking_priority,round_limit=int(rounds),target=int(target))
+                save();st.success('Opsætning gemt.')
+        st.divider()
+        with st.expander('Nulstil turnering – slet runder og resultater'):
+            st.warning('Nulstilling sletter turneringens runder og resultater. Dette kan ikke fortrydes.')
+            confirm=st.checkbox('Jeg forstår, at alle runder og resultater bliver slettet',key='pp20_reset_confirm')
+            if st.button('Nulstil turnering',disabled=not confirm,key='pp20_reset_button',use_container_width=True):
+                # Behold navn, spillere og indstillinger; nulstil kun spilledata.
+                d.update(round=0,matches=[],history=[],byes=[],finale=None,finales=None,americano_schedule=[])
+                save();st.session_state.pp20_view='turnering';st.rerun()
+        if st.button('← Tilbage til turneringen',key='pp20_settings_back'):
+            st.session_state.pp20_view='turnering';st.rerun()
+        st.stop()
 
 st.markdown("""<style>
 .pp126-hero{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:165px}
