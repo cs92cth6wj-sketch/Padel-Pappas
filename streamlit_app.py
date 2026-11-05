@@ -3759,9 +3759,48 @@ if not st.session_state.get('tid'):
             try:
                 days = signup_day_rows(include_old=True)
                 if days:
-                    labels = {f'{day["date"]} · {day.get("title","Søndagspadel")}': day['date'] for day in reversed(days)}
-                    selected_label = st.selectbox('Vælg spilledag', list(labels), key='su_selected_day')
-                    selected_day = labels[selected_label]
+                    # Vælg spilledag med ægte knapper: ingen BaseWeb-selectbox eller mørkt dropdown-tema.
+                    day_options = list(reversed(days))
+                    day_dates = [str(day['date']) for day in day_options]
+                    if st.session_state.get('su_selected_day_button') not in day_dates:
+                        st.session_state['su_selected_day_button'] = day_dates[0]
+                    st.markdown('<div class="pp-choice-label">Vælg spilledag</div>', unsafe_allow_html=True)
+                    st.markdown("""<style>
+                    .stApp [class*="st-key-pp193_day_"] button {
+                        min-height:58px!important;border-radius:12px!important;
+                        padding:9px 12px!important;white-space:normal!important;
+                        font-weight:700!important;line-height:1.35!important;
+                    }
+                    .stApp [class*="st-key-pp193_day_"] button[kind="primary"],
+                    .stApp [class*="st-key-pp193_day_"] button[data-testid="stBaseButton-primary"] {
+                        background:#005c43!important;border:1px solid #005c43!important;color:#fff!important;
+                    }
+                    .stApp [class*="st-key-pp193_day_"] button[kind="secondary"],
+                    .stApp [class*="st-key-pp193_day_"] button[data-testid="stBaseButton-secondary"] {
+                        background:#edf8f3!important;border:1px solid #a8d4c5!important;color:#005c43!important;
+                    }
+                    .stApp [class*="st-key-pp193_day_"] button[kind="primary"] *,
+                    .stApp [class*="st-key-pp193_day_"] button[data-testid="stBaseButton-primary"] * {
+                        color:#fff!important;-webkit-text-fill-color:#fff!important;
+                    }
+                    .stApp [class*="st-key-pp193_day_"] button[kind="secondary"] *,
+                    .stApp [class*="st-key-pp193_day_"] button[data-testid="stBaseButton-secondary"] * {
+                        color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+                    }
+                    </style>""", unsafe_allow_html=True)
+                    day_cols = st.columns(2, gap='small')
+                    for day_idx, day in enumerate(day_options):
+                        day_date = str(day['date'])
+                        day_title = str(day.get('title') or 'Søndagspadel')
+                        is_selected = st.session_state['su_selected_day_button'] == day_date
+                        with day_cols[day_idx % 2]:
+                            if st.button(('✓  ' if is_selected else '') + day_date + ' · ' + day_title,
+                                         key=f'pp193_day_{day_idx}',
+                                         type='primary' if is_selected else 'secondary',
+                                         use_container_width=True):
+                                st.session_state['su_selected_day_button'] = day_date
+                                st.rerun()
+                    selected_day = st.session_state['su_selected_day_button']
                     imported_players = [r['name'] for r in signup_roster(selected_day)]
                     st.markdown(f'<div class="pp192-player-heading"><strong>{len(imported_players)} tilmeldte spillere</strong><span>Indlæses automatisk i turneringen</span></div>', unsafe_allow_html=True)
                     if imported_players:
