@@ -3717,6 +3717,41 @@ if not st.session_state.get('tid'):
             color:#005c43!important;-webkit-text-fill-color:#005c43!important;
         }
         </style>""", unsafe_allow_html=True)
+        # Ensartet lyst design for spilledagsvælgeren og den importerede spilleroversigt.
+        st.markdown("""<style>
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] > div,
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] [data-baseweb="select"] > div,
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] [role="combobox"],
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] input{
+            background:#fff!important;background-color:#fff!important;
+            color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+            border-color:#b7d9ce!important;
+        }
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] *{
+            color:#005c43!important;-webkit-text-fill-color:#005c43!important;
+        }
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] svg{
+            fill:#005c43!important;color:#005c43!important;
+        }
+        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] > div{
+            border:1px solid #b7d9ce!important;border-radius:12px!important;
+            box-shadow:none!important;min-height:48px!important;
+        }
+        .pp192-player-heading{display:flex;justify-content:space-between;align-items:center;
+            flex-wrap:wrap;gap:5px 14px;margin:15px 0 10px;color:#005c43}
+        .pp192-player-heading strong{font-size:1rem;font-weight:750}
+        .pp192-player-heading span{font-size:.83rem;color:#64847b}
+        .pp192-player-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+            margin:0 0 18px}
+        .pp192-player-chip{display:flex;align-items:center;gap:9px;min-width:0;
+            background:#edf8f3;border:1px solid #c4e1d6;border-radius:11px;
+            padding:10px 12px;color:#005c43;font-size:.92rem;font-weight:600;
+            overflow-wrap:anywhere}
+        .pp192-player-check{display:inline-flex;align-items:center;justify-content:center;
+            flex:0 0 22px;width:22px;height:22px;border-radius:50%;
+            background:#005c43;color:#fff;font-size:13px;font-weight:800}
+        @media(max-width:560px){.pp192-player-grid{grid-template-columns:1fr}}
+        </style>""",unsafe_allow_html=True)
         signup_source = pp_choice('Hvor kommer spillerne fra?', ['Skriv spillere manuelt', 'Hent fra spilledag'], 'pp_choice_source')
         selected_day = None
         imported_players = []
@@ -3728,9 +3763,12 @@ if not st.session_state.get('tid'):
                     selected_label = st.selectbox('Vælg spilledag', list(labels), key='su_selected_day')
                     selected_day = labels[selected_label]
                     imported_players = [r['name'] for r in signup_roster(selected_day)]
-                    st.caption(f'{len(imported_players)} tilmeldte bliver indlæst.')
+                    st.markdown(f'<div class="pp192-player-heading"><strong>{len(imported_players)} tilmeldte spillere</strong><span>Indlæses automatisk i turneringen</span></div>', unsafe_allow_html=True)
                     if imported_players:
-                        st.write(', '.join(imported_players))
+                        chips = ''.join(f'<div class="pp192-player-chip"><span class="pp192-player-check">✓</span><span>{html.escape(str(name))}</span></div>' for name in imported_players)
+                        st.markdown(f'<div class="pp192-player-grid">{chips}</div>', unsafe_allow_html=True)
+                    else:
+                        st.info('Der er endnu ingen tilmeldte spillere på denne spilledag.')
                 else:
                     st.info('Ingen spilledage oprettet endnu. Brug Tilmelding på forsiden.')
             except requests.RequestException as exc:
