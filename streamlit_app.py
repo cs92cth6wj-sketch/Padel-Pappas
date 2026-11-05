@@ -3645,76 +3645,39 @@ if not st.session_state.get('tid'):
         </style>""",unsafe_allow_html=True)
         st.subheader('Opret ny turnering')
         st.markdown('<div class="pp166-section">1 · Spillere</div>',unsafe_allow_html=True)
-        # Version 18.7: to ens, vandrette valgknapper uden synlige radioprikker.
-        # De oprindelige st.radio widgets og deres værdier er uændrede.
-        st.markdown("""
-        <style>
-        /* Ensartet 2-kolonne-layout i oprettelsesformularen. */
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"]{
-          display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
-          gap:10px!important;width:100%!important;align-items:stretch!important;
+        # Ægte Streamlit-knapper i stedet for radio-widgets og skrøbelig CSS.
+        def pp_choice(label, options, key, default=None, help_text=None):
+            if key not in st.session_state or st.session_state[key] not in options:
+                st.session_state[key] = default if default in options else options[0]
+            st.markdown(f'<div class="pp-choice-label">{html.escape(label)}</div>', unsafe_allow_html=True)
+            if help_text:
+                st.caption(help_text)
+            cols = st.columns(len(options), gap="small")
+            for col, option in zip(cols, options):
+                with col:
+                    chosen = st.session_state[key] == option
+                    if st.button(option, key=f"{key}_{options.index(option)}", type="primary" if chosen else "secondary", use_container_width=True):
+                        st.session_state[key] = option
+                        st.rerun()
+            return st.session_state[key]
+
+        st.markdown("""<style>
+        .pp-choice-label{font-weight:600;color:#005c43;margin:15px 0 7px}
+        .stApp [class*="st-key-pp_choice_"] button[kind="primary"],
+        .stApp [class*="st-key-pp_choice_"] button[data-testid="stBaseButton-primary"]{
+            background:#005c43!important;color:white!important;border:1px solid #005c43!important;
         }
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] > *{
-          min-width:0!important;width:100%!important;max-width:none!important;
-          margin:0!important;flex:unset!important;align-self:stretch!important;
+        .stApp [class*="st-key-pp_choice_"] button[kind="secondary"],
+        .stApp [class*="st-key-pp_choice_"] button[data-testid="stBaseButton-secondary"]{
+            background:#edf8f3!important;color:#005c43!important;border:1px solid #a8d4c5!important;
         }
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label{
-          position:relative!important;display:flex!important;align-items:center!important;
-          justify-content:center!important;min-width:0!important;width:100%!important;
-          min-height:54px!important;box-sizing:border-box!important;padding:11px 8px!important;
-          border:1.5px solid #a8d4c5!important;border-radius:14px!important;
-          background:#edf8f3!important;color:#005c43!important;
-          cursor:pointer!important;text-align:center!important;gap:0!important;
-          box-shadow:none!important;
-        }
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked),
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label:has([aria-checked="true"]){
-          background:#005c43!important;border-color:#005c43!important;
-          color:#fff!important;box-shadow:0 5px 14px rgba(0,92,67,.10)!important;
-        }
-        /* Gem hele den grafiske radiomarkør – men bevar input til tastatur og skærmlæser. */
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label input[type="radio"]{
-          position:absolute!important;opacity:0!important;width:1px!important;height:1px!important;
-        }
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label [data-baseweb="radio"]{
-          display:none!important;
-        }
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label > div:first-child:not([data-testid="stMarkdownContainer"]){
-          display:none!important;
-        }
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"],
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"] p,
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label p{
-          color:inherit!important;-webkit-text-fill-color:currentColor!important;
-          font-size:14px!important;font-weight:700!important;line-height:1.3!important;
-          text-align:center!important;margin:0!important;white-space:normal!important;
-        }
-        .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label:focus-within{
-          outline:2px solid #005c43!important;outline-offset:3px!important;
-        }
-        /* Spilledagsvælger: fjern gamle sorte baggrunde og brug samme lyse design. */
-        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"],
-        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] > div,
-        .stApp [class*="st-key-su_selected_day"] [role="combobox"],
-        .stApp [class*="st-key-su_selected_day"] [aria-haspopup="listbox"]{
-          background:#fff!important;background-color:#fff!important;
-          color:#005c43!important;-webkit-text-fill-color:#005c43!important;
-          border-color:#bfd9d0!important;box-shadow:none!important;
-        }
-        .stApp [class*="st-key-su_selected_day"] [data-baseweb="select"] *,
-        .stApp [class*="st-key-su_selected_day"] [role="combobox"] *,
-        .stApp [class*="st-key-su_selected_day"] [aria-haspopup="listbox"] *{
-          color:#005c43!important;-webkit-text-fill-color:#005c43!important;
-        }
-        .stApp [class*="st-key-su_selected_day"] svg{fill:#005c43!important;color:#005c43!important;}
-        @media(max-width:380px){
-          .stApp section.main [data-testid="stRadio"] [role="radiogroup"]{gap:7px!important;}
-          .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label{min-height:58px!important;padding:9px 5px!important;}
-          .stApp section.main [data-testid="stRadio"] [role="radiogroup"] label p{font-size:12px!important;}
-        }
-        </style>
-        """,unsafe_allow_html=True)
-        signup_source = st.radio('Hvor kommer spillerne fra?', ['Skriv spillere manuelt', 'Hent fra spilledag'], horizontal=True, key='su_player_source')
+        .stApp [class*="st-key-pp_choice_"] button{min-height:55px!important;border-radius:13px!important;
+            white-space:normal!important;font-weight:700!important;padding:8px!important}
+        .stApp [class*="st-key-pp_choice_"] button p{color:inherit!important;font-weight:700!important;
+            white-space:normal!important;overflow-wrap:anywhere!important}
+        .stApp [class*="st-key-pp_choice_"] button:hover{border-color:#005c43!important}
+        </style>""", unsafe_allow_html=True)
+        signup_source = pp_choice('Hvor kommer spillerne fra?', ['Skriv spillere manuelt', 'Hent fra spilledag'], 'pp_choice_source')
         selected_day = None
         imported_players = []
         if signup_source == 'Hent fra spilledag':
@@ -3732,9 +3695,9 @@ if not st.session_state.get('tid'):
                     st.info('Ingen spilledage oprettet endnu. Brug Tilmelding på forsiden.')
             except requests.RequestException as exc:
                 st.error(f'Kunne ikke hente tilmeldinger: {exc}')
-        with st.form('pp11_new_form'):
+        with st.container(key='pp19_new_form'):
             st.markdown('<div class="pp166-section">2 · Turneringsoplysninger</div>',unsafe_allow_html=True)
-            id_choice=st.radio('Turnerings-ID',['Vælg selv','Generér automatisk'],horizontal=True)
+            id_choice=pp_choice('Turnerings-ID', ['Vælg selv','Generér automatisk'], 'pp_choice_id')
             chosen_id=st.text_input('Dit turnerings-ID',placeholder='F.eks. PADEL1/11',help='3-32 tegn; kun bogstaver, tal, /, - og _.')
             title=st.text_input('Turneringens navn',value='Søndagspadel')
             if signup_source == 'Hent fra spilledag':
@@ -3742,13 +3705,13 @@ if not st.session_state.get('tid'):
             else:
                 raw=st.text_area('Spillere – én pr. linje',height=170,placeholder='Jan\nTue\nLasse\nMia')
             st.markdown('<div class="pp166-section">3 · Spilleformat</div>',unsafe_allow_html=True)
-            fmt=st.radio('Turneringsform',['Mexicano','Americano'],horizontal=True)
-            partner=st.radio('Makkertype',['Skiftende makker','Fast makker'],horizontal=True,
-                            help='Ved fast makker skrives parrene to og to i spillerlisten.')
-            ranking=st.radio('Hvad afgør placeringen?',['Point først','Sejre først'],horizontal=True)
+            fmt=pp_choice('Turneringsform', ['Mexicano','Americano'], 'pp_choice_format')
+            partner=pp_choice('Makkertype', ['Skiftende makker','Fast makker'], 'pp_choice_partner',
+                              help_text='Ved fast makker skrives parrene to og to i spillerlisten.')
+            ranking=pp_choice('Hvad afgør placeringen?', ['Point først','Sejre først'], 'pp_choice_ranking')
             rounds=st.number_input('Maksimalt antal runder',min_value=1,max_value=40,value=7)
             target=st.number_input('Point pr. kamp (0 = frit)',min_value=0,max_value=100,value=32)
-            create_clicked=st.form_submit_button('Opret turnering',type='primary',use_container_width=True,key='pp166_create_submit')
+            create_clicked=st.button('Opret turnering',type='primary',use_container_width=True,key='pp166_create_submit')
         if create_clicked:
             players=[p.strip() for p in raw.splitlines() if p.strip()]
             tid=normalize_id(chosen_id) if id_choice=='Vælg selv' else 'P-'+secrets.token_hex(5).upper()
